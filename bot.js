@@ -58,8 +58,69 @@ async function checkRegistration(chatId) {
     return data ? data.user_ids.includes(chatId) : false
 }
 
+// Вспомогательные функции
+/**
+ * Отправляет новый комментарий на сервер.
+ * @param {number} id - ID комментария.
+ * @param {string} comment - Текст комментария.
+ */
+async function sendNewComment(id, comment) {
+    const params = {
+        id: id,
+        comment: comment,
+    }
+    return await fetchData(WEB_SERVICE_URL + '/add_comment.php', params)
+}
+
+/**
+ * Изменяет существующий комментарий на сервере.
+ * @param {number} id - ID комментария.
+ * @param {string} newComment - Новый текст комментария.
+ */
+async function updateComment(id, newComment) {
+    const params = {
+        id: id,
+        new_comment: newComment,
+    }
+    return await fetchData(WEB_SERVICE_URL + '/update_comment.php', params)
+}
+
+// Основной код
+async function handleAddComment(ctx) {
+    // Запросить текст комментария от пользователя
+    ctx.reply('Пожалуйста, введите ваш комментарий.')
+    bot.on('text', async (ctx) => {
+        const comment = ctx.message.text
+        const id = 1 // Получите этот ID из нужного источника
+        const response = await sendNewComment(id, comment)
+        if (response && response.success) {
+            ctx.reply('Комментарий успешно добавлен.')
+        } else {
+            ctx.reply('Не удалось добавить комментарий.')
+        }
+    })
+}
+
+async function handleRefComment(ctx) {
+    // Запросить новый текст комментария от пользователя
+    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
+    bot.on('text', async (ctx) => {
+        const newComment = ctx.message.text
+        const id = 1 // Получите этот ID из нужного источника
+        const response = await updateComment(id, newComment)
+        if (response && response.success) {
+            ctx.reply('Комментарий успешно обновлен.')
+        } else {
+            ctx.reply('Не удалось обновить комментарий.')
+        }
+    })
+}
+
 // Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
+
+bot.command('add_comment', handleAddComment)
+bot.command('ref_comment', handleRefComment)
 
 bot.command('start', handleStartCommand)
 bot.command('reg', (ctx) =>
