@@ -1,5 +1,5 @@
 require('dotenv').config() // загрузить переменные среды из файла .env
-const { Telegraf, Markup } = require('telegraf')
+const { Telegraf, Markup, session } = require('telegraf')
 const axios = require('axios')
 
 const messages = require('./messages')
@@ -41,22 +41,41 @@ async function fetchComments() {
 async function notifyUsers() {
     const comments = await fetchComments()
 
-    if (!comments) {
-        return
-    }
+    if (!comments) return
 
-    for (const comment of comments) {
+    const userMessageCounts = {} // Словарь для подсчета числа сообщений для каждого пользователя
+
+    // Сортируем комментарии по user_id, чтобы сообщения от одного пользователя шли подряд
+    const sortedComments = comments.sort((a, b) => a.user_id - b.user_id)
+
+    for (const comment of sortedComments) {
         const chatId = comment.user_id
+
+        if (!userMessageCounts[chatId]) {
+            userMessageCounts[chatId] = 0
+        }
+
+        // Увеличиваем счетчик сообщений для пользователя
+        userMessageCounts[chatId]++
+
+        const totalMessagesForUser = comments.filter(
+            (c) => c.user_id === chatId
+        ).length
         const message =
-            'Пожалуйста, прокомментируйте следующую операцию:\n' +
-            `Название: <code>${comment.name}.</code>\n` +
+            `Пожалуйста, прокомментируйте следующую операцию` +
+            `<code>(${userMessageCounts[chatId]}/${totalMessagesForUser})</code>:\n` +
+            `Название: <code>${comment.name}</code>\n` +
             `Описание: <code>${comment.description}</code>\n` +
             `Дата: <code>${comment.date}</code>`
-        bot.telegram
+
+        await bot.telegram
             .sendMessage(chatId, message, { parse_mode: 'HTML' })
             .catch((err) =>
                 console.error(`Error sending message to chatId ${chatId}:`, err)
             )
+
+        // Добавляем задержку перед следующей отправкой (в миллисекундах)
+        await new Promise((resolve) => setTimeout(resolve, 500))
     }
 }
 
@@ -162,6 +181,69 @@ bot.command('reg', (ctx) =>
 )
 bot.on('text', handleTextCommand)
 
+bot.command('add_comment', async (ctx) => {
+    ctx.session.state = 'ADDING_COMMENT'
+    ctx.reply('Пожалуйста, введите ваш комментарий.')
+})
+
+bot.command('ref_comment', async (ctx) => {
+    ctx.session.state = 'REF_COMMENT'
+    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
+})
+
+bot.command('start', handleStartCommand)
+bot.command('reg', (ctx) =>
+    ctx.reply(messages.enterData, { parse_mode: 'HTML' })
+)
+
+bot.on('text', async (ctx) => {
+    const text = ctx.message.text
+
+    if (ctx.session.state === 'ADDING_COMMENT') {
+        const id = 1
+        const response = await sendNewComment(id, text)
+        if (response && response.success) {
+            ctx.reply(
+                'Комментарий успешно добавлен.',
+                Markup.inlineKeyboard([
+                    Markup.button.callback('Принять', 'approve'),
+                    Markup.button.callback('Отклонить', 'reject'),
+                ])
+            )
+            ctx.session.state = 'AWAITING_APPROVAL'
+        } else {
+            ctx.reply('Не удалось добавить комментарий.')
+        }
+    } else if (ctx.session.state === 'REF_COMMENT') {
+        const id = 1
+        const response = await updateComment(id, text)
+        if (response && response.success) {
+            ctx.reply(
+                'Комментарий успешно обновлен.',
+                Markup.inlineKeyboard([
+                    Markup.button.callback('Принять', 'approve'),
+                    Markup.button.callback('Отклонить', 'reject'),
+                ])
+            )
+            ctx.session.state = 'AWAITING_APPROVAL'
+        } else {
+            ctx.reply('Не удалось обновить комментарий.')
+        }
+    } else {
+        handleTextCommand(ctx)
+    }
+})
+
+bot.action('approve', (ctx) => {
+    ctx.reply('Комментарий принят.')
+    ctx.session.state = null
+})
+
+bot.action('reject', (ctx) => {
+    ctx.reply('Комментарий отклонен.')
+    ctx.session.state = null
+})
+
 bot.launch()
 
-setInterval(notifyUsers, 10000) // каждые 10 секунд
+setInterval(notifyUsers, 10000)
