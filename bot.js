@@ -1,79 +1,70 @@
-require('dotenv').config()
+require('dotenv').config() // загрузить переменные среды из файла .env
 const { Telegraf, Markup } = require('telegraf')
 const axios = require('axios')
 
-const webServiseUrl = 'https://bot.pf-forum.ru/web_servise'
+const messages = require('./messages')
 
-async function checkRegistration(chatId) {
+// Конфигурационные данные
+const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
+const BOT_TOKEN = process.env.BOT_TOKEN
+
+// Вспомогательные функции
+
+/**
+ * Выполняет HTTP GET запрос к указанному URL с заданными параметрами.
+ * @param {string} url - URL-адрес для выполнения GET запроса.
+ * @param {Object} params - Параметры для GET запроса.
+ * @returns {Object|null} Возвращает ответ сервера в форме объекта или null в случае ошибки.
+ */
+async function fetchData(url, params) {
     try {
-        const response = await axios.get(webServiseUrl + '/get_user_id.php')
-        const data = response.data
-        return data.user_ids.includes(chatId)
+        const response = await axios.get(url, { params })
+        return response.data
     } catch (error) {
-        console.error('Ошибка при проверке регистрации:', error)
-        return false
+        console.error(messages.serverError, error)
+        return null
     }
 }
 
+// Основной код
 async function handleStartCommand(ctx) {
     const chatId = ctx.message.chat.id
     const isRegistered = await checkRegistration(chatId)
-
-    const replyMessage = isRegistered
-        ? 'Вы уже зарегистрированы!'
-        : 'Не зарегистрированы. \nВведите данные в формате <code>Иванов И.И.</code>'
-
-    ctx.reply(replyMessage, { parse_mode: 'HTML' })
+    ctx.reply(
+        isRegistered ? messages.alreadyRegistered : messages.notRegistered,
+        { parse_mode: 'HTML' }
+    )
 }
-
+// Обработка текстовой команды
 async function handleTextCommand(ctx) {
-    const text = ctx.message.text
-    const chatId = ctx.message.chat.id
-    const username = ctx.message.from.username
-
+    const { text, chat, from } = ctx.message
     if (/^[А-Яа-я]+\s[А-Яа-я]\.[А-Яа-я]\.$/.test(text)) {
-        // ? Проверяет формат Иванонов И.И.
+        // Проверяет Иванов И.И.
         const params = {
-            id: chatId,
+            id: chat.id,
             fio: text,
-            username: username,
+            username: from.username,
             active: 1,
         }
-        try {
-            const response = await axios.get(
-                'https://bot.pf-forum.ru/web_servise/user.php',
-                { params }
-            )
-            const data = response.data
-            handleApiResponse(ctx, data)
-        } catch (error) {
-            ctx.reply('Ошибка сервера.')
-        }
+        const data = await fetchData(WEB_SERVICE_URL + `/user.php`, params)
+        if (data) handleApiResponse(ctx, data)
     } else {
-        ctx.reply('Формат введенных данных неверный.')
+        ctx.reply(messages.invalidData)
     }
 }
 
-function handleApiResponse(ctx, data) {
-    if (data.status === 'OK') {
-        ctx.reply('Регистрация прошла успешно!')
-    } else {
-        const replyMessage =
-            data.message === 'Record already exists.'
-                ? 'Вы уже зарегистрированы.'
-                : `Ошибка регистрации: ${data.message}`
-        ctx.reply(replyMessage)
-    }
+async function checkRegistration(chatId) {
+    const data = await fetchData(WEB_SERVICE_URL + `/get_user_id.php`)
+    return data ? data.user_ids.includes(chatId) : false
 }
 
-const bot = new Telegraf(process.env.BOT_TOKEN)
+// Инициализация бота
+const bot = new Telegraf(BOT_TOKEN)
 
 bot.command('start', handleStartCommand)
-bot.command('reg', (ctx) => {
-    ctx.reply('Введите данные в формате <code>Иванов И.И.</code>', {
-        parse_mode: 'HTML',
-    })
-})
+bot.command('reg', (ctx) =>
+    ctx.reply(messages.enterData, { parse_mode: 'HTML' })
+)
 bot.on('text', handleTextCommand)
 
 bot.launch()
