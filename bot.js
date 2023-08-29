@@ -1,20 +1,21 @@
-require('dotenv').config()
-const { Telegraf, Markup } = require('telegraf')
+require('dotenv').config() // загрузить переменные среды из файла .env
+const { Telegraf, Markup, session } = require('telegraf')
 const axios = require('axios')
+
 const messages = require('./messages')
-const LocalSession = require('telegraf-session-local')
 
-const BOT_TOKEN = process.env.BOT_TOKEN
+// Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
+const BOT_TOKEN = process.env.BOT_TOKEN
 
-const bot = new Telegraf(BOT_TOKEN)
+// Вспомогательные функции
 
-const localSession = new LocalSession({ database: 'session_db.json' })
-bot.use(localSession.middleware())
-
-// Удаляем следующую строку, так как она заменена telegraf-session-local
-// bot.use(Telegraf.session())
-
+/**
+ * Выполняет HTTP GET запрос к указанному URL с заданными параметрами.
+ * @param {string} url - URL-адрес для выполнения GET запроса.
+ * @param {Object} params - Параметры для GET запроса.
+ * @returns {Object|null} Возвращает ответ сервера в форме объекта или null в случае ошибки.
+ */
 async function fetchData(url, params) {
     try {
         const response = await axios.get(url, { params })
@@ -37,79 +38,212 @@ async function fetchComments() {
     }
 }
 
-bot.start(async (ctx) => {
-    const chatId = ctx.message.chat.id
-    const isRegistered = await fetchData(`${WEB_SERVICE_URL}/get_user_id.php`, {
-        chatId,
-    })
-    ctx.reply(
-        isRegistered ? messages.alreadyRegistered : messages.notRegistered,
-        { parse_mode: 'HTML' }
-    )
-})
-
-bot.command('reg', (ctx) => {
-    ctx.reply(messages.enterData, { parse_mode: 'HTML' })
-})
-
-bot.command('add_comment', (ctx) => {
-    ctx.session.state = 'ADDING_COMMENT'
-    ctx.reply('Пожалуйста, введите ваш комментарий.')
-})
-
-bot.command('ref_comment', (ctx) => {
-    ctx.session.state = 'REF_COMMENT'
-    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
-})
-
-bot.on('text', async (ctx) => {
-    const { text } = ctx.message
-
-    if (ctx.session.state === 'ADDING_COMMENT') {
-        const response = await fetchData(`${WEB_SERVICE_URL}/add_comment.php`, {
-            comment: text,
-        })
-        ctx.reply(
-            response
-                ? 'Комментарий успешно добавлен.'
-                : 'Не удалось добавить комментарий.'
-        )
-        ctx.session.state = null
-    } else if (ctx.session.state === 'REF_COMMENT') {
-        const response = await fetchData(
-            `${WEB_SERVICE_URL}/update_comment.php`,
-            { new_comment: text }
-        )
-        ctx.reply(
-            response
-                ? 'Комментарий успешно обновлен.'
-                : 'Не удалось обновить комментарий.'
-        )
-        ctx.session.state = null
-    } else {
-        // Другая логика обработки текстовых сообщений
-    }
-})
-
-bot.launch()
-
 async function notifyUsers() {
     const comments = await fetchComments()
+
     if (!comments) return
 
-    for (const comment of comments) {
+    const userMessageCounts = {} // Словарь для подсчета числа сообщений для каждого пользователя
+
+    // Сортируем комментарии по user_id, чтобы сообщения от одного пользователя шли подряд
+    const sortedComments = comments.sort((a, b) => a.user_id - b.user_id)
+
+    for (const comment of sortedComments) {
         const chatId = comment.user_id
+
+        if (!userMessageCounts[chatId]) {
+            userMessageCounts[chatId] = 0
+        }
+
+        // Увеличиваем счетчик сообщений для пользователя
+        userMessageCounts[chatId]++
+
+        const totalMessagesForUser = comments.filter(
+            (c) => c.user_id === chatId
+        ).length
         const message =
             `Пожалуйста, прокомментируйте следующую операцию` +
             `<code>(${userMessageCounts[chatId]}/${totalMessagesForUser})</code>:\n` +
             `Название: <code>${comment.name}</code>\n` +
             `Описание: <code>${comment.description}</code>\n` +
             `Дата: <code>${comment.date}</code>`
+
         await bot.telegram
-            .sendMessage(chatId, message)
-            .catch((err) => console.error(`Error: ${err}`))
+            .sendMessage(chatId, message, { parse_mode: 'HTML' })
+            .catch((err) =>
+                console.error(`Error sending message to chatId ${chatId}:`, err)
+            )
+
+        // Добавляем задержку перед следующей отправкой (в миллисекундах)
         await new Promise((resolve) => setTimeout(resolve, 500))
     }
 }
+
+// Основной код
+async function handleStartCommand(ctx) {
+    const chatId = ctx.message.chat.id
+    const isRegistered = await checkRegistration(chatId)
+    ctx.reply(
+        isRegistered ? messages.alreadyRegistered : messages.notRegistered,
+        { parse_mode: 'HTML' }
+    )
+}
+// Обработка текстовой команды
+async function handleTextCommand(ctx) {
+    const { text, chat, from } = ctx.message
+    if (/^[А-Яа-я]+\s[А-Яа-я]\.[А-Яа-я]\.$/.test(text)) {
+        // Проверяет Иванов И.И.
+        const params = {
+            id: chat.id,
+            fio: text,
+            username: from.username,
+            active: 1,
+        }
+        const data = await fetchData(WEB_SERVICE_URL + `/user.php`, params)
+        if (data) handleApiResponse(ctx, data)
+    } else {
+        ctx.reply(messages.invalidData)
+    }
+}
+
+async function checkRegistration(chatId) {
+    const data = await fetchData(WEB_SERVICE_URL + `/get_user_id.php`)
+    return data ? data.user_ids.includes(chatId) : false
+}
+
+// Вспомогательные функции
+/**
+ * Отправляет новый комментарий на сервер.
+ * @param {number} id - ID комментария.
+ * @param {string} comment - Текст комментария.
+ */
+async function sendNewComment(id, comment) {
+    const params = {
+        id: id,
+        comment: comment,
+    }
+    return await fetchData(WEB_SERVICE_URL + '/add_comment.php', params)
+}
+
+/**
+ * Изменяет существующий комментарий на сервере.
+ * @param {number} id - ID комментария.
+ * @param {string} newComment - Новый текст комментария.
+ */
+async function updateComment(id, newComment) {
+    const params = {
+        id: id,
+        new_comment: newComment,
+    }
+    return await fetchData(WEB_SERVICE_URL + '/update_comment.php', params)
+}
+
+// Основной код
+async function handleAddComment(ctx) {
+    // Запросить текст комментария от пользователя
+    ctx.reply('Пожалуйста, введите ваш комментарий.')
+    bot.on('text', async (ctx) => {
+        const comment = ctx.message.text
+        const id = 1 // Получите этот ID из нужного источника
+        const response = await sendNewComment(id, comment)
+        if (response && response.success) {
+            ctx.reply('Комментарий успешно добавлен.')
+        } else {
+            ctx.reply('Не удалось добавить комментарий.')
+        }
+    })
+}
+
+async function handleRefComment(ctx) {
+    // Запросить новый текст комментария от пользователя
+    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
+    bot.on('text', async (ctx) => {
+        const newComment = ctx.message.text
+        const id = 1 // Получите этот ID из нужного источника
+        const response = await updateComment(id, newComment)
+        if (response && response.success) {
+            ctx.reply('Комментарий успешно обновлен.')
+        } else {
+            ctx.reply('Не удалось обновить комментарий.')
+        }
+    })
+}
+
+// Инициализация бота
+const bot = new Telegraf(BOT_TOKEN)
+
+bot.command('add_comment', handleAddComment)
+bot.command('ref_comment', handleRefComment)
+
+bot.command('start', handleStartCommand)
+bot.command('reg', (ctx) =>
+    ctx.reply(messages.enterData, { parse_mode: 'HTML' })
+)
+bot.on('text', handleTextCommand)
+
+bot.command('add_comment', async (ctx) => {
+    ctx.session.state = 'ADDING_COMMENT'
+    ctx.reply('Пожалуйста, введите ваш комментарий.')
+})
+
+bot.command('ref_comment', async (ctx) => {
+    ctx.session.state = 'REF_COMMENT'
+    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
+})
+
+bot.command('start', handleStartCommand)
+bot.command('reg', (ctx) =>
+    ctx.reply(messages.enterData, { parse_mode: 'HTML' })
+)
+
+bot.on('text', async (ctx) => {
+    const text = ctx.message.text
+
+    if (ctx.session.state === 'ADDING_COMMENT') {
+        const id = 1
+        const response = await sendNewComment(id, text)
+        if (response && response.success) {
+            ctx.reply(
+                'Комментарий успешно добавлен.',
+                Markup.inlineKeyboard([
+                    Markup.button.callback('Принять', 'approve'),
+                    Markup.button.callback('Отклонить', 'reject'),
+                ])
+            )
+            ctx.session.state = 'AWAITING_APPROVAL'
+        } else {
+            ctx.reply('Не удалось добавить комментарий.')
+        }
+    } else if (ctx.session.state === 'REF_COMMENT') {
+        const id = 1
+        const response = await updateComment(id, text)
+        if (response && response.success) {
+            ctx.reply(
+                'Комментарий успешно обновлен.',
+                Markup.inlineKeyboard([
+                    Markup.button.callback('Принять', 'approve'),
+                    Markup.button.callback('Отклонить', 'reject'),
+                ])
+            )
+            ctx.session.state = 'AWAITING_APPROVAL'
+        } else {
+            ctx.reply('Не удалось обновить комментарий.')
+        }
+    } else {
+        handleTextCommand(ctx)
+    }
+})
+
+bot.action('approve', (ctx) => {
+    ctx.reply('Комментарий принят.')
+    ctx.session.state = null
+})
+
+bot.action('reject', (ctx) => {
+    ctx.reply('Комментарий отклонен.')
+    ctx.session.state = null
+})
+
+bot.launch()
 
 setInterval(notifyUsers, 10000)
