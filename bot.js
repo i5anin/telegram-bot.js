@@ -1,36 +1,20 @@
-const Telegraf = require("telegraf");
+require("dotenv").config();
+const { Telegraf } = require("telegraf");
 const axios = require("axios");
 
-// Инициализация бота с токеном от Telegram
-const bot = new Telegraf("YOUR_BOT_TOKEN_HERE");
+const bot = new Telegraf(process.env.BOT_TOKEN);
 
-// Обработчик для команды /weather
-bot.command("weather", async (ctx) => {
-  // Получаем имя города из сообщения пользователя
-  const input = ctx.message.text.split(" ");
-  const cityName = input.length > 1 ? input.slice(1).join(" ") : "Moscow";
+bot.start((ctx) => ctx.reply("send me ur geolocation"));
 
-  try {
-    // Получаем погоду с помощью AJAX запроса
-    const response = await axios.get(
-      `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=YOUR_OPENWEATHER_API_KEY_HERE`
+bot.on("message", async (ctx) => {
+  console.log(ctx.message);
+  if (ctx.message.location) {
+    const weatherAPIUrl = `https://openweathermap.org/data/2.5/weather?lat=${ctx.message.location.latitude}&lon=${ctx.message.location.longitude}&appid=${process.env.OWEATHER_APIKEY}`;
+    const response = await axios.get(weatherAPIUrl);
+    ctx.reply(
+      `${response.data.name}: ${response.data.weather[0].main} ${response.data.main.temp} °C`
     );
-    const weatherData = response.data;
-
-    // Формируем и отправляем сообщение
-    const weatherInfo = `
-      Weather in ${cityName}:
-      Temperature: ${(weatherData.main.temp - 273.15).toFixed(2)}°C
-      Condition: ${weatherData.weather[0].description}
-    `;
-
-    ctx.reply(weatherInfo);
-  } catch (error) {
-    // Обработка ошибок
-    console.error(error);
-    ctx.reply("Error fetching weather data.");
   }
 });
 
-// Запуск бота
 bot.launch();
