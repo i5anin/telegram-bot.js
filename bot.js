@@ -26,6 +26,40 @@ async function fetchData(url, params) {
     }
 }
 
+async function fetchComments() {
+    try {
+        const response = await axios.get(
+            `${WEB_SERVICE_URL}/get_sk_comments.php`
+        )
+        return response.data.comments
+    } catch (error) {
+        console.error('Error fetching comments:', error)
+        return null
+    }
+}
+
+async function notifyUsers() {
+    const comments = await fetchComments()
+
+    if (!comments) {
+        return
+    }
+
+    for (const comment of comments) {
+        const chatId = comment.user_id
+        const message =
+            'Пожалуйста, прокомментируйте следующую операцию:\n' +
+            `Название: <code>${comment.name}.</code>\n` +
+            `Описание: <code>${comment.description}</code>\n` +
+            `Дата: <code>${comment.date}</code>`
+        bot.telegram
+            .sendMessage(chatId, message, { parse_mode: 'HTML' })
+            .catch((err) =>
+                console.error(`Error sending message to chatId ${chatId}:`, err)
+            )
+    }
+}
+
 // Основной код
 async function handleStartCommand(ctx) {
     const chatId = ctx.message.chat.id
@@ -129,3 +163,5 @@ bot.command('reg', (ctx) =>
 bot.on('text', handleTextCommand)
 
 bot.launch()
+
+setInterval(notifyUsers, 10000) // каждые 10 секунд
