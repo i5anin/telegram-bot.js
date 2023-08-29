@@ -1,49 +1,46 @@
-require("dotenv").config();
-// const axios = require("axios");
+require('dotenv').config() // Добавлено для загрузки переменных окружения
+const { Telegraf, Markup } = require('telegraf')
+const axios = require('axios')
 
-const { Telegraf, Markup } = require("telegraf");
+const bot = new Telegraf(process.env.BOT_TOKEN)
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+bot.command('reg', (ctx) => {
+    ctx.reply('Введите данные в формате Исанин С.А.')
+})
 
-// Обработка команды /start
-bot.command("start", (ctx) => {
-  // Создание inline-клавиатуры
-  const inlineMessageKeyboard = Markup.inlineKeyboard([
-    [
-      Markup.button.callback("1", "1"),
-      Markup.button.callback("2", "2"),
-      Markup.button.callback("3", "3"),
-    ],
-    [
-      Markup.button.callback("4", "4"),
-      Markup.button.callback("5", "5"),
-      Markup.button.callback("6", "6"),
-    ],
-    [
-      Markup.button.callback("7", "7"),
-      Markup.button.callback("8", "8"),
-      Markup.button.callback("9", "9"),
-    ],
-    [Markup.button.callback("<", "prev"), Markup.button.callback(">", "next")],
-  ]);
+bot.on('text', async (ctx) => {
+    const text = ctx.message.text
+    const chatId = ctx.message.chat.id
+    const username = ctx.message.from.username
 
-  // Отправка сообщения с inline-клавиатурой
-  ctx.reply("Пожалуйста, выберите дату", inlineMessageKeyboard);
-});
+    if (/^[А-Яа-я]+\s[А-Яа-я]\.[А-Яа-я]\.$/.test(text)) {
+        const params = {
+            id: chatId,
+            fio: text,
+            username: username,
+            active: 1,
+        }
 
-// Обработчик кнопок
-bot.action(/.+/, async (ctx) => {
-  const data = ctx.match[0];
-  if (data === "next") {
-    ctx.reply("Обработка кнопки next"); // Обработка кнопки "next"
-    await ctx.answerCbQuery();
-  } else if (data === "prev") {
-    ctx.reply("Обработка кнопки prev"); // Обработка кнопки "prev"
-    await ctx.answerCbQuery();
-  } else {
-    ctx.reply(`Вы выбрали ${data}`); // Обработка числовых кнопок
-    await ctx.answerCbQuery(`You have selected ${data}`);
-  }
-});
+        try {
+            const response = await axios.get(
+                'https://bot.pf-forum.ru/web_servise/user.php',
+                { params }
+            )
+            const data = response.data
 
-bot.launch();
+            if (data.status === 'OK') {
+                ctx.reply('Регистрация прошла успешно!')
+            } else {
+                ctx.reply('Ошибка регистрации: ' + data.message)
+            }
+        } catch (error) {
+            ctx.reply('Ошибка сервера.')
+        }
+    } else {
+        ctx.reply(
+            'Формат введенных данных не верный. \nПожалуйста, попробуйте еще раз.'
+        )
+    }
+})
+
+bot.launch()
