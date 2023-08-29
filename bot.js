@@ -82,7 +82,7 @@ async function updateComment(id, newComment) {
         id: id,
         new_comment: newComment,
     }
-    return await fetchData(WEB_SERVICE_URL + '/update_sk_comment.php', params)
+    return await fetchData(WEB_SERVICE_URL + '/update_comment.php', params)
 }
 
 // Основной код
