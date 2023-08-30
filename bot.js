@@ -51,11 +51,8 @@ async function notifyUsers() {
     for (const comment of sortedComments) {
         const chatId = comment.user_id
 
-        if (!userMessageCounts[chatId]) userMessageCounts[chatId] = 0
-
-        // Увеличиваем счетчик сообщений для пользователя
-        // userMessageCounts[chatId]++
-
+        if (!userMessageCounts[chatId]) userMessageCounts[chatId] = 1
+        // userMessageCounts[chatId]++ // Увеличиваем счетчик сообщений для пользователя
         const totalMessagesForUser = comments.filter(
             (c) => c.user_id === chatId
         ).length
@@ -85,22 +82,6 @@ async function handleStartCommand(ctx) {
         isRegistered ? messages.alreadyRegistered : messages.notRegistered,
         { parse_mode: 'HTML' }
     )
-}
-// Функция для обработки текстовых команд
-async function handleTextCommand(ctx) {
-    const { text, chat, from } = ctx.message
-    if (/^[А-Яа-я]+\s[А-Яа-я]\.[А-Яа-я]\.$/.test(text)) {
-        // Проверяет Иванов И.И.
-        const data = await fetchData(WEB_SERVICE_URL + '/user.php', {
-            id: chat.id,
-            fio: text,
-            username: from.username,
-            active: 1,
-        })
-        if (data) handleApiResponse(ctx, data)
-    } else {
-        ctx.reply(messages.invalidData)
-    }
 }
 
 // Функция для проверки регистрации пользователя на Сервере
@@ -165,7 +146,7 @@ let db = new sqlite3.Database('./state.db', (err) => {
     if (err) {
         console.error('Could not connect to database', err)
     } else {
-        console.log('Connected to database')
+        console.log('Подключение к базе данных')
     }
 })
 
@@ -198,47 +179,29 @@ bot.command('add_comment', (ctx) => {
     ctx.reply('Пожалуйста, напишите свой комментарий.')
 })
 
-bot.command('ref_comment', (ctx) => {
-    let chatId = ctx.chat.id.toString()
-    db.run(
-        `INSERT OR REPLACE INTO user_session (chat_id, state) VALUES (?, ?)`,
-        [chatId, 'WAITING_FOR_NEW_COMMENT'],
-        (err) => {
-            if (err) console.error('Could not insert into table', err)
-        }
-    )
-    ctx.reply('Пожалуйста, напишите свой комментарий.')
-})
-
-bot.on('text', (ctx) => {
-    let chatId = ctx.chat.id.toString()
-    db.get(
-        `SELECT state FROM user_session WHERE chat_id = ?`,
-        [chatId],
-        (err, row) => {
-            if (err) {
-                console.error('Could not read from table', err) // Не удалось прочитать из таблицы
-                return
-            }
-
-            let state = row ? row.state : null
-            if (state === 'WAITING_FOR_COMMENT') {
-                // Обработка добавления комментария
-                ctx.reply('Ваш комментарий добавлен.')
-            } else if (state === 'WAITING_FOR_NEW_COMMENT') {
-                // Обработка обновления комментария
-                ctx.reply('Ваш комментарий был обновлен.')
-            }
-        }
-    )
-})
+// Функция для обработки текстовых команд
+async function handleTextCommand(ctx) {
+    const { text, chat, from } = ctx.message
+    if (/^[А-Яа-я]+\s[А-Яа-я]\.[А-Яа-я]\.$/.test(text)) {
+        // Проверяет Иванов И.И.
+        const data = await fetchData(WEB_SERVICE_URL + '/user.php', {
+            id: chat.id,
+            fio: text,
+            username: from.username,
+            active: 1,
+        })
+        if (data) handleApiResponse(ctx, data)
+    } else {
+        ctx.reply(messages.invalidData)
+    }
+}
 
 bot.command('add_comment', handleAddComment)
 bot.command('ref_comment', handleRefComment)
+bot.command('new_comment', notifyUsers)
 bot.command('start', handleStartCommand)
 bot.command('reg', handleRegComment)
+
 bot.on('text', handleTextCommand)
 
 bot.launch()
-
-// setInterval(notifyUsers, 10000)
