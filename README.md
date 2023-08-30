@@ -1,11 +1,9 @@
-# weather-telegram-bot
+# pfforum bot
 
-Simple Telegram bot, that shows the weather by your geolocation
-
-How to start:
-- clone it
-- run ``npm i``
-- add ur apikey and token to ``.env-example``
-- rename ``.env-example`` to ``.env``
-- run ``npm start``
-- enjoy!
+```
+  "axios": "^1.5.0",
+  "dotenv": "^16.0.3",
+  "sqlite3": "^5.1.6",
+  "telegraf": "^4.11.2",
+  "telegraf-session-local": "^2.1.1"
+```
