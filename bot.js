@@ -40,25 +40,18 @@ async function fetchComments() {
 // Функция для уведомления пользователей о комментариях
 async function notifyUsers() {
     const comments = await fetchComments()
-
     if (!comments) return
-
     const userMessageCounts = {} // Словарь для подсчета числа сообщений для каждого пользователя
-
-    // Сортируем комментарии по user_id, чтобы сообщения от одного пользователя шли подряд
-    const sortedComments = comments.sort((a, b) => a.user_id - b.user_id)
+    const sortedComments = comments.sort((a, b) => a.user_id - b.user_id) // Сортируем комментарии по user_id, чтобы сообщения от одного пользователя шли подряд
 
     for (const comment of sortedComments) {
         const chatId = comment.user_id
-
         if (!userMessageCounts[chatId]) userMessageCounts[chatId] = 0
-
-        // Увеличиваем счетчик сообщений для пользователя
-        // userMessageCounts[chatId]++
-
+        userMessageCounts[chatId]++ // Увеличиваем счетчик сообщений для пользователя
         const totalMessagesForUser = comments.filter(
             (c) => c.user_id === chatId
         ).length
+        console.log(userMessageCounts[chatId])
         const message =
             `Пожалуйста, прокомментируйте следующую операцию:\n` +
             `<code>(${userMessageCounts[
@@ -73,7 +66,7 @@ async function notifyUsers() {
             .catch((err) => console.error(errorMsg + chatId, err))
 
         // Добавляем задержку перед следующей отправкой (в миллисекундах)
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 5000))
     }
 }
 
@@ -118,12 +111,12 @@ async function sendNewComment(id, comment) {
 }
 
 // Функция для обновления комментария
-async function updateComment(id, newComment) {
-    return await fetchData(WEB_SERVICE_URL + '/update_comment.php', {
-        id: id,
-        new_comment: newComment,
-    })
-}
+// async function updateComment(id, newComment) {
+//     return await fetchData(WEB_SERVICE_URL + '/update_comment.php', {
+//         id: id,
+//         new_comment: newComment,
+//     })
+// }
 
 // Функция для добавления комментария
 async function handleAddComment(ctx) {
@@ -141,21 +134,21 @@ async function handleAddComment(ctx) {
     })
 }
 
-// Функция для обновления комментария
-async function handleRefComment(ctx) {
-    // Запросить новый текст комментария от пользователя
-    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
-    bot.on('text', async (ctx) => {
-        const newComment = ctx.message.text
-        const id = 1 // Получите этот ID из нужного источника
-        const response = await updateComment(id, newComment)
-        if (response && response.success) {
-            ctx.reply('Комментарий успешно обновлен.')
-        } else {
-            ctx.reply('Не удалось обновить комментарий.')
-        }
-    })
-}
+//  Функция для обновления комментария
+// async function handleRefComment(ctx) {
+//     Запросить новый текст комментария от пользователя
+//     ctx.reply('Пожалуйста, введите ваш новый комментарий.')
+//     bot.on('text', async (ctx) => {
+//         const newComment = ctx.message.text
+//         const id = 1 // Получите этот ID из нужного источника
+//         const response = await updateComment(id, newComment)
+//         if (response && response.success) {
+//             ctx.reply('Комментарий успешно обновлен.')
+//         } else {
+//             ctx.reply('Не удалось обновить комментарий.')
+//         }
+//     })
+// }
 
 async function handleRegComment(ctx) {
     ctx.reply(messages.enterData, { parse_mode: 'HTML' })
@@ -163,16 +156,16 @@ async function handleRegComment(ctx) {
 
 let db = new sqlite3.Database('./state.db', (err) => {
     if (err) {
-        console.error('Could not connect to database', err)
+        console.error('Не удалось подключиться к базе данных', err)
     } else {
-        console.log('Connected to database')
+        console.log('Подключение к базе данных')
     }
 })
 
 db.run(
     'CREATE TABLE IF NOT EXISTS user_session (chat_id TEXT, state TEXT)',
     (err) => {
-        if (err) console.error('Could not create table', err)
+        if (err) console.error('Не удалось создать таблицу', err)
     }
 )
 
@@ -190,7 +183,7 @@ bot.command('add_comment', (ctx) => {
         [chatId, 'WAITING_FOR_COMMENT'], // Передаем ID чата и состояние 'WAITING_FOR_COMMENT' как параметры запроса
         (err) => {
             // Обработка ошибок: если произошла ошибка, выводим ее в консоль
-            if (err) console.error('Could not insert into table', err)
+            if (err) console.error('Не удалось вставить в таблицу', err)
         }
     )
 
@@ -204,7 +197,7 @@ bot.command('ref_comment', (ctx) => {
         `INSERT OR REPLACE INTO user_session (chat_id, state) VALUES (?, ?)`,
         [chatId, 'WAITING_FOR_NEW_COMMENT'],
         (err) => {
-            if (err) console.error('Could not insert into table', err)
+            if (err) console.error('Не удалось вставить в таблицу', err)
         }
     )
     ctx.reply('Пожалуйста, напишите свой комментарий.')
@@ -217,7 +210,7 @@ bot.on('text', (ctx) => {
         [chatId],
         (err, row) => {
             if (err) {
-                console.error('Could not read from table', err) // Не удалось прочитать из таблицы
+                console.error('Не удалось прочитать из таблицы', err) // Не удалось прочитать из таблицы
                 return
             }
 
@@ -234,11 +227,11 @@ bot.on('text', (ctx) => {
 })
 
 bot.command('add_comment', handleAddComment)
-bot.command('ref_comment', handleRefComment)
+// bot.command('ref_comment', handleRefComment)
 bot.command('start', handleStartCommand)
 bot.command('reg', handleRegComment)
 bot.on('text', handleTextCommand)
 
 bot.launch()
 
-// setInterval(notifyUsers, 10000)
+setInterval(notifyUsers, 100 * 100)
