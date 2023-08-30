@@ -1,5 +1,6 @@
 require('dotenv').config() // загрузить переменные среды из файла .env
 const { Telegraf, Markup, session } = require('telegraf')
+const sqlite3 = require('sqlite3').verbose()
 const axios = require('axios')
 
 const messages = require('./messages')
@@ -8,13 +9,15 @@ const messages = require('./messages')
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
 const BOT_TOKEN = process.env.BOT_TOKEN
 
+// Инициализация бота
+const bot = new Telegraf(BOT_TOKEN)
+
 // Вспомогательные функции
 
 // Функция для выполнения GET-запросов
 async function fetchData(url, params) {
     try {
-        const response = await axios.get(url, { params })
-        return response.data
+        return (await axios.get(url, { params })).data
     } catch (error) {
         console.error(messages.serverError, error)
         return null
@@ -25,7 +28,7 @@ async function fetchData(url, params) {
 async function fetchComments() {
     try {
         const response = await axios.get(
-            `${WEB_SERVICE_URL}/get_sk_comments.php`
+            WEB_SERVICE_URL + '/get_sk_comments.php'
         )
         return response.data.comments
     } catch (error) {
@@ -48,28 +51,26 @@ async function notifyUsers() {
     for (const comment of sortedComments) {
         const chatId = comment.user_id
 
-        if (!userMessageCounts[chatId]) {
-            userMessageCounts[chatId] = 0
-        }
+        if (!userMessageCounts[chatId]) userMessageCounts[chatId] = 0
 
         // Увеличиваем счетчик сообщений для пользователя
-        userMessageCounts[chatId]++
+        // userMessageCounts[chatId]++
 
         const totalMessagesForUser = comments.filter(
             (c) => c.user_id === chatId
         ).length
         const message =
             `Пожалуйста, прокомментируйте следующую операцию:\n` +
-            `<code>(${userMessageCounts[chatId]}/${totalMessagesForUser})</code>\n` +
+            `<code>(${userMessageCounts[
+                chatId
+            ]++}/${totalMessagesForUser})</code>\n` +
             `Название: <code>${comment.name}</code>\n` +
             `Описание: <code>${comment.description}</code>\n` +
             `Дата: <code>${comment.date}</code>`
-
+        errorMsg = 'Error sending message to chatId'
         await bot.telegram
             .sendMessage(chatId, message, { parse_mode: 'HTML' })
-            .catch((err) =>
-                console.error(`Error sending message to chatId ${chatId}:`, err)
-            )
+            .catch((err) => console.error(errorMsg + chatId, err))
 
         // Добавляем задержку перед следующей отправкой (в миллисекундах)
         await new Promise((resolve) => setTimeout(resolve, 500))
@@ -90,41 +91,38 @@ async function handleTextCommand(ctx) {
     const { text, chat, from } = ctx.message
     if (/^[А-Яа-я]+\s[А-Яа-я]\.[А-Яа-я]\.$/.test(text)) {
         // Проверяет Иванов И.И.
-        const params = {
+        const data = await fetchData(WEB_SERVICE_URL + '/user.php', {
             id: chat.id,
             fio: text,
             username: from.username,
             active: 1,
-        }
-        const data = await fetchData(WEB_SERVICE_URL + `/user.php`, params)
+        })
         if (data) handleApiResponse(ctx, data)
     } else {
         ctx.reply(messages.invalidData)
     }
 }
 
-// Функция для проверки регистрации пользователя
+// Функция для проверки регистрации пользователя на Сервере
 async function checkRegistration(chatId) {
-    const data = await fetchData(WEB_SERVICE_URL + `/get_user_id.php`)
+    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php')
     return data ? data.user_ids.includes(chatId) : false
 }
 
-// Функция для отправки нового комментария
+// Функция для отправки нового комментария на Сервер
 async function sendNewComment(id, comment) {
-    const params = {
+    return await fetchData(WEB_SERVICE_URL + '/add_comment.php', {
         id: id,
         comment: comment,
-    }
-    return await fetchData(WEB_SERVICE_URL + '/add_comment.php', params)
+    })
 }
 
 // Функция для обновления комментария
 async function updateComment(id, newComment) {
-    const params = {
+    return await fetchData(WEB_SERVICE_URL + '/update_comment.php', {
         id: id,
         new_comment: newComment,
-    }
-    return await fetchData(WEB_SERVICE_URL + '/update_comment.php', params)
+    })
 }
 
 // Функция для добавления комментария
@@ -163,26 +161,84 @@ async function handleRegComment(ctx) {
     ctx.reply(messages.enterData, { parse_mode: 'HTML' })
 }
 
-// Инициализация бота
-const bot = new Telegraf(BOT_TOKEN)
+let db = new sqlite3.Database('./state.db', (err) => {
+    if (err) {
+        console.error('Could not connect to database', err)
+    } else {
+        console.log('Connected to database')
+    }
+})
+
+db.run(
+    'CREATE TABLE IF NOT EXISTS user_session (chat_id TEXT, state TEXT)',
+    (err) => {
+        if (err) console.error('Could not create table', err)
+    }
+)
+
+// ! -------------------------------- command --------------------------------
+
+// Определяем команду 'add_comment' для бота
+bot.command('add_comment', (ctx) => {
+    // Преобразуем ID чата в строку
+    let chatId = ctx.chat.id.toString()
+
+    // Выполняем SQL-запрос для вставки или обновления данных в таблице 'user_session'
+    // Мы используем 'INSERT OR REPLACE', чтобы либо вставить новую запись, либо заменить существующую
+    db.run(
+        `INSERT OR REPLACE INTO user_session (chat_id, state) VALUES (?, ?)`,
+        [chatId, 'WAITING_FOR_COMMENT'], // Передаем ID чата и состояние 'WAITING_FOR_COMMENT' как параметры запроса
+        (err) => {
+            // Обработка ошибок: если произошла ошибка, выводим ее в консоль
+            if (err) console.error('Could not insert into table', err)
+        }
+    )
+
+    // Отправляем пользователю сообщение, просим его написать комментарий
+    ctx.reply('Пожалуйста, напишите свой комментарий.')
+})
+
+bot.command('ref_comment', (ctx) => {
+    let chatId = ctx.chat.id.toString()
+    db.run(
+        `INSERT OR REPLACE INTO user_session (chat_id, state) VALUES (?, ?)`,
+        [chatId, 'WAITING_FOR_NEW_COMMENT'],
+        (err) => {
+            if (err) console.error('Could not insert into table', err)
+        }
+    )
+    ctx.reply('Пожалуйста, напишите свой комментарий.')
+})
+
+bot.on('text', (ctx) => {
+    let chatId = ctx.chat.id.toString()
+    db.get(
+        `SELECT state FROM user_session WHERE chat_id = ?`,
+        [chatId],
+        (err, row) => {
+            if (err) {
+                console.error('Could not read from table', err) // Не удалось прочитать из таблицы
+                return
+            }
+
+            let state = row ? row.state : null
+            if (state === 'WAITING_FOR_COMMENT') {
+                // Обработка добавления комментария
+                ctx.reply('Ваш комментарий добавлен.')
+            } else if (state === 'WAITING_FOR_NEW_COMMENT') {
+                // Обработка обновления комментария
+                ctx.reply('Ваш комментарий был обновлен.')
+            }
+        }
+    )
+})
 
 bot.command('add_comment', handleAddComment)
 bot.command('ref_comment', handleRefComment)
 bot.command('start', handleStartCommand)
 bot.command('reg', handleRegComment)
-
 bot.on('text', handleTextCommand)
-
-// bot.action('approve', (ctx) => {
-//     ctx.reply('Комментарий принят.')
-//     ctx.session.state = null
-// })
-
-// bot.action('reject', (ctx) => {
-//     ctx.reply('Комментарий отклонен.')
-//     ctx.session.state = null
-// })
 
 bot.launch()
 
-setInterval(notifyUsers, 10000)
+// setInterval(notifyUsers, 10000)
