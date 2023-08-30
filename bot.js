@@ -159,27 +159,29 @@ async function handleRefComment(ctx) {
     })
 }
 
+async function handleRegComment(ctx) {
+    ctx.reply(messages.enterData, { parse_mode: 'HTML' })
+}
+
 // Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
 
 bot.command('add_comment', handleAddComment)
 bot.command('ref_comment', handleRefComment)
-
 bot.command('start', handleStartCommand)
-bot.command('reg', (ctx) =>
-    ctx.reply(messages.enterData, { parse_mode: 'HTML' })
-)
+bot.command('reg', handleRegComment)
+
 bot.on('text', handleTextCommand)
 
-bot.action('approve', (ctx) => {
-    ctx.reply('Комментарий принят.')
-    ctx.session.state = null
-})
+// bot.action('approve', (ctx) => {
+//     ctx.reply('Комментарий принят.')
+//     ctx.session.state = null
+// })
 
-bot.action('reject', (ctx) => {
-    ctx.reply('Комментарий отклонен.')
-    ctx.session.state = null
-})
+// bot.action('reject', (ctx) => {
+//     ctx.reply('Комментарий отклонен.')
+//     ctx.session.state = null
+// })
 
 bot.launch()
 
