@@ -166,6 +166,8 @@ async function handleRegComment(ctx) {
 // Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
 
+bot.use(session());  // Добавляем middleware для сессии
+
 bot.command('add_comment', handleAddComment)
 bot.command('ref_comment', handleRefComment)
 bot.command('start', handleStartCommand)
@@ -173,15 +175,28 @@ bot.command('reg', handleRegComment)
 
 bot.on('text', handleTextCommand)
 
-// bot.action('approve', (ctx) => {
-//     ctx.reply('Комментарий принят.')
-//     ctx.session.state = null
-// })
+bot.command('add_comment', async (ctx) => {
+    ctx.reply('Пожалуйста, введите ваш комментарий.')
+    ctx.session.state = 'WAITING_FOR_COMMENT'
+})
 
-// bot.action('reject', (ctx) => {
-//     ctx.reply('Комментарий отклонен.')
-//     ctx.session.state = null
-// })
+bot.command('ref_comment', async (ctx) => {
+    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
+    ctx.session.state = 'WAITING_FOR_NEW_COMMENT'
+})
+
+bot.on('text', async (ctx) => {
+    if (ctx.session.state === 'WAITING_FOR_COMMENT') {
+        const comment = ctx.message.text
+        // ... ваш код для добавления комментария ...
+        ctx.session.state = null
+    } else if (ctx.session.state === 'WAITING_FOR_NEW_COMMENT') {
+        const newComment = ctx.message.text
+        // ... ваш код для обновления комментария ...
+        ctx.session.state = null
+    }
+    // ... остальная логика ...
+})
 
 bot.launch()
 
