@@ -1,20 +1,22 @@
 require('dotenv').config() // загрузить переменные среды из файла .env
 const { Telegraf, Markup, session } = require('telegraf')
 const axios = require('axios')
-
 const messages = require('./messages')
 
 // Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
 const BOT_TOKEN = process.env.BOT_TOKEN
 
-// Вспомогательные функции
+// Инициализация bot
+const bot = new Telegraf(BOT_TOKEN)
+
+// Теперь можно использовать bot
+bot.use(session())
 
 // Функция для выполнения GET-запросов
 async function fetchData(url, params) {
     try {
-        const response = await axios.get(url, { params })
-        return response.data
+        return (await axios.get(url, { params })).data
     } catch (error) {
         console.error(messages.serverError, error)
         return null
@@ -34,36 +36,31 @@ async function fetchComments() {
     }
 }
 
-// Функция для уведомления пользователей о комментариях
+// Добавлено состояние сессии
+// bot.use(session())
+
 async function notifyUsers() {
     const comments = await fetchComments()
-
     if (!comments) return
 
-    const userMessageCounts = {} // Словарь для подсчета числа сообщений для каждого пользователя
-
-    // Сортируем комментарии по user_id, чтобы сообщения от одного пользователя шли подряд
-    const sortedComments = comments.sort((a, b) => a.user_id - b.user_id)
-
-    for (const comment of sortedComments) {
+    for (const comment of comments) {
         const chatId = comment.user_id
 
-        if (!userMessageCounts[chatId]) {
-            userMessageCounts[chatId] = 0
+        // Проверяем, отправляли ли мы уже сообщение этому пользователю
+        if (!bot.session[chatId]) {
+            bot.session[chatId] = { waitingForReply: false }
         }
 
-        // Увеличиваем счетчик сообщений для пользователя
-        userMessageCounts[chatId]++
+        // Если ждем ответа от пользователя, пропускаем итерацию
+        if (bot.session[chatId].waitingForReply) {
+            continue
+        }
 
-        const totalMessagesForUser = comments.filter(
-            (c) => c.user_id === chatId
-        ).length
-        const message =
-            `Пожалуйста, прокомментируйте следующую операцию` +
-            `<code>(${userMessageCounts[chatId]}/${totalMessagesForUser})</code>:\n` +
-            `Название: <code>${comment.name}</code>\n` +
-            `Описание: <code>${comment.description}</code>\n` +
-            `Дата: <code>${comment.date}</code>`
+        const message = // формирование сообщения
+            `Пожалуйста, прокомментируйте следующую операцию:\n` +
+            `Название: ${comment.name}\n` +
+            `Описание: ${comment.description}\n` +
+            `Дата: ${comment.date}`
 
         await bot.telegram
             .sendMessage(chatId, message, { parse_mode: 'HTML' })
@@ -71,15 +68,28 @@ async function notifyUsers() {
                 console.error(`Error sending message to chatId ${chatId}:`, err)
             )
 
-        // Добавляем задержку перед следующей отправкой (в миллисекундах)
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        // Отмечаем, что ждем ответа от пользователя
+        bot.session[chatId].waitingForReply = true
     }
 }
 
+// Обработчик для текстовых сообщений
+bot.on('text', async (ctx) => {
+    const chatId = ctx.message.chat.id
+
+    // Если получили ответ от пользователя, снимаем флаг ожидания и обрабатываем ответ
+    if (bot.session[chatId] && bot.session[chatId].waitingForReply) {
+        const userReply = ctx.message.text
+        // Обработка userReply
+        console.log('User replied:', userReply)
+        bot.session[chatId].waitingForReply = false
+    }
+})
+
 // Функция для обработки команды /start
 async function handleStartCommand(ctx) {
-    const chatId = ctx.message.chat.id
-    const isRegistered = await checkRegistration(chatId)
+    const userId = ctx.message.chat.id
+    const isRegistered = await checkRegistration(userId)
     ctx.reply(
         isRegistered ? messages.alreadyRegistered : messages.notRegistered,
         { parse_mode: 'HTML' }
@@ -96,7 +106,7 @@ async function handleTextCommand(ctx) {
             username: from.username,
             active: 1,
         }
-        const data = await fetchData(WEB_SERVICE_URL + `/user.php`, params)
+        const data = await fetchData(WEB_SERVICE_URL + '/user.php', params)
         if (data) handleApiResponse(ctx, data)
     } else {
         ctx.reply(messages.invalidData)
@@ -105,7 +115,7 @@ async function handleTextCommand(ctx) {
 
 // Функция для проверки регистрации пользователя
 async function checkRegistration(chatId) {
-    const data = await fetchData(WEB_SERVICE_URL + `/get_user_id.php`)
+    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php')
     return data ? data.user_ids.includes(chatId) : false
 }
 
@@ -160,7 +170,7 @@ async function handleRefComment(ctx) {
 }
 
 // Инициализация бота
-const bot = new Telegraf(BOT_TOKEN)
+// const bot = new Telegraf(BOT_TOKEN)
 
 bot.command('add_comment', handleAddComment)
 bot.command('ref_comment', handleRefComment)
