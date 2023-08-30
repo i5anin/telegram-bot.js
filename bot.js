@@ -10,12 +10,7 @@ const BOT_TOKEN = process.env.BOT_TOKEN
 
 // Вспомогательные функции
 
-/**
- * Выполняет HTTP GET запрос к указанному URL с заданными параметрами.
- * @param {string} url - URL-адрес для выполнения GET запроса.
- * @param {Object} params - Параметры для GET запроса.
- * @returns {Object|null} Возвращает ответ сервера в форме объекта или null в случае ошибки.
- */
+// Функция для выполнения GET-запросов
 async function fetchData(url, params) {
     try {
         const response = await axios.get(url, { params })
@@ -26,6 +21,7 @@ async function fetchData(url, params) {
     }
 }
 
+// Функция для выполнения GET-запросов
 async function fetchComments() {
     try {
         const response = await axios.get(
@@ -38,6 +34,7 @@ async function fetchComments() {
     }
 }
 
+// Функция для уведомления пользователей о комментариях
 async function notifyUsers() {
     const comments = await fetchComments()
 
@@ -79,7 +76,7 @@ async function notifyUsers() {
     }
 }
 
-// Основной код
+// Функция для обработки команды /start
 async function handleStartCommand(ctx) {
     const chatId = ctx.message.chat.id
     const isRegistered = await checkRegistration(chatId)
@@ -88,7 +85,7 @@ async function handleStartCommand(ctx) {
         { parse_mode: 'HTML' }
     )
 }
-// Обработка текстовой команды
+// Функция для обработки текстовых команд
 async function handleTextCommand(ctx) {
     const { text, chat, from } = ctx.message
     if (/^[А-Яа-я]+\s[А-Яа-я]\.[А-Яа-я]\.$/.test(text)) {
@@ -106,17 +103,13 @@ async function handleTextCommand(ctx) {
     }
 }
 
+// Функция для проверки регистрации пользователя
 async function checkRegistration(chatId) {
     const data = await fetchData(WEB_SERVICE_URL + `/get_user_id.php`)
     return data ? data.user_ids.includes(chatId) : false
 }
 
-// Вспомогательные функции
-/**
- * Отправляет новый комментарий на сервер.
- * @param {number} id - ID комментария.
- * @param {string} comment - Текст комментария.
- */
+// Функция для отправки нового комментария
 async function sendNewComment(id, comment) {
     const params = {
         id: id,
@@ -125,11 +118,7 @@ async function sendNewComment(id, comment) {
     return await fetchData(WEB_SERVICE_URL + '/add_comment.php', params)
 }
 
-/**
- * Изменяет существующий комментарий на сервере.
- * @param {number} id - ID комментария.
- * @param {string} newComment - Новый текст комментария.
- */
+// Функция для обновления комментария
 async function updateComment(id, newComment) {
     const params = {
         id: id,
@@ -138,7 +127,7 @@ async function updateComment(id, newComment) {
     return await fetchData(WEB_SERVICE_URL + '/update_comment.php', params)
 }
 
-// Основной код
+// Функция для добавления комментария
 async function handleAddComment(ctx) {
     // Запросить текст комментария от пользователя
     ctx.reply('Пожалуйста, введите ваш комментарий.')
@@ -154,6 +143,7 @@ async function handleAddComment(ctx) {
     })
 }
 
+// Функция для обновления комментария
 async function handleRefComment(ctx) {
     // Запросить новый текст комментария от пользователя
     ctx.reply('Пожалуйста, введите ваш новый комментарий.')
