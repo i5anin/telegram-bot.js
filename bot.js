@@ -34,44 +34,38 @@ async function fetchComments() {
     }
 }
 
+let sentNotifications = {}
 // Функция для уведомления пользователей о комментариях
 async function notifyUsers() {
     const comments = await fetchComments()
-
     if (!comments) return
 
-    const userMessageCounts = {} // Словарь для подсчета числа сообщений для каждого пользователя
+    const notifications = {}
 
-    // Сортируем комментарии по user_id, чтобы сообщения от одного пользователя шли подряд
-    const sortedComments = comments.sort((a, b) => a.user_id - b.user_id)
+    for (const comment of comments) {
+        const userId = comment.user_id
 
-    for (const comment of sortedComments) {
-        const chatId = comment.user_id
-
-        if (!userMessageCounts[chatId]) {
-            userMessageCounts[chatId] = 0
+        if (!sentNotifications[userId]) {
+            sentNotifications[userId] = new Set()
         }
 
-        // Увеличиваем счетчик сообщений для пользователя
-        userMessageCounts[chatId]++
+        if (sentNotifications[userId].has(comment.id)) {
+            continue
+        }
 
-        const totalMessagesForUser = comments.filter(
-            (c) => c.user_id === chatId
+        sentNotifications[userId].add(comment.id)
+        notifications[userId] = (notifications[userId] || 0) + 1
+
+        const numCommentsForUser = comments.filter(
+            (c) => c.user_id === userId
         ).length
-        const message =
-            `Пожалуйста, прокомментируйте следующую операцию` +
-            `<code>(${userMessageCounts[chatId]}/${totalMessagesForUser})</code>:\n` +
-            `Название: <code>${comment.name}</code>\n` +
-            `Описание: <code>${comment.description}</code>\n` +
-            `Дата: <code>${comment.date}</code>`
+        const message = `Пожалуйста, прокомментируйте следующую операцию(${notifications[userId]}/${numCommentsForUser}):\nНазвание: ${comment.name}\nОписание: ${comment.description}\nДата: ${comment.date}`
 
         await bot.telegram
-            .sendMessage(chatId, message, { parse_mode: 'HTML' })
-            .catch((err) =>
-                console.error(`Error sending message to chatId ${chatId}:`, err)
+            .sendMessage(userId, message, { parse_mode: 'HTML' })
+            .catch((e) =>
+                console.error(`Error sending message to chatId ${userId}:`, e)
             )
-
-        // Добавляем задержку перед следующей отправкой (в миллисекундах)
         await new Promise((resolve) => setTimeout(resolve, 500))
     }
 }
@@ -163,10 +157,43 @@ async function handleRegComment(ctx) {
     ctx.reply(messages.enterData, { parse_mode: 'HTML' })
 }
 
-// Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
+// Инициализация бота
+bot.use(session())
 
-bot.use(session());  // Добавляем middleware для сессии
+bot.command('add_comment', (ctx) => {
+    ctx.reply('Пожалуйста, введите ваш комментарий.')
+    ctx.session.state = 'WAITING_FOR_COMMENT'
+})
+
+bot.command('ref_comment', (ctx) => {
+    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
+    ctx.session.state = 'WAITING_FOR_NEW_COMMENT'
+})
+
+bot.on('text', async (ctx) => {
+    if (ctx.session.state === 'WAITING_FOR_COMMENT') {
+        const text = ctx.message.text
+        const result = await sendNewComment(1, text) // предположим, что sendNewComment - это ваша функция
+        if (result && result.success) {
+            ctx.reply('Комментарий успешно добавлен.')
+        } else {
+            ctx.reply('Не удалось добавить комментарий.')
+        }
+        ctx.session.state = null // сбрасываем состояние сессии
+    } else if (ctx.session.state === 'WAITING_FOR_NEW_COMMENT') {
+        const text = ctx.message.text
+        const result = await updateComment(1, text) // предположим, что updateComment - это ваша функция
+        if (result && result.success) {
+            ctx.reply('Комментарий успешно обновлен.')
+        } else {
+            ctx.reply('Не удалось обновить комментарий.')
+        }
+        ctx.session.state = null // сбрасываем состояние сессии
+    }
+})
+
+bot.sessionStorage = {}
 
 bot.command('add_comment', handleAddComment)
 bot.command('ref_comment', handleRefComment)
@@ -188,11 +215,17 @@ bot.command('ref_comment', async (ctx) => {
 bot.on('text', async (ctx) => {
     if (ctx.session.state === 'WAITING_FOR_COMMENT') {
         const comment = ctx.message.text
-        // ... ваш код для добавления комментария ...
+        await bot.telegram.sendMessage(
+            userId,
+            'ваш код для добавления комментария'
+        )
         ctx.session.state = null
     } else if (ctx.session.state === 'WAITING_FOR_NEW_COMMENT') {
         const newComment = ctx.message.text
-        // ... ваш код для обновления комментария ...
+        await bot.telegram.sendMessage(
+            userId,
+            'ваш код для обновления комментария'
+        )
         ctx.session.state = null
     }
     // ... остальная логика ...
