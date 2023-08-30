@@ -58,19 +58,21 @@ async function notifyUsers() {
         ).length
         const message =
             `Пожалуйста, прокомментируйте следующую операцию:\n` +
-            `<code>(${userMessageCounts[
-                chatId
-            ]++}/${totalMessagesForUser})</code>\n` +
+            `<code>(${userMessageCounts[chatId]++}` +
+            `/${totalMessagesForUser})</code>\n` +
             `Название: <code>${comment.name}</code>\n` +
             `Описание: <code>${comment.description}</code>\n` +
-            `Дата: <code>${comment.date}</code>`
+            `Дата: <code>${comment.date}</code>\n` +
+            `id: <code>${comment.id}</code>`
+
         errorMsg = 'Error sending message to chatId'
         await bot.telegram
             .sendMessage(chatId, message, { parse_mode: 'HTML' })
             .catch((err) => console.error(errorMsg + chatId, err))
 
         // Добавляем задержку перед следующей отправкой (в миллисекундах)
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        return
     }
 }
 
