@@ -1,5 +1,5 @@
 require('dotenv').config() // загрузить переменные среды из файла .env
-const { Telegraf, Markup, session } = require('telegraf')
+const { Telegraf, Markup } = require('telegraf')
 const axios = require('axios')
 
 const messages = require('./messages')
@@ -158,42 +158,6 @@ async function handleRegComment(ctx) {
 }
 
 const bot = new Telegraf(BOT_TOKEN)
-// Инициализация бота
-bot.use(session())
-
-bot.command('add_comment', (ctx) => {
-    ctx.reply('Пожалуйста, введите ваш комментарий.')
-    ctx.session.state = 'WAITING_FOR_COMMENT'
-})
-
-bot.command('ref_comment', (ctx) => {
-    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
-    ctx.session.state = 'WAITING_FOR_NEW_COMMENT'
-})
-
-bot.on('text', async (ctx) => {
-    if (ctx.session.state === 'WAITING_FOR_COMMENT') {
-        const text = ctx.message.text
-        const result = await sendNewComment(1, text) // предположим, что sendNewComment - это ваша функция
-        if (result && result.success) {
-            ctx.reply('Комментарий успешно добавлен.')
-        } else {
-            ctx.reply('Не удалось добавить комментарий.')
-        }
-        ctx.session.state = null // сбрасываем состояние сессии
-    } else if (ctx.session.state === 'WAITING_FOR_NEW_COMMENT') {
-        const text = ctx.message.text
-        const result = await updateComment(1, text) // предположим, что updateComment - это ваша функция
-        if (result && result.success) {
-            ctx.reply('Комментарий успешно обновлен.')
-        } else {
-            ctx.reply('Не удалось обновить комментарий.')
-        }
-        ctx.session.state = null // сбрасываем состояние сессии
-    }
-})
-
-bot.sessionStorage = {}
 
 bot.command('add_comment', handleAddComment)
 bot.command('ref_comment', handleRefComment)
@@ -201,35 +165,6 @@ bot.command('start', handleStartCommand)
 bot.command('reg', handleRegComment)
 
 bot.on('text', handleTextCommand)
-
-bot.command('add_comment', async (ctx) => {
-    ctx.reply('Пожалуйста, введите ваш комментарий.')
-    ctx.session.state = 'WAITING_FOR_COMMENT'
-})
-
-bot.command('ref_comment', async (ctx) => {
-    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
-    ctx.session.state = 'WAITING_FOR_NEW_COMMENT'
-})
-
-bot.on('text', async (ctx) => {
-    if (ctx.session.state === 'WAITING_FOR_COMMENT') {
-        const comment = ctx.message.text
-        await bot.telegram.sendMessage(
-            userId,
-            'ваш код для добавления комментария'
-        )
-        ctx.session.state = null
-    } else if (ctx.session.state === 'WAITING_FOR_NEW_COMMENT') {
-        const newComment = ctx.message.text
-        await bot.telegram.sendMessage(
-            userId,
-            'ваш код для обновления комментария'
-        )
-        ctx.session.state = null
-    }
-    // ... остальная логика ...
-})
 
 bot.launch()
 
