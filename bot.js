@@ -39,41 +39,32 @@ async function fetchComments() {
 
 // Функция для уведомления пользователей о комментариях
 async function notifyUsers() {
-    const comments = await fetchComments()
+    const comments = await fetchComments() // Получаем комментарии с помощью fetchComments
 
-    if (!comments) return
+    // Если комментарии не найдены, отправляем сообщение об этом и завершаем выполнение функции
+    if (!comments)
+        bot.telegram.sendMessage(chatId, 'Комментарии не найдены.', {
+            parse_mode: 'HTML',
+        })
+    const firstComment = comments[0] // Взять первый комментарий из списка
+    const chatId = firstComment.user_id // Получаем ID чата из первого комментария
+    const totalMessagesForUser = comments.filter(
+        (c) => c.user_id === chatId
+    ).length // Получаем общее число сообщений для этого пользователя
 
-    const userMessageCounts = {} // Словарь для подсчета числа сообщений для каждого пользователя
+    const message = // Составляем текст сообщения
+        `Пожалуйста, прокомментируйте следующую операцию:\n` +
+        `<code>(1/${totalMessagesForUser})</code>\n` +
+        `Название: <code>${firstComment.name}</code>\n` +
+        `Описание: <code>${firstComment.description}</code>\n` +
+        `Дата: <code>${firstComment.date}</code>\n` +
+        `id: <code>${firstComment.id}</code>`
 
-    // Сортируем комментарии по user_id, чтобы сообщения от одного пользователя шли подряд
-    const sortedComments = comments.sort((a, b) => a.user_id - b.user_id)
+    const errorMsg = 'Error sending message to chatId'
 
-    for (const comment of sortedComments) {
-        const chatId = comment.user_id
-
-        if (!userMessageCounts[chatId]) userMessageCounts[chatId] = 1
-        // userMessageCounts[chatId]++ // Увеличиваем счетчик сообщений для пользователя
-        const totalMessagesForUser = comments.filter(
-            (c) => c.user_id === chatId
-        ).length
-        const message =
-            `Пожалуйста, прокомментируйте следующую операцию:\n` +
-            `<code>(${userMessageCounts[chatId]++}` +
-            `/${totalMessagesForUser})</code>\n` +
-            `Название: <code>${comment.name}</code>\n` +
-            `Описание: <code>${comment.description}</code>\n` +
-            `Дата: <code>${comment.date}</code>\n` +
-            `id: <code>${comment.id}</code>`
-
-        errorMsg = 'Error sending message to chatId'
-        await bot.telegram
-            .sendMessage(chatId, message, { parse_mode: 'HTML' })
-            .catch((err) => console.error(errorMsg + chatId, err))
-
-        // Добавляем задержку перед следующей отправкой (в миллисекундах)
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        return
-    }
+    await bot.telegram // Отправляем сообщение
+        .sendMessage(chatId, message, { parse_mode: 'HTML' })
+        .catch((err) => console.error(errorMsg + chatId, err))
 }
 
 // Функция для обработки команды /start
