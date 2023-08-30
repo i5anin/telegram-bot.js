@@ -3,7 +3,7 @@ const { Telegraf, Markup, session } = require('telegraf')
 const sqlite3 = require('sqlite3').verbose()
 const axios = require('axios')
 
-const messages = require('./messages')
+const messages = require('./text_messages')
 
 // Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
