@@ -171,59 +171,6 @@ bot.command('reg', (ctx) =>
 )
 bot.on('text', handleTextCommand)
 
-bot.command('add_comment', async (ctx) => {
-    ctx.session.state = 'ADDING_COMMENT'
-    ctx.reply('Пожалуйста, введите ваш комментарий.')
-})
-
-bot.command('ref_comment', async (ctx) => {
-    ctx.session.state = 'REF_COMMENT'
-    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
-})
-
-bot.command('start', handleStartCommand)
-bot.command('reg', (ctx) =>
-    ctx.reply(messages.enterData, { parse_mode: 'HTML' })
-)
-
-bot.on('text', async (ctx) => {
-    const text = ctx.message.text
-
-    if (ctx.session.state === 'ADDING_COMMENT') {
-        const id = 1
-        const response = await sendNewComment(id, text)
-        if (response && response.success) {
-            ctx.reply(
-                'Комментарий успешно добавлен.',
-                Markup.inlineKeyboard([
-                    Markup.button.callback('Принять', 'approve'),
-                    Markup.button.callback('Отклонить', 'reject'),
-                ])
-            )
-            ctx.session.state = 'AWAITING_APPROVAL'
-        } else {
-            ctx.reply('Не удалось добавить комментарий.')
-        }
-    } else if (ctx.session.state === 'REF_COMMENT') {
-        const id = 1
-        const response = await updateComment(id, text)
-        if (response && response.success) {
-            ctx.reply(
-                'Комментарий успешно обновлен.',
-                Markup.inlineKeyboard([
-                    Markup.button.callback('Принять', 'approve'),
-                    Markup.button.callback('Отклонить', 'reject'),
-                ])
-            )
-            ctx.session.state = 'AWAITING_APPROVAL'
-        } else {
-            ctx.reply('Не удалось обновить комментарий.')
-        }
-    } else {
-        handleTextCommand(ctx)
-    }
-})
-
 bot.action('approve', (ctx) => {
     ctx.reply('Комментарий принят.')
     ctx.session.state = null
