@@ -99,59 +99,6 @@ async function updateComment(id, newComment) {
 
 // Функция для добавления комментария
 async function handleAddComment(ctx) {
-    // Запросить текст комментария от пользователя
-    ctx.reply('Пожалуйста, введите ваш комментарий.')
-    bot.on('text', async (ctx) => {
-        const comment = ctx.message.text
-        const id = 1 // Получите этот ID из нужного источника
-        const response = await sendNewComment(id, comment)
-        if (response && response.success) {
-            ctx.reply('Комментарий успешно добавлен.')
-        } else {
-            ctx.reply('Не удалось добавить комментарий.')
-        }
-    })
-}
-
-// Функция для обновления комментария
-async function handleRefComment(ctx) {
-    // Запросить новый текст комментария от пользователя
-    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
-    bot.on('text', async (ctx) => {
-        const newComment = ctx.message.text
-        const id = 1 // Получите этот ID из нужного источника
-        const response = await updateComment(id, newComment)
-        if (response && response.success) {
-            ctx.reply('Комментарий успешно обновлен.')
-        } else {
-            ctx.reply('Не удалось обновить комментарий.')
-        }
-    })
-}
-
-async function handleRegComment(ctx) {
-    ctx.reply(messages.enterData, { parse_mode: 'HTML' })
-}
-
-let db = new sqlite3.Database('./state.db', (err) => {
-    if (err) {
-        console.error('Could not connect to database', err)
-    } else {
-        console.log('Подключение к базе данных')
-    }
-})
-
-db.run(
-    'CREATE TABLE IF NOT EXISTS user_session (chat_id TEXT, state TEXT)',
-    (err) => {
-        if (err) console.error('Could not create table', err)
-    }
-)
-
-// ! ------------------ command ------------------
-
-// Определяем команду 'add_comment' для бота
-bot.command('add_comment', (ctx) => {
     let chatId = ctx.chat.id.toString() // Преобразуем ID чата в строку
     // Выполняем SQL-запрос для вставки или обновления данных в таблице 'user_session'
     // Мы используем 'INSERT OR REPLACE', чтобы либо вставить новую запись, либо заменить существующую
@@ -163,7 +110,29 @@ bot.command('add_comment', (ctx) => {
         }
     )
     ctx.reply('Пожалуйста, напишите свой комментарий.') // Отправляем пользователю сообщение, просим его написать комментарий
-})
+}
+
+// Функция для обновления комментария
+// async function handleRefComment(ctx) {
+//     // Запросить новый текст комментария от пользователя
+//     ctx.reply('Пожалуйста, введите ваш новый комментарий.')
+//     bot.on('text', async (ctx) => {
+//         const newComment = ctx.message.text
+//         const id = 1 // Получите этот ID из нужного источника
+//         const response = await updateComment(id, newComment)
+//         if (response && response.success) {
+//             ctx.reply('Комментарий успешно обновлен.')
+//         } else {
+//             ctx.reply('Не удалось обновить комментарий.')
+//         }
+//     })
+// }
+//  Асинхронная функция, которая отправляет сообщение пользователю
+// с просьбой ввести данные (возможно, для регистрации).
+// ! reg
+async function handleRegComment(ctx) {
+    ctx.reply(messages.enterData, { parse_mode: 'HTML' })
+}
 
 // Функция для обработки текстовых команд
 async function handleTextCommand(ctx) {
@@ -182,8 +151,31 @@ async function handleTextCommand(ctx) {
     }
 }
 
+// ? ------------------ по умолчаию ------------------
+
+// Подключение к базе данных SQLite, сохранение дескриптора в переменную db
+let db = new sqlite3.Database('./state.db', (err) => {
+    // Проверка на ошибки при подключении
+    if (err) {
+        console.error('Could not connect to database', err) // Вывод ошибки, если не удается подключиться
+    } else {
+        console.log('Подключение к базе данных') // Вывод сообщения об успешном подключении
+    }
+})
+
+// ! Создание таблицы 'user_session', если она не существует
+db.run(
+    'CREATE TABLE IF NOT EXISTS user_session (chat_id TEXT, state TEXT)',
+    (err) => {
+        // Проверка на ошибки при создании таблицы
+        if (err) console.error('Could not create table', err) // Вывод ошибки, если не удается создать таблицу
+    }
+)
+
+// ! ------------------ command ------------------
+
 bot.command('add_comment', handleAddComment)
-bot.command('ref_comment', handleRefComment)
+// bot.command('ref_comment', handleRefComment)
 bot.command('new_comment', notifyUsers)
 bot.command('start', handleStartCommand)
 bot.command('reg', handleRegComment)
