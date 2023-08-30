@@ -116,20 +116,20 @@ async function handleAddComment(ctx) {
 }
 
 // Функция для обновления комментария
-async function handleRefComment(ctx) {
-    // Запросить новый текст комментария от пользователя
-    ctx.reply('Пожалуйста, введите ваш новый комментарий.')
-    bot.on('text', async (ctx) => {
-        const newComment = ctx.message.text
-        const id = 1 // Получите этот ID из нужного источника
-        const response = await updateComment(id, newComment)
-        if (response && response.success) {
-            ctx.reply('Комментарий успешно обновлен.')
-        } else {
-            ctx.reply('Не удалось обновить комментарий.')
-        }
-    })
-}
+// async function handleRefComment(ctx) {
+//     // Запросить новый текст комментария от пользователя
+//     ctx.reply('Пожалуйста, введите ваш новый комментарий.')
+//     bot.on('text', async (ctx) => {
+//         const newComment = ctx.message.text
+//         const id = 1 // Получите этот ID из нужного источника
+//         const response = await updateComment(id, newComment)
+//         if (response && response.success) {
+//             ctx.reply('Комментарий успешно обновлен.')
+//         } else {
+//             ctx.reply('Не удалось обновить комментарий.')
+//         }
+//     })
+// }
 
 async function handleRegComment(ctx) {
     ctx.reply(messages.enterData, { parse_mode: 'HTML' })
@@ -190,7 +190,7 @@ async function handleTextCommand(ctx) {
 }
 
 bot.command('add_comment', handleAddComment)
-bot.command('ref_comment', handleRefComment)
+// bot.command('ref_comment', handleRefComment)
 bot.command('new_comment', notifyUsers)
 bot.command('start', handleStartCommand)
 bot.command('reg', handleRegComment)
