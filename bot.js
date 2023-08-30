@@ -12,8 +12,6 @@ const BOT_TOKEN = process.env.BOT_TOKEN
 // Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
 
-// Вспомогательные функции
-
 // Функция для выполнения GET-запросов
 async function fetchData(url, params) {
     try {
@@ -95,7 +93,7 @@ async function sendNewComment(id, comment) {
 async function updateComment(id, newComment) {
     return await fetchData(WEB_SERVICE_URL + '/update_comment.php', {
         id: id,
-        new_comment: newComment,
+        comment: newComment,
     })
 }
 
@@ -150,26 +148,21 @@ db.run(
     }
 )
 
-// ! -------------------------------- command --------------------------------
+// ! ------------------ command ------------------
 
 // Определяем команду 'add_comment' для бота
 bot.command('add_comment', (ctx) => {
-    // Преобразуем ID чата в строку
-    let chatId = ctx.chat.id.toString()
-
+    let chatId = ctx.chat.id.toString() // Преобразуем ID чата в строку
     // Выполняем SQL-запрос для вставки или обновления данных в таблице 'user_session'
     // Мы используем 'INSERT OR REPLACE', чтобы либо вставить новую запись, либо заменить существующую
     db.run(
         `INSERT OR REPLACE INTO user_session (chat_id, state) VALUES (?, ?)`,
         [chatId, 'WAITING_FOR_COMMENT'], // Передаем ID чата и состояние 'WAITING_FOR_COMMENT' как параметры запроса
         (err) => {
-            // Обработка ошибок: если произошла ошибка, выводим ее в консоль
-            if (err) console.error('Could not insert into table', err)
+            if (err) console.error('Could not insert into table', err) // Обработка ошибок: если произошла ошибка, выводим ее в консоль
         }
     )
-
-    // Отправляем пользователю сообщение, просим его написать комментарий
-    ctx.reply('Пожалуйста, напишите свой комментарий.')
+    ctx.reply('Пожалуйста, напишите свой комментарий.') // Отправляем пользователю сообщение, просим его написать комментарий
 })
 
 // Функция для обработки текстовых команд
