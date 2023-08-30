@@ -38,7 +38,6 @@ async function fetchComments() {
 // Функция для уведомления пользователей о комментариях
 async function notifyUsers() {
     const comments = await fetchComments() // Получаем комментарии с помощью fetchComments
-
     // Если комментарии не найдены, отправляем сообщение об этом и завершаем выполнение функции
     if (!comments)
         bot.telegram.sendMessage(chatId, 'Комментарии не найдены.', {
@@ -112,23 +111,6 @@ async function handleAddComment(ctx) {
     ctx.reply('Пожалуйста, напишите свой комментарий.') // Отправляем пользователю сообщение, просим его написать комментарий
 }
 
-// Функция для обновления комментария
-// async function handleRefComment(ctx) {
-//     // Запросить новый текст комментария от пользователя
-//     ctx.reply('Пожалуйста, введите ваш новый комментарий.')
-//     bot.on('text', async (ctx) => {
-//         const newComment = ctx.message.text
-//         const id = 1 // Получите этот ID из нужного источника
-//         const response = await updateComment(id, newComment)
-//         if (response && response.success) {
-//             ctx.reply('Комментарий успешно обновлен.')
-//         } else {
-//             ctx.reply('Не удалось обновить комментарий.')
-//         }
-//     })
-// }
-//  Асинхронная функция, которая отправляет сообщение пользователю
-// с просьбой ввести данные (возможно, для регистрации).
 // ! reg
 async function handleRegComment(ctx) {
     ctx.reply(messages.enterData, { parse_mode: 'HTML' })
@@ -174,12 +156,13 @@ db.run(
 
 // ! ------------------ command ------------------
 
-bot.command('add_comment', handleAddComment)
-// bot.command('ref_comment', handleRefComment)
-bot.command('new_comment', notifyUsers)
-bot.command('start', handleStartCommand)
-bot.command('reg', handleRegComment)
+bot.command('add_comment', handleAddComment) // ! Добавить комментарий к работе
 
-bot.on('text', handleTextCommand)
+bot.command('new_comment', notifyUsers) // ! Оповищения
+
+bot.command('start', handleStartCommand) // start
+bot.command('reg', handleRegComment) // reg
+
+bot.on('text', handleTextCommand) // обработка текстовых команд
 
 bot.launch()
