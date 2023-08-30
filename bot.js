@@ -133,7 +133,7 @@ async function handleTextCommand(ctx) {
     }
 }
 
-// ? ------------------ по умолчаию ------------------
+// ? ------------------ по умолчанию ------------------
 
 // Подключение к базе данных SQLite, сохранение дескриптора в переменную db
 let db = new sqlite3.Database('./state.db', (err) => {
@@ -158,7 +158,7 @@ db.run(
 
 bot.command('add_comment', handleAddComment) // ! Добавить комментарий к работе
 
-bot.command('new_comment', notifyUsers) // ! Оповищения
+bot.command('new_comment', notifyUsers) // ! Оповещения
 
 bot.command('start', handleStartCommand) // start
 bot.command('reg', handleRegComment) // reg
