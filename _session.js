@@ -1,22 +1,42 @@
-require('dotenv').config() // загрузить переменные среды из файла .env
-const { Telegraf } = require('telegraf') // Обратите внимание на скобки {}
+require('dotenv').config()
+const { Telegraf, session } = require('telegraf')
 
-const BOT_TOKEN = process.env.BOT_TOKEN // Поставьте свой токен здесь, если он не в .env файле
+const BOT_TOKEN = process.env.BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE'
 
 const bot = new Telegraf(BOT_TOKEN)
 
-// Включаем встроенную сессию
-bot.use(Telegraf.session())
+// Включаем сессию (Обратите внимание, что это первый middleware)
+bot.use(session())
 
-bot.command('count', (ctx) => {
-    // Инициализация счетчика для пользователя, если он еще не создан
-    ctx.session.counter = ctx.session.counter || 0
+bot.command('start', (ctx) => {
+    if (!ctx.session) {
+        ctx.session = {} // Инициализация сессии, если её нет
+    }
 
-    // Увеличиваем счетчик
-    ctx.session.counter++
+    console.log('Session state:', ctx.session)
+    ctx.reply('Привет! Как тебя зовут?')
+    ctx.session.state = 'ASK_NAME'
+})
 
-    // Отправляем текущее значение счетчика
-    ctx.reply(`Вы вызвали эту команду ${ctx.session.counter} раз.`)
+bot.on('text', (ctx) => {
+    if (!ctx.session) {
+        ctx.session = {} // Инициализация сессии, если её нет
+    }
+
+    console.log('Session state:', ctx.session)
+
+    if (ctx.session.state === 'ASK_NAME') {
+        const name = ctx.message.text
+        ctx.session.name = name
+        ctx.reply(`Приятно познакомиться, ${name}!`)
+        ctx.session.state = 'GREETED'
+    } else if (ctx.session.state === 'GREETED') {
+        ctx.reply(`Привет снова, ${ctx.session.name}!`)
+    }
 })
 
 bot.launch()
+    .then(() => {
+        console.log('Bot started')
+    })
+    .catch((err) => console.log('Bot launch error', err))
