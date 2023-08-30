@@ -1,5 +1,5 @@
 require('dotenv').config() // загрузить переменные среды из файла .env
-const { Telegraf, Markup } = require('telegraf')
+const { Telegraf, Markup, session } = require('telegraf')
 const axios = require('axios')
 
 const messages = require('./messages')
@@ -34,38 +34,44 @@ async function fetchComments() {
     }
 }
 
-let sentNotifications = {}
 // Функция для уведомления пользователей о комментариях
 async function notifyUsers() {
     const comments = await fetchComments()
+
     if (!comments) return
 
-    const notifications = {}
+    const userMessageCounts = {} // Словарь для подсчета числа сообщений для каждого пользователя
 
-    for (const comment of comments) {
-        const userId = comment.user_id
+    // Сортируем комментарии по user_id, чтобы сообщения от одного пользователя шли подряд
+    const sortedComments = comments.sort((a, b) => a.user_id - b.user_id)
 
-        if (!sentNotifications[userId]) {
-            sentNotifications[userId] = new Set()
+    for (const comment of sortedComments) {
+        const chatId = comment.user_id
+
+        if (!userMessageCounts[chatId]) {
+            userMessageCounts[chatId] = 0
         }
 
-        if (sentNotifications[userId].has(comment.id)) {
-            continue
-        }
+        // Увеличиваем счетчик сообщений для пользователя
+        userMessageCounts[chatId]++
 
-        sentNotifications[userId].add(comment.id)
-        notifications[userId] = (notifications[userId] || 0) + 1
-
-        const numCommentsForUser = comments.filter(
-            (c) => c.user_id === userId
+        const totalMessagesForUser = comments.filter(
+            (c) => c.user_id === chatId
         ).length
-        const message = `Пожалуйста, прокомментируйте следующую операцию(${notifications[userId]}/${numCommentsForUser}):\nНазвание: ${comment.name}\nОписание: ${comment.description}\nДата: ${comment.date}`
+        const message =
+            `Пожалуйста, прокомментируйте следующую операцию:\n` +
+            `<code>(${userMessageCounts[chatId]}/${totalMessagesForUser})</code>\n` +
+            `Название: <code>${comment.name}</code>\n` +
+            `Описание: <code>${comment.description}</code>\n` +
+            `Дата: <code>${comment.date}</code>`
 
         await bot.telegram
-            .sendMessage(userId, message, { parse_mode: 'HTML' })
-            .catch((e) =>
-                console.error(`Error sending message to chatId ${userId}:`, e)
+            .sendMessage(chatId, message, { parse_mode: 'HTML' })
+            .catch((err) =>
+                console.error(`Error sending message to chatId ${chatId}:`, err)
             )
+
+        // Добавляем задержку перед следующей отправкой (в миллисекундах)
         await new Promise((resolve) => setTimeout(resolve, 500))
     }
 }
@@ -157,6 +163,7 @@ async function handleRegComment(ctx) {
     ctx.reply(messages.enterData, { parse_mode: 'HTML' })
 }
 
+// Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
 
 bot.command('add_comment', handleAddComment)
@@ -165,6 +172,16 @@ bot.command('start', handleStartCommand)
 bot.command('reg', handleRegComment)
 
 bot.on('text', handleTextCommand)
+
+// bot.action('approve', (ctx) => {
+//     ctx.reply('Комментарий принят.')
+//     ctx.session.state = null
+// })
+
+// bot.action('reject', (ctx) => {
+//     ctx.reply('Комментарий отклонен.')
+//     ctx.session.state = null
+// })
 
 bot.launch()
 
