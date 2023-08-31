@@ -93,29 +93,31 @@ async function checkRegistration(chatId) {
 
 // Функция для добавления комментария в базу MySQL
 async function handleAddComment(ctx) {
-    console.log("Обработка добавления комментария\n");
-    console.log(ctx); // undefined wtf?
+    console.log("Context: ", ctx);  // Для отладки
+    if (!ctx) {
+        console.log("Context is undefined!");
+        return;
+    }
+
     if (isAwaitComment) {
-        console.log("isAwaitComment = ", isAwaitComment);
         const userComment = ctx.message.text;
         const chatId = ctx.message.chat.id;
 
-        // Здесь код для отправки комментария и ID задачи
         try {
             await fetchData(WEB_SERVICE_URL + `/update_comment.php`, {id_task: currentTaskId, comment: userComment});
-            bot.telegram.sendMessage(chatId, "Комментарий добавлен успешно.", {parse_mode: "HTML"});
+            await bot.telegram.sendMessage(chatId, "Комментарий добавлен успешно.", {parse_mode: "HTML"});
             console.log("Комментарий добавлен успешно.");
         } catch (error) {
-            bot.telegram.sendMessage(chatId, "Ошибка при добавлении комментария: " + error, {parse_mode: "HTML"});
+            await bot.telegram.sendMessage(chatId, "Ошибка при добавлении комментария: " + error, {parse_mode: "HTML"});
             console.log("Ошибка при добавлении комментария:", error);
         }
 
-        isAwaitComment = false; // Сбрасываем флаг ожидания
-        currentTaskId = null; // Сбрасываем текущий ID задачи
-    } else {
-        // Обрабатываем случай, если комментарий не ожидается
+        isAwaitComment = false;
+        currentTaskId = null;
+        await notifyUsers(ctx);  // Если функция асинхронная, лучше использовать await
     }
 }
+
 
 
 // ! reg
