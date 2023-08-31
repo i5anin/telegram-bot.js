@@ -1,10 +1,9 @@
-require('dotenv').config() // загрузить переменные среды из файла .env
-const { Telegraf } = require('telegraf')//, Markup, session
-const sqlite3 = require('sqlite3').verbose()
-const axios = require('axios')
-
-const messages = require('./text_messages')
-const process = require("eslint-config-airbnb-base/legacy");
+require('dotenv').config();
+const { Telegraf } = require('telegraf');
+const sqlite3Package = require('sqlite3');
+const axios = require('axios');
+const { verbose } = sqlite3Package;
+const sqlite3 = verbose();
 
 // Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
@@ -50,21 +49,22 @@ async function notifyUsers(ctx) {
         })
 
     const actualComments = comments.filter(({user_id: userId})=> userId === chatId)
-    const firstComment = actualComments[0] // Взять первый комментарий из списка
+    const task = actualComments[0] // Взять первый комментарий из списка
 
     const message = // Составляем текст сообщения
         `Пожалуйста, прокомментируйте следующую операцию:\n` +
         `<code>(1/${actualComments.length})</code>\n` +
-        `Название: <code>${firstComment.name}</code>\n` +
-        `Описание: <code>${firstComment.description}</code>\n` +
-        `Дата: <code>${firstComment.date}</code>\n` +
-        `id: <code>${firstComment.id}</code>`
+        `Название: <code>${task.name}</code>\n` +
+        `Описание: <code>${task.description}</code>\n` +
+        `Дата: <code>${task.date}</code>\n` +
+        `id: <code>${task.id}</code>`
 
     const errorMsg = 'Error sending message to chatId'
     isAwaitComment = true
     await bot.telegram // Отправляем сообщение
         .sendMessage(chatId, message, { parse_mode: 'HTML' })
         .catch((err) => console.error(errorMsg + chatId, err))
+    let isAwaitComment = true;
 }
 
 // Функция для обработки команды /start
@@ -76,7 +76,7 @@ async function handleStartCommand(ctx) {
 
     const chatId = ctx.message.chat.id
     const isRegistered = await checkRegistration(chatId)
-    ctx.reply(
+    ctx.reply(  // Вы уже зарегистрированы! / Не зарегистрированы
         isRegistered ? messages.alreadyRegistered : messages.notRegistered,
         { parse_mode: 'HTML' }
     )
@@ -85,44 +85,41 @@ async function handleStartCommand(ctx) {
 // Функция для проверки регистрации пользователя на Сервере
 async function checkRegistration(chatId) {
     const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php')
-    return data ? data.user_ids.includes(chatId) : false
-}
-
-// Функция для отправки нового комментария на Сервер
-async function sendNewComment(id, comment) {
-    return await fetchData(WEB_SERVICE_URL + '/add_comment.php', {
-        id: id,
-        comment: comment,
-    })
-}
-
-// Функция для обновления комментария
-async function updateComment(id, newComment) {
-    return await fetchData(WEB_SERVICE_URL + '/update_comment.php', {
-        id: id,
-        comment: newComment,
-    })
+    data.user_ids = undefined;
+    return data ? data.user_ids.includes(chatId) : false // user_ids проверяем масив
 }
 
 // Функция для добавления комментария
+// https://bot.pf-forum.ru/web_servise/update_comment.php?id=5&comment=%D0%9D%D0%BE%D0%B2%D1%8B%D0%B9%2020%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9
 async function handleAddComment(ctx) {
-    let chatId = ctx.chat.id.toString() // Преобразуем ID чата в строку
-    // Выполняем SQL-запрос для вставки или обновления данных в таблице 'user_session'
-    // Мы используем 'INSERT OR REPLACE', чтобы либо вставить новую запись, либо заменить существующую
+    // let chatId = ctx.chat.id.toString();
 
-    // записываем ответ если ждем коммент
     if (isAwaitComment) {
-        db.run(
-            `INSERT OR REPLACE INTO user_session (chat_id, state) VALUES (?, ?)`,
-            [chatId, 'WAITING_FOR_COMMENT'], // Передаем ID чата и состояние 'WAITING_FOR_COMMENT' как параметры запроса
-            (err) => {
-                if (err) console.error('Could not insert into table', err) // Обработка ошибок: если произошла ошибка, выводим ее в консоль
-            }
-        )
-    }
+        // Просто пример функции reply. В реальном коде, она будет работать с библиотекой для чат-бота.
+        const reply = new Promise((resolve) => {
+            console.log("Пожалуйста, напишите свой комментарий.");
+            // Здесь логика для ожидания комментария от пользователя и его получения
+            const userComment = "Реальный комментарий пользователя"; // Замените на реальный комментарий
+            const userId = ctx.chat.id; // Замените на реальный id
+            resolve({ id: userId, comment: userComment });
+        });
 
-    ctx.reply('Пожалуйста, напишите свой комментарий.') // Отправляем пользователю сообщение, просим его написать комментарий
+        reply.then(async ({ id, comment }) => {
+            comment = encodeURIComponent(comment);
+            const task_id = ctx.someField; // ! Здесь должно быть извлечение нужного ID
+            try {
+                const url = WEB_SERVICE_URL+`/update_comment.php`;
+                const data = await fetchData(url, { id: task_id, comment: comment });
+                console.log("Успешно обновлен комментарий:", data);
+            } catch (error) {
+                console.error("Ошибка при обновлении комментария:", error);
+            }
+        });
+    }
+    let isAwaitComment = false;
 }
+
+
 
 // ! reg
 async function handleRegComment(ctx) {
