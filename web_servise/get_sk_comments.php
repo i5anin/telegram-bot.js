@@ -12,7 +12,7 @@ function get_sk_comments()
     $mysqli = mysqli_connect($server, $user, $pass, $db);
     mysqli_set_charset($mysqli, 'utf8mb4');
 
-    $stmt = mysqli_prepare($mysqli, "SELECT `id`,`user_id`, `date`,  `name`, `description` FROM `sk_comment` WHERE `completed` = 0");
+    $stmt = mysqli_prepare($mysqli, "SELECT `id_task`,`user_id`, `date`,  `name`, `description` FROM `sk_comment` WHERE `completed` = 0");
 
     if (!mysqli_stmt_execute($stmt)) {
         return json_encode(['error' => 'Ошибка: ' . mysqli_stmt_error($stmt)]);
@@ -36,5 +36,5 @@ $comments = get_sk_comments();
 if ($comments) {
     echo json_encode(['comments' => $comments]);
 } else {
-    echo json_encode(['error' => 'ОШИБКА!']);
+    echo json_encode(['error' => 'ERROR!']);
 }
