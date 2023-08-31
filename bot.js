@@ -1,10 +1,7 @@
 require('dotenv').config();
 const {Telegraf} = require('telegraf');
-const sqlite3Package = require('sqlite3');
 const axios = require('axios');
-const {verbose} = sqlite3Package;
-const sqlite3 = verbose();
-const messages = require('./text_messages');
+const ruLang = require('./ru_lang');
 
 // Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
@@ -13,15 +10,27 @@ const BOT_TOKEN = process.env.BOT_TOKEN
 // Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
 
+// ! Флаги
+let isAwaitFio = false;
+let isAwaitComment = false;
+
+let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
+
 // Функция для выполнения GET-запросов
 async function fetchData(url, params) {
     try {
-        return axios.get(url, {params}).data
+        const response = await axios.get(url, {params});
+        if (!response.data) {
+            console.error("Сервер ответил без данных.");
+            return null;
+        }
+        return response.data;
     } catch (error) {
-        console.error(messages.serverError, error)
-        return null
+        console.error(ruLang.serverError, error);
+        return null;
     }
 }
+
 
 // Проверка комминтариев
 async function fetchComments() {
@@ -36,60 +45,39 @@ async function fetchComments() {
     }
 }
 
-let isAwaitingComment = false;
-let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
-
 // Функция для уведомления пользователей о комментариях
 async function notifyUsers(ctx) {
 
     const chatId = ctx.message.chat.id;
-    const zeroComments = await fetchComments();
-    if (!zeroComments) {
-        bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
-        return;
-    }
+    const uncommentedTasks = await fetchComments();
+    if (!uncommentedTasks) return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
 
-    const actualComments = zeroComments.filter(({user_id}) => user_id === chatId); // фильтуем по id нужный
-    const arr = actualComments[0]; // предположим, что это ваша текущая задача
-
+    const userActualComments =
+        uncommentedTasks.filter(({user_id}) => user_id === chatId); // фильтуем по id нужный
+    const currentTask = userActualComments [0]; // берем первую задачу
+    isAwaitComment = true; // Включаем режим ожидания комментария
     const message =
         'Пожалуйста, прокомментируйте следующую операцию:\n' +
-        `<code>(1/${actualComments.length})</code>\n` +
-        `Название: <code>${arr.name}</code>\n` +
-        `Описание: <code>${arr.description}</code>\n` +
-        `Дата: <code>${arr.date}</code>\n` +
-        `id: <code>${arr.id_task}</code>`;
+        `<code>(1/${userActualComments.length})</code>\n` +
+        `Название: <code>${currentTask.name}</code>\n` +
+        `Описание: <code>${currentTask.description}</code>\n` +
+        `Дата: <code>${currentTask.date}</code>\n` +
+        `id: <code>${currentTask.id_task}</code>`;
 
-    isAwaitComment = true; // Включаем режим ожидания комментария
-    currentTaskId = arr.id_task; // Сохраняем ID текущей задачи
+    currentTaskId = currentTask.id_task; // Сохраняем ID текущей задачи
 
     await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"})
         .catch(err => console.error("Error sending message to chatId " + chatId, err));
-    isAwaitingComment = true;
-    async function handleAddComment(ctx) {
-        if(!ctx || !ctx.message) {
-            // Handle error, maybe log it or send a message to admin
-            return;
-        }
-        const userComment = ctx.message.text;
-        // rest of your code
-    }
-
 }
-
 
 // Функция для обработки команды /start
 async function handleStartCommand(ctx) {
-    // if (isAwaitingComment) {
-    //     ctx.reply('Пожалуйста, напишите свой комментарий.') // Отправляем пользователю сообщение, просим его написать комментарий
-    //     return
-    // }
-
     const chatId = ctx.message.chat.id
     const isRegistered = await checkRegistration(chatId)
     ctx.reply(  // Вы уже зарегистрированы! / Не зарегистрированы
-        isRegistered ? messages.alreadyRegistered : messages.notRegistered,
+        isRegistered ? ruLang.alreadyRegistered : ruLang.notRegistered,
         {parse_mode: 'HTML'}
+        // FIXME: Заменить "Вы уже зарегистрированы!" на выполнение функции проверки комментариев
     )
 }
 
@@ -100,25 +88,24 @@ async function checkRegistration(chatId) {
     return data ? data.user_ids.includes(chatId) : false // user_ids проверяем масив
 }
 
-// Функция для добавления комментария
-// https://bot.pf-forum.ru/web_servise/update_comment.php?id=5&comment=%D0%9D%D0%BE%D0%B2%D1%8B%D0%B9%2020%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9
+// Функция для добавления комментария в базу MySQL
 async function handleAddComment(ctx) {
     console.log("Обработка добавления комментария");
-    if (isAwaitingComment) {
+    if (isAwaitComment) {
         const userComment = ctx.message.text;
         const chatId = ctx.message.chat.id;
 
         // Здесь код для отправки комментария и ID задачи
         try {
-            await fetchData(`${WEB_SERVICE_URL}/update_comment.php`, { id: currentTaskId, comment: userComment });
-            bot.telegram.sendMessage(chatId, "Комментарий добавлен успешно.", { parse_mode: "HTML" });
+            await fetchData(WEB_SERVICE_URL + `/update_comment.php`, {id_task: currentTaskId, comment: userComment});
+            bot.telegram.sendMessage(chatId, "Комментарий добавлен успешно.", {parse_mode: "HTML"});
             console.log("Комментарий добавлен успешно.");
         } catch (error) {
-            bot.telegram.sendMessage(chatId, "Ошибка при добавлении комментария: " + error, { parse_mode: "HTML" });
+            bot.telegram.sendMessage(chatId, "Ошибка при добавлении комментария: " + error, {parse_mode: "HTML"});
             console.log("Ошибка при добавлении комментария:", error);
         }
 
-        isAwaitingComment = false; // Сбрасываем флаг ожидания
+        isAwaitComment = false; // Сбрасываем флаг ожидания
         currentTaskId = null; // Сбрасываем текущий ID задачи
     } else {
         // Обрабатываем случай, если комментарий не ожидается
@@ -128,50 +115,37 @@ async function handleAddComment(ctx) {
 
 // ! reg
 async function handleRegComment(ctx) {
-    ctx.reply(messages.enterData, {parse_mode: 'HTML'})
+    ctx.reply(ruLang.enterData, {parse_mode: 'HTML'})
+    isAwaitFio = true;
+    isAwaitComment = false;
+    return isAwaitFio
 }
 
-// Функция для обработки текстовых команд
+// Обработка текстовых команд ФИО /add_user
 async function handleTextCommand(ctx) {
 
-    if (regChek = 0) {
-        console.log(ctx.update.message.reply_to_message)
+    if (isAwaitFio) {
         const {text, chat, from} = ctx.message
         if (/^[А-Яа-я]+\s[А-я]\.[А-я]\.$/.test(text)) {
             // Проверяет Иванов И.И.
-            const data = await fetchData(WEB_SERVICE_URL + '/user.php', {
+            const data = await fetchData(WEB_SERVICE_URL + '/add_user.php', {
                 id: chat.id,
                 fio: text,
                 username: from.username,
                 active: 1,
             })
-            if (data) handleApiResponse(ctx, data)
+            console.log("Data from fetchData: ", data);
+            if (data) {
+                // Тут вы можете обработать ответ от сервера.
+                // Например, отправить сообщение пользователю.
+                ctx.reply("Вы успешно зарегистрированы!", {parse_mode: 'HTML'});
+            }
+            isAwaitFio = false;  // Сбрасываем флаг
         } else {
-            ctx.reply(messages.invalidData)
+            ctx.reply(ruLang.invalidData)
         }
     }
 }
-
-// ? ------------------ по умолчанию ------------------
-
-// Подключение к базе данных SQLite, сохранение дескриптора в переменную db
-let db = new sqlite3.Database('./state.db', (err) => {
-    // Проверка на ошибки при подключении
-    if (err) {
-        // console.error('Could not connect to database', err) // Вывод ошибки, если не удается подключиться
-    } else {
-        // console.log('Подключение к базе данных') // Вывод сообщения об успешном подключении
-    }
-})
-
-// ! Создание таблицы 'user_session', если она не существует
-db.run(
-    'CREATE TABLE IF NOT EXISTS user_session (chat_id TEXT, state TEXT)',
-    (err) => {
-        // Проверка на ошибки при создании таблицы
-        if (err) console.error('Could not create table', err) // Вывод ошибки, если не удается создать таблицу
-    }
-)
 
 // ! ------------------ command ------------------
 
