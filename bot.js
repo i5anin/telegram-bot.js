@@ -69,21 +69,31 @@ async function notifyUsers(ctx) {
 
     await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"})
         .catch(err => console.error("Error sending message to chatId " + chatId, err));
+    // handleAddComment(ctx);
 }
-
 
 
 // Функция для проверки регистрации пользователя на Сервере
 async function checkRegistration(chatId) {
-    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php')
-    data.user_ids = undefined;
-    return data ? data.user_ids.includes(chatId) : false // user_ids проверяем масив
+    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php');
+    // Добавляем отладочный вывод
+    console.log("Data returned from server: ", data);
+    // Проверяем, содержит ли 'data' нужное поле
+    if (data && data.hasOwnProperty('user_ids')) {
+        return data.user_ids.includes(chatId);
+    } else {
+        console.error("The server response did not contain 'user_ids'");
+        return false;
+    }
 }
+
 
 // Функция для добавления комментария в базу MySQL
 async function handleAddComment(ctx) {
-    console.log("Обработка добавления комментария");
+    console.log("Обработка добавления комментария\n");
+    console.log(ctx); // undefined wtf?
     if (isAwaitComment) {
+        console.log("isAwaitComment = ", isAwaitComment);
         const userComment = ctx.message.text;
         const chatId = ctx.message.chat.id;
 
@@ -139,12 +149,13 @@ async function handleTextCommand(ctx) {
         } else {
             ctx.reply(ruLang.invalidData)
         }
+    } else if (isAwaitComment) {  // Добавленная часть
+        // Вызываем уже существующую функцию обработки комментария
+        await handleAddComment(ctx);
     }
 }
 
 // ! ------------------ command ------------------
-
-bot.command('add_comment', handleAddComment) // ! Добавить комментарий к работе
 
 bot.command('new_comment', notifyUsers) // ! Оповещения
 
