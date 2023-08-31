@@ -1,9 +1,10 @@
 require('dotenv').config() // загрузить переменные среды из файла .env
-const { Telegraf, Markup, session } = require('telegraf')
+const { Telegraf } = require('telegraf')//, Markup, session
 const sqlite3 = require('sqlite3').verbose()
 const axios = require('axios')
 
 const messages = require('./text_messages')
+const process = require("eslint-config-airbnb-base/legacy");
 
 // Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
@@ -132,7 +133,7 @@ async function handleRegComment(ctx) {
 async function handleTextCommand(ctx) {
     console.log(ctx.update.message.reply_to_message)
     const { text, chat, from } = ctx.message
-    if (/^[А-Яа-я]+\s[А-Яа-я]\.[А-Яа-я]\.$/.test(text)) {
+    if (/^[А-Яа-я]+\s[А-я]\.[А-я]\.$/.test(text)) {
         // Проверяет Иванов И.И.
         const data = await fetchData(WEB_SERVICE_URL + '/user.php', {
             id: chat.id,
