@@ -51,10 +51,11 @@ async function notifyUsers(ctx) {
 
     const chatId = ctx.message.chat.id;
     const uncommentedTasks = await fetchComments();
-    if (!uncommentedTasks) return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
-
     const userActualComments =
         uncommentedTasks.filter(({user_id}) => user_id === chatId); // фильтуем по id нужный
+
+    if (!uncommentedTasks) return bot.telegram.sendMessage(userActualComments, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
+
     const currentTask = userActualComments [0]; // берем первую задачу
     isAwaitComment = true; // Включаем режим ожидания комментария
     const message =
