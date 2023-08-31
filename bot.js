@@ -50,14 +50,16 @@ async function fetchComments() {
 async function notifyUsers(ctx) {
 
     const chatId = ctx.message.chat.id;
-    const uncommentedTasks = await fetchComments();
-    const userActualComments =
-        uncommentedTasks.filter(({user_id}) => user_id === chatId); // фильтуем по id нужный
+    const uncommentedTasks = await fetchComments(); // ваша функция для получения комментариев
+    const userActualComments = uncommentedTasks.filter(({user_id}) => user_id === chatId);
 
-    if (!uncommentedTasks) return bot.telegram.sendMessage(userActualComments, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
+    if (userActualComments.length === 0) {
+        return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
+    }
 
-    const currentTask = userActualComments [0]; // берем первую задачу
-    isAwaitComment = true; // Включаем режим ожидания комментария
+    const currentTask = userActualComments[0];
+    isAwaitComment = true;  // Включаем режим ожидания комментария
+
     const message =
         'Пожалуйста, прокомментируйте следующую операцию:\n' +
         `<code>(1/${userActualComments.length})</code>\n` +
@@ -66,12 +68,12 @@ async function notifyUsers(ctx) {
         `Дата: <code>${currentTask.date}</code>\n` +
         `id: <code>${currentTask.id_task}</code>`;
 
-    currentTaskId = currentTask.id_task; // Сохраняем ID текущей задачи
+    currentTaskId = currentTask.id_task;  // Сохраняем ID текущей задачи
 
     await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"})
         .catch(err => console.error("Error sending message to chatId " + chatId, err));
-    // handleAddComment(ctx);
 }
+
 
 
 // Функция для проверки регистрации пользователя на Сервере
