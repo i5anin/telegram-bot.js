@@ -1,7 +1,7 @@
 <?php
 
-// https://bot.pf-forum.ru/web_servise/update_comment.php?id=5&comment=Новый%20комментарий
-// https://bot.pf-forum.ru/web_servise/update_comment.php?id=5&comment=Новый%20комментарий&access_key=ВАШ_КЛЮЧ_ДОСТУПА
+// https://bot.pf-forum.ru/web_servise/update_comment.php?id_task=42&comment=%D0%9D%D0%BE%D0%B2%D1%8B%D0%B9%20%D1%8B%D0%B2%D0%B0%D0%BF%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9123qwe
+// https://bot.pf-forum.ru/web_servise/update_comment.php?id_task=5&comment=Новый%20комментарий&access_key=ВАШ_КЛЮЧ_ДОСТУПА
 
 header('Content-Type: application/json');  // Устанавливаем заголовок для ответа в формате JSON
 
@@ -24,7 +24,7 @@ function update_sk_comment($id, $comment)
     $mysqli = mysqli_connect($server, $user, $pass, $db);
     mysqli_set_charset($mysqli, 'utf8mb4');
 
-    $stmt = mysqli_prepare($mysqli, "UPDATE `sk_comment` SET `comment` = ?, `completed` = 1 WHERE `id` = ?");
+    $stmt = mysqli_prepare($mysqli, "UPDATE `sk_comment` SET `comment` = ?, `completed` = 1 WHERE `id_task` = ?");
     mysqli_stmt_bind_param($stmt, "si", $comment, $id);
 
     if (!mysqli_stmt_execute($stmt)) {
@@ -38,10 +38,10 @@ function update_sk_comment($id, $comment)
 }
 
 // Получение данных из GET-запроса
-$id = $_GET["id"];
+$id_task = $_GET["id_task"];
 $comment = $_GET["comment"];
 
-$res = update_sk_comment($id, $comment);
+$res = update_sk_comment($id_task, $comment);
 
 if ($res) {
     echo json_encode(['status' => 'OK', 'message' => 'Data successfully updated.']); // Данные успешно обновлены
