@@ -10,9 +10,10 @@ const BOT_TOKEN = process.env.BOT_TOKEN
 // Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
 
-// ! Флаги
+// ! ------------ Флаги ------------
 let isAwaitFio = false;
 let isAwaitComment = false;
+// ! -------------------------------
 
 let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
 
@@ -70,16 +71,7 @@ async function notifyUsers(ctx) {
         .catch(err => console.error("Error sending message to chatId " + chatId, err));
 }
 
-// Функция для обработки команды /start
-async function handleStartCommand(ctx) {
-    const chatId = ctx.message.chat.id
-    const isRegistered = await checkRegistration(chatId)
-    ctx.reply(  // Вы уже зарегистрированы! / Не зарегистрированы
-        isRegistered ? ruLang.alreadyRegistered : ruLang.notRegistered,
-        {parse_mode: 'HTML'}
-        // FIXME: Заменить "Вы уже зарегистрированы!" на выполнение функции проверки комментариев
-    )
-}
+
 
 // Функция для проверки регистрации пользователя на Сервере
 async function checkRegistration(chatId) {
@@ -115,10 +107,13 @@ async function handleAddComment(ctx) {
 
 // ! reg
 async function handleRegComment(ctx) {
-    ctx.reply(ruLang.enterData, {parse_mode: 'HTML'})
-    isAwaitFio = true;
-    isAwaitComment = false;
-    return isAwaitFio
+    const chatId = ctx.message.chat.id
+    const isRegistered = await checkRegistration(chatId)
+    ctx.reply(  // Вы уже зарегистрированы! / Не зарегистрированы
+        isRegistered ? ruLang.alreadyRegistered : ruLang.notRegistered,
+        {parse_mode: 'HTML'}
+        // FIXME: Заменить "Вы уже зарегистрированы!" на выполнение функции проверки комментариев
+    )
 }
 
 // Обработка текстовых команд ФИО /add_user
@@ -153,7 +148,7 @@ bot.command('add_comment', handleAddComment) // ! Добавить коммен�
 
 bot.command('new_comment', notifyUsers) // ! Оповещения
 
-bot.command('start', handleStartCommand) // start
+bot.command('start', handleRegComment) // start
 bot.command('reg', handleRegComment) // reg
 
 bot.on('text', handleTextCommand) // обработка текстовых команд
