@@ -84,7 +84,7 @@ async function notifyUsers(ctx, userInitiated = false) {
             return bot.telegram.sendMessage(chatId, "Произошла ошибка при получении комментариев.", {parse_mode: "HTML"});
         }
 
-        const userActualComments = uncommentedTasks.filter(({user_id}) => user_id === chatId.toString());
+        const userActualComments = uncommentedTasks.filter(({user_id}) => user_id === chatId);
 
         console.log(chatId);
 
