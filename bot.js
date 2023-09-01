@@ -91,7 +91,12 @@ async function notifyUsers(ctx) {
         const currentTask = userActualComments[0];
         isAwaitComment = true;  // Включаем режим ожидания комментария
 
-        const message = 'Пожалуйста, прокомментируйте следующую операцию:\n' + `<code>(1/${userActualComments.length})</code>\n` + `Название: <code>${currentTask.name}</code>\n` + `Описание: <code>${currentTask.description}</code>\n` + `Дата: <code>${currentTask.date}</code>\n` + `id: <code>${currentTask.id_task}</code>`;
+        const message = 'Пожалуйста, прокомментируйте следующую операцию:\n'
+            + `<code>(1/${userActualComments.length})</code>\n`
+            + `Название: <code>${currentTask.name}</code>\n`
+            + `Описание: <code>${currentTask.description}</code>\n`
+            + `Дата: <code>${currentTask.date}</code>\n`
+            + `id: <code>${currentTask.id_task}</code>`;
 
         currentTaskId = currentTask.id_task;  // Сохраняем ID текущей задачи
 
