@@ -51,7 +51,7 @@ async function fetchData(url, params) {
 async function fetchComments() {
     try {
         // Получение данных от сервера
-        const response = await axios.get(WEB_SERVICE_URL+`/get_sk_comments.php`);
+        const response = await axios.get(WEB_SERVICE_URL + `/get_sk_comments.php`);
 
         // Добавленная строка для отладки: выводим данные, возвращённые сервером
         console.log("Data returned from server: ", response.data);
@@ -91,13 +91,7 @@ async function notifyUsers(ctx) {
         const currentTask = userActualComments[0];
         isAwaitComment = true;  // Включаем режим ожидания комментария
 
-        const message =
-            'Пожалуйста, прокомментируйте следующую операцию:\n' +
-            `<code>(1/${userActualComments.length})</code>\n` +
-            `Название: <code>${currentTask.name}</code>\n` +
-            `Описание: <code>${currentTask.description}</code>\n` +
-            `Дата: <code>${currentTask.date}</code>\n` +
-            `id: <code>${currentTask.id_task}</code>`;
+        const message = 'Пожалуйста, прокомментируйте следующую операцию:\n' + `<code>(1/${userActualComments.length})</code>\n` + `Название: <code>${currentTask.name}</code>\n` + `Описание: <code>${currentTask.description}</code>\n` + `Дата: <code>${currentTask.date}</code>\n` + `id: <code>${currentTask.id_task}</code>`;
 
         currentTaskId = currentTask.id_task;  // Сохраняем ID текущей задачи
 
@@ -108,7 +102,6 @@ async function notifyUsers(ctx) {
         console.error('Error in notifyUsers:', error);
     }
 }
-
 
 
 // Функция для проверки регистрации пользователя на Сервере
@@ -161,11 +154,13 @@ async function handleRegComment(ctx) {
     if (isRegistered) {
         ctx.reply(ruLang.alreadyRegistered, {parse_mode: 'HTML'});
         isAwaitFio = false;
-        // await notifyUsers(ctx);
+        // notifyUsers(ctx);
+        // await notifyUsers(ctx); // Функция для уведомления пользователей о комментариях
     } else {
         ctx.reply(ruLang.notRegistered, {parse_mode: 'HTML'});
         isAwaitFio = true;
     }
+    // if (isRegistered) notifyUsers(ctx);
 }
 
 
@@ -175,24 +170,25 @@ async function handleTextCommand(ctx) {
     console.log('isAwaitComment = ' + isAwaitComment);
     if (isAwaitFio) {
         const {text, chat, from} = ctx.message
-        if (/^[А-Яа-я]+\s[А-я]\.[А-я]\.$/.test(text)) {
+        if (/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\.[А-Яа-яёЁ]\.$/
+            .test(text)) {
             // Проверяет Иванов И.И.
             const data = await fetchData(WEB_SERVICE_URL + '/add_user.php', {
-                id: chat.id,
-                fio: text,
-                username: from.username,
-                active: 1,
+                id: chat.id, fio: text, username: from.username, active: 1,
             })
             console.log("Data from fetchData: ", data);
             if (data) {
                 // Тут вы можете обработать ответ от сервера.
                 // Например, отправить сообщение пользователю.
                 ctx.reply("Вы успешно зарегистрированы!", {parse_mode: 'HTML'});
+                notifyUsers(etx); // если зарегистрировался кидем задачу
             }
             isAwaitFio = false;  // Сбрасываем флаг
         } else {
             ctx.reply(ruLang.invalidData)
         }
+
+
     } else if (isAwaitComment) {  // Добавленная часть
         // Вызываем уже существующую функцию обработки комментария
         await handleAddComment(ctx);
