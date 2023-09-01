@@ -3,6 +3,7 @@ const express = require('express');
 const {Telegraf} = require('telegraf');
 const axios = require('axios');
 const ruLang = require('./ru_lang');
+const cron = require('node-cron');
 
 // Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
@@ -31,6 +32,41 @@ let userInitiated = false;
 // ! -------------------------------
 
 let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
+
+
+async function notifyAllUsers() {
+    // Получение всех комментариев
+    const allComments = await fetchComments();
+
+    // Получение списка всех зарегистрированных пользователей
+    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php');
+    if (!data || !data.hasOwnProperty('user_ids')) {
+        console.error("The server response did not contain 'user_ids'");
+        return;
+    }
+    const allUsers = data.user_ids; // предполагается, что это массив chatId
+
+    allUsers.forEach(async (chatId) => {
+        const userComments = allComments.filter(comment => comment.user_id === chatId);
+
+        if (userComments.length > 0) {
+            let message = "Вам нужно прокомментировать следующие задачи:\n";
+            for (const comment of userComments) {
+                const index = userComments.indexOf(comment);
+                message += `\n<code>(${index + 1}/${userComments.length})</code>`;
+                message += `\nНазвание: <code>${comment.name}</code>`;
+                message += `\nОбозначение: <code>${comment.description}</code>`;
+                message += `\nДата: <code>${comment.date}</code>`;
+                message += `\nID: <code>${comment.id_task}</code>\n`;
+            }
+
+            await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"});
+        } else {
+            // await bot.telegram.sendMessage(chatId, "На данный момент у вас нет задач для комментирования.", {parse_mode: "HTML"});
+        }
+    });
+}
+
 
 // Функция для выполнения GET-запросов
 async function fetchData(url, params) {
@@ -214,9 +250,16 @@ bot.on('text', handleTextCommand) // обработка текстовых ко�
 bot.launch()
     .catch(err => console.error('Error while launching the bot:', err));
 
+cron.schedule('*/1 * * * *', async () => {
+    console.log('Running a task every 10 minutes');
+    await notifyAllUsers();
+});
+
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
+
+
 
 
 
