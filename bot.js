@@ -1,4 +1,5 @@
 require('dotenv').config();
+const express = require('express');
 const {Telegraf} = require('telegraf');
 const axios = require('axios');
 const ruLang = require('./ru_lang');
@@ -6,9 +7,22 @@ const ruLang = require('./ru_lang');
 // Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
 const BOT_TOKEN = process.env.BOT_TOKEN
+const app = express();  // создаем экземпляр Express
 
 // Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
+
+// Middleware для чтения заголовков
+app.use((req, res, next) => {
+    const token = req.headers['x-telegram-bot-api-secret-token'];
+    if (token) {
+        console.log(`Token received: ${token}`);
+    }
+    next();
+});
+
+// Настройка веб-хука
+bot.telegram.setWebhook('https://pfforum-js.onrender.com');
 
 // ! ------------ Флаги ------------
 let isAwaitFio = false;
@@ -37,7 +51,7 @@ async function fetchData(url, params) {
 async function fetchComments() {
     try {
         // Получение данных от сервера
-        const response = await axios.get(`${WEB_SERVICE_URL}/get_sk_comments.php`);
+        const response = await axios.get(WEB_SERVICE_URL+`/get_sk_comments.php`);
 
         // Добавленная строка для отладки: выводим данные, возвращённые сервером
         console.log("Data returned from server: ", response.data);
@@ -196,6 +210,10 @@ bot.on('text', handleTextCommand) // обработка текстовых ко�
 
 bot.launch()
     .catch(err => console.error('Error while launching the bot:', err));
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+});
 
 
 
