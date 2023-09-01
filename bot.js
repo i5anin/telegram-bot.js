@@ -73,40 +73,38 @@ async function fetchComments() {
 
 // Функция для уведомления пользователей о комментариях
 async function notifyUsers(ctx, userInitiated = false) {
-    const chatId = ctx.message.chat.id;
-
-    // Переместим эту строку ближе к месту использования
-    let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
-
     try {
-        const uncommentedTasks = await fetchComments();
+        const chatId = ctx.message.chat.id;
+        const uncommentedTasks = await fetchComments(); // your function for fetching comments
+        console.log("Найдено: ", uncommentedTasks);
+
         if (!uncommentedTasks) {
+            console.error("No comments returned from fetchComments");
             return bot.telegram.sendMessage(chatId, "Произошла ошибка при получении комментариев.", {parse_mode: "HTML"});
         }
-
         const userActualComments = uncommentedTasks.filter(({user_id}) => user_id === chatId.toString());
-
-        console.log(chatId);
+        console.log("Filtered userActualComments: ", userActualComments);
 
         if (userActualComments.length === 0) {
-            // if (userInitiated) {
-                return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
-            // }
+            if (userInitiated)  return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
             return;
         }
 
-        // Установим currentTaskId теперь, когда мы уверены, что он нужен
-        currentTaskId = userActualComments[0].id_task;
+        const currentTask = userActualComments[0];
+        isAwaitComment = true;  // Включаем режим ожидания комментария
 
-        // Готовим и отправляем сообщение
-        const message = `Пожалуйста, прокомментируйте следующую операцию:\n`
+        const message = 'Пожалуйста, прокомментируйте следующую операцию:\n'
             + `<code>(1/${userActualComments.length})</code>\n`
-            + `Название: <code>${userActualComments[0].name}</code>\n`
-            + `Обозначение: <code>${userActualComments[0].description}</code>\n`
-            + `Дата: <code>${userActualComments[0].date}</code>\n`
-            + `id: <code>${currentTaskId}</code>`;
+            + `Название: <code>${currentTask.name}</code>\n`
+            + `Обозначение: <code>${currentTask.description}</code>\n`
+            + `Дата: <code>${currentTask.date}</code>\n`
+            + `id: <code>${currentTask.id_task}</code>`;
 
-        await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"});
+        currentTaskId = currentTask.id_task;  // Сохраняем ID текущей задачи
+
+        await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"})
+            .catch(err => console.error("Error sending message to chatId " + chatId, err));
+
     } catch (error) {
         console.error('Error in notifyUsers:', error);
     }
@@ -151,7 +149,7 @@ async function handleAddComment(ctx) {
 
         isAwaitComment = false;
         currentTaskId = null;
-        await notifyUsers(ctx);  // Если функция асинхронная, лучше использовать await
+        notifyUsers(ctx);  // Если функция асинхронная, лучше использовать await
     }
 }
 
