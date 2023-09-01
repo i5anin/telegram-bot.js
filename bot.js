@@ -36,13 +36,23 @@ async function fetchData(url, params) {
 // Проверка комминтариев
 async function fetchComments() {
     try {
-        const response = await axios.get(
-            WEB_SERVICE_URL + '/get_sk_comments.php'
-        )
-        return response.data.comments
+        // Получение данных от сервера
+        const response = await axios.get(`${WEB_SERVICE_URL}/get_sk_comments.php`);
+
+        // Добавленная строка для отладки: выводим данные, возвращённые сервером
+        console.log("Data returned from server: ", response.data);
+
+        // Проверка наличия поля 'comments' в ответе от сервера
+        if (response.data && 'comments' in response.data) {
+            return response.data.comments;
+        } else {
+            console.warn("The field 'comments' was not found in the returned data.");
+            return null;
+        }
     } catch (error) {
-        console.error('Ошибка при получении комментариев:', error)
-        return null
+        // В случае ошибки выводим её в консоль
+        console.error('Ошибка при получении комментариев:', error);
+        return null;
     }
 }
 
@@ -73,7 +83,6 @@ async function notifyUsers(ctx) {
     await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"})
         .catch(err => console.error("Error sending message to chatId " + chatId, err));
 }
-
 
 
 // Функция для проверки регистрации пользователя на Сервере
@@ -118,22 +127,26 @@ async function handleAddComment(ctx) {
     }
 }
 
-
-
 // ! reg
 async function handleRegComment(ctx) {
-    const chatId = ctx.message.chat.id
-    const isRegistered = await checkRegistration(chatId)
-    ctx.reply(  // Вы уже зарегистрированы! / Не зарегистрированы
-        isRegistered ? ruLang.alreadyRegistered : ruLang.notRegistered,
-        {parse_mode: 'HTML'}
-        // FIXME: Заменить "Вы уже зарегистрированы!" на выполнение функции проверки комментариев
-    )
+    const chatId = ctx.message.chat.id;
+    const isRegistered = await checkRegistration(chatId);
+
+    if (isRegistered) {
+        ctx.reply(ruLang.alreadyRegistered, {parse_mode: 'HTML'});
+        isAwaitFio = false;
+        // await notifyUsers(ctx);
+    } else {
+        ctx.reply(ruLang.notRegistered, {parse_mode: 'HTML'});
+        isAwaitFio = true;
+    }
 }
+
 
 // Обработка текстовых команд ФИО /add_user
 async function handleTextCommand(ctx) {
-
+    console.log('isAwaitFio = ' + isAwaitFio);
+    console.log('isAwaitComment = ' + isAwaitComment);
     if (isAwaitFio) {
         const {text, chat, from} = ctx.message
         if (/^[А-Яа-я]+\s[А-я]\.[А-я]\.$/.test(text)) {
@@ -170,5 +183,7 @@ bot.command('reg', handleRegComment) // reg
 bot.on('text', handleTextCommand) // обработка текстовых команд
 
 bot.launch()
+    .catch(err => console.error('Error while launching the bot:', err));
+
 
 
