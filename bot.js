@@ -27,6 +27,7 @@ bot.telegram.setWebhook('https://pfforum-js.onrender.com');
 // ! ------------ Флаги ------------
 let isAwaitFio = false;
 let isAwaitComment = false;
+let userInitiated = false;
 // ! -------------------------------
 
 let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
@@ -54,7 +55,7 @@ async function fetchComments() {
         const response = await axios.get(WEB_SERVICE_URL + `/get_sk_comments.php`);
 
         // Добавленная строка для отладки: выводим данные, возвращённые сервером
-        console.log("Data returned from server: ", response.data);
+        console.log("Данные, возвращаемые с сервера: ", response.data);
 
         // Проверка наличия поля 'comments' в ответе от сервера
         if (response.data && 'comments' in response.data) {
@@ -71,21 +72,22 @@ async function fetchComments() {
 }
 
 // Функция для уведомления пользователей о комментариях
-async function notifyUsers(ctx) {
+async function notifyUsers(ctx, userInitiated = false) {
     try {
         const chatId = ctx.message.chat.id;
-        const uncommentedTasks = await fetchComments(); // ваша функция для получения комментариев
+        const uncommentedTasks = await fetchComments(); // your function for fetching comments
+        console.log("Найдено: ", uncommentedTasks);
 
-        // Проверяем, получены ли комментарии
         if (!uncommentedTasks) {
             console.error("No comments returned from fetchComments");
             return bot.telegram.sendMessage(chatId, "Произошла ошибка при получении комментариев.", {parse_mode: "HTML"});
         }
-
-        const userActualComments = uncommentedTasks.filter(({user_id}) => user_id === chatId);
+        const userActualComments = uncommentedTasks.filter(({user_id}) => user_id === chatId.toString());
+        console.log("Filtered userActualComments: ", userActualComments);
 
         if (userActualComments.length === 0) {
-            return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
+            if (userInitiated)  return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
+            return;
         }
 
         const currentTask = userActualComments[0];
@@ -94,7 +96,7 @@ async function notifyUsers(ctx) {
         const message = 'Пожалуйста, прокомментируйте следующую операцию:\n'
             + `<code>(1/${userActualComments.length})</code>\n`
             + `Название: <code>${currentTask.name}</code>\n`
-            + `Описание: <code>${currentTask.description}</code>\n`
+            + `Обозначение: <code>${currentTask.description}</code>\n`
             + `Дата: <code>${currentTask.date}</code>\n`
             + `id: <code>${currentTask.id_task}</code>`;
 
@@ -147,7 +149,7 @@ async function handleAddComment(ctx) {
 
         isAwaitComment = false;
         currentTaskId = null;
-        await notifyUsers(ctx);  // Если функция асинхронная, лучше использовать await
+        notifyUsers(ctx);  // Если функция асинхронная, лучше использовать await
     }
 }
 
@@ -159,13 +161,10 @@ async function handleRegComment(ctx) {
     if (isRegistered) {
         ctx.reply(ruLang.alreadyRegistered, {parse_mode: 'HTML'});
         isAwaitFio = false;
-        // notifyUsers(ctx);
-        // await notifyUsers(ctx); // Функция для уведомления пользователей о комментариях
     } else {
         ctx.reply(ruLang.notRegistered, {parse_mode: 'HTML'});
         isAwaitFio = true;
     }
-    // if (isRegistered) notifyUsers(ctx);
 }
 
 
@@ -186,8 +185,9 @@ async function handleTextCommand(ctx) {
                 // Тут вы можете обработать ответ от сервера.
                 // Например, отправить сообщение пользователю.
                 ctx.reply("Вы успешно зарегистрированы!", {parse_mode: 'HTML'});
-                notifyUsers(etx); // если зарегистрировался кидем задачу
             }
+            console.log("\nЕсли зарегистрировался кидем задачу\n")
+            await notifyUsers(ctx); // если зарегистрировался кидем задачу
             isAwaitFio = false;  // Сбрасываем флаг
         } else {
             ctx.reply(ruLang.invalidData)
@@ -202,7 +202,7 @@ async function handleTextCommand(ctx) {
 
 // ! ------------------ command ------------------
 
-bot.command('new_comment', notifyUsers) // ! Оповещения
+bot.command('new_comment', (ctx) => notifyUsers(ctx, true)) // Оповещения с флагом userInitiated=true
 
 bot.command('start', handleRegComment) // start
 bot.command('reg', handleRegComment) // reg
