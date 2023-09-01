@@ -46,26 +46,24 @@ async function notifyAllUsers() {
     }
     const allUsers = data.user_ids; // предполагается, что это массив chatId
 
-    allUsers.forEach(async (chatId) => {
+    for (const chatId of allUsers) {
         const userComments = allComments.filter(comment => comment.user_id === chatId);
 
         if (userComments.length > 0) {
-            let message = "Вам нужно прокомментировать следующие задачи:\n";
-            for (const comment of userComments) {
-                const index = userComments.indexOf(comment);
-                message += `\n<code>(${index + 1}/${userComments.length})</code>`;
-                message += `\nНазвание: <code>${comment.name}</code>`;
-                message += `\nОбозначение: <code>${comment.description}</code>`;
-                message += `\nДата: <code>${comment.date}</code>`;
-                message += `\nID: <code>${comment.id_task}</code>\n`;
-            }
+            const firstComment = userComments[0]; // выбираем только первый комментарий
+            let message = "Вам нужно прокомментировать следующую задачу:\n";
+
+            message += `\nНазвание: <code>${firstComment.name}</code>`;
+            message += `\nОбозначение: <code>${firstComment.description}</code>`;
+            message += `\nДата: <code>${firstComment.date}</code>`;
+            message += `\nID: <code>${firstComment.id_task}</code>\n`;
 
             await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"});
-        } else {
-            // await bot.telegram.sendMessage(chatId, "На данный момент у вас нет задач для комментирования.", {parse_mode: "HTML"});
         }
-    });
+        // Ничего не отправляем, если у пользователя нет задач для комментирования
+    }
 }
+
 
 
 // Функция для выполнения GET-запросов
