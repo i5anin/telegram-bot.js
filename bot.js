@@ -33,37 +33,42 @@ let userInitiated = false;
 
 let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
 
-
+// Функция для уведомления всех пользователей
 async function notifyAllUsers() {
-    // Получение всех комментариев
     const allComments = await fetchComments();
+    const data = await fetchData(WEB_SERVICE_URL + "/get_user_id.php");
 
-    // Получение списка всех зарегистрированных пользователей
-    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php');
-    if (!data || !data.hasOwnProperty('user_ids')) {
+    if (!data || !data.hasOwnProperty("user_ids")) {
         console.error("The server response did not contain 'user_ids'");
         return;
     }
-    const allUsers = data.user_ids; // предполагается, что это массив chatId
+
+    const allUsers = data.user_ids;
 
     for (const chatId of allUsers) {
+        // Проверяем, ожидаем ли мы комментарий от этого пользователя
+        if (userStates.get(chatId)) {
+            continue;
+        }
+
         const userComments = allComments.filter(comment => comment.user_id === chatId);
 
         if (userComments.length > 0) {
-            const firstComment = userComments[0]; // выбираем только первый комментарий
-            let message = "Вам нужно прокомментировать следующую задачу:\n";
-
-            message += `\nНазвание: <code>${firstComment.name}</code>`;
-            message += `\nОбозначение: <code>${firstComment.description}</code>`;
-            message += `\nДата: <code>${firstComment.date}</code>`;
-            message += `\nID: <code>${firstComment.id_task}</code>\n`;
+            const comment = userComments[0];
+            let message = "<code>Cron</code>\nВам нужно прокомментировать следующую задачу:\n";
+            message += `\nНазвание: <code>${comment.name}</code>`;
+            message += `\nОбозначение: <code>${comment.description}</code>`;
+            message += `\nДата: <code>${comment.date}</code>`;
+            message += `\nID: <code>${comment.id_task}</code>\n`;
 
             await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"});
-        }
-        // Ничего не отправляем, если у пользователя нет задач для комментирования
-    }
-}
 
+            // Устанавливаем состояние ожидания для пользователя
+            userStates.set(chatId, {isAwaitingComment: true, taskId: comment.id_task});
+        }
+    }
+    isAwaitComment = true;
+}
 
 
 // Функция для выполнения GET-запросов
@@ -124,7 +129,7 @@ async function notifyUsers(ctx, userInitiated = false) {
 
         if (userActualComments.length === 0) {
             // if (userInitiated) {
-                return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
+            return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
             // }
             return;
         }
@@ -164,30 +169,36 @@ async function checkRegistration(chatId) {
 
 // Функция для добавления комментария в базу MySQL
 async function handleAddComment(ctx) {
-    console.log("Context: ", ctx);  // Для отладки
     if (!ctx) {
         console.log("Context is undefined!");
         return;
     }
 
-    if (isAwaitComment) {
+    const chatId = ctx.message.chat.id;
+    const userState = userStates.get(chatId);
+
+    if (userState && userState.isAwaitingComment) {
         const userComment = ctx.message.text;
-        const chatId = ctx.message.chat.id;
 
         try {
-            await fetchData(WEB_SERVICE_URL + `/update_comment.php`, {id_task: currentTaskId, comment: userComment});
+            await fetchData(WEB_SERVICE_URL + `/update_comment.php`, {id_task: userState.taskId, comment: userComment});
             await bot.telegram.sendMessage(chatId, "Комментарий добавлен успешно.", {parse_mode: "HTML"});
             console.log("Комментарий добавлен успешно.");
+
+            // Обновляем состояние пользователя
+            userStates.set(chatId, { isAwaitingComment: false, taskId: null });
         } catch (error) {
             await bot.telegram.sendMessage(chatId, "Ошибка при добавлении комментария: " + error, {parse_mode: "HTML"});
             console.log("Ошибка при добавлении комментария:", error);
-        }
 
-        isAwaitComment = false;
-        currentTaskId = null;
-        await notifyUsers(ctx);  // Если функция асинхронная, лучше использовать await
+            // Обновляем состояние пользователя
+            userStates.set(chatId, { isAwaitingComment: true, taskId: userState.taskId });
+        }
+    } else {
+        console.log("No comment is awaited from this user at the moment.");
     }
 }
+
 
 // ! reg
 async function handleRegComment(ctx) {
@@ -247,7 +258,7 @@ bot.on('text', handleTextCommand) // обработка текстовых ко�
 
 bot.launch()
     .catch(err => console.error('Error while launching the bot:', err));
-
+const userStates = new Map();
 cron.schedule('*/1 * * * *', async () => {
     console.log('Running a task every 10 minutes');
     await notifyAllUsers();
