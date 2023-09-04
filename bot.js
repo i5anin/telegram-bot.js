@@ -55,11 +55,12 @@ async function notifyAllUsers() {
 
         if (userComments.length > 0) {
             const comment = userComments[0];
-            let message = "<code>Cron</code>\nВам нужно прокомментировать следующую задачу:\n";
-            message += `\nНазвание: <code>${comment.name}</code>`;
-            message += `\nОбозначение: <code>${comment.description}</code>`;
-            message += `\nДата: <code>${comment.date}</code>`;
-            message += `\nID: <code>${comment.id_task}</code>\n`;
+            let message = "<code>Cron</code>\nВам нужно прокомментировать следующую задачу:\n"
+                + `<code>(1/${userActualComments.length})</code>\n`
+                + `Название: <code>${comment.name}</code>\n`
+                + `Обозначение: <code>${comment.description}</code>\n`
+                + `Дата: <code>${comment.date}</code>\n`
+                + `ID: <code>${comment.id_task}</code>`;
 
             await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"});
 
@@ -186,13 +187,13 @@ async function handleAddComment(ctx) {
             console.log("Комментарий добавлен успешно.");
 
             // Обновляем состояние пользователя
-            userStates.set(chatId, { isAwaitingComment: false, taskId: null });
+            userStates.set(chatId, {isAwaitingComment: false, taskId: null});
         } catch (error) {
             await bot.telegram.sendMessage(chatId, "Ошибка при добавлении комментария: " + error, {parse_mode: "HTML"});
             console.log("Ошибка при добавлении комментария:", error);
 
             // Обновляем состояние пользователя
-            userStates.set(chatId, { isAwaitingComment: true, taskId: userState.taskId });
+            userStates.set(chatId, {isAwaitingComment: true, taskId: userState.taskId});
         }
     } else {
         console.log("No comment is awaited from this user at the moment.");
