@@ -285,9 +285,10 @@ cron.schedule('*/1 * * * *', async () => {
     await notifyAllUsers();
 });
 
-app.listen(8443, () => {
+app.listen(8443, '192.168.0.1', () => {
     console.log('Server is running on port 8443');
 });
+
 
 
 
