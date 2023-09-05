@@ -128,7 +128,7 @@ async function notifyUsers(ctx, userInitiated = false) {
 
         const userActualComments = uncommentedTasks.filter(({user_id}) => user_id === chatId);
 
-        console.log(chatId);
+        // console.log(chatId);
 
         if (userActualComments.length === 0) {
             // if (userInitiated) {
@@ -186,13 +186,13 @@ async function handleAddComment(ctx) {
         try {
             await fetchData(WEB_SERVICE_URL + `/update_comment.php`, {id_task: userState.taskId, comment: userComment});
             await bot.telegram.sendMessage(chatId, "Комментарий добавлен успешно.", {parse_mode: "HTML"});
-            console.log("Комментарий добавлен успешно.");
+            // console.log("Комментарий добавлен успешно.");
 
             // Обновляем состояние пользователя
             userStates.set(chatId, {isAwaitingComment: false, taskId: null});
         } catch (error) {
             await bot.telegram.sendMessage(chatId, "Ошибка при добавлении комментария: " + error, {parse_mode: "HTML"});
-            console.log("Ошибка при добавлении комментария:", error);
+            // console.log("Ошибка при добавлении комментария:", error);
 
             // Обновляем состояние пользователя
             userStates.set(chatId, {isAwaitingComment: true, taskId: userState.taskId});
@@ -248,7 +248,7 @@ async function handleTextCommand(ctx) {
             const data = await fetchData(WEB_SERVICE_URL + '/add_user.php', {
                 id: chat.id, fio: cleanedText, username: from.username, active: 1,
             });
-            console.log("Data from fetchData: ", data);
+            // console.log("Data from fetchData: ", data);
             if (data) {
                 // Тут вы можете обработать ответ от сервера.
                 // Например, отправить сообщение пользователю.
