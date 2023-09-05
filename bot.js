@@ -208,8 +208,8 @@ async function handleRegComment(ctx) {
     const chatId = ctx.message.chat.id;
     const isRegistered = await checkRegistration(chatId);
 
-    // const { chat, from, text } = ctx.message;
-    // await bot.telegram.sendMessage(LOG_CHANNEL_ID, `msg ID <code>${chat.id}</code> @${from.username}\nname: <code>${from.first_name || "N/A"}</code>\nSent command: <code>${text}</code>`, {parse_mode: "HTML"});
+    const { chat, from, text } = ctx.message;
+    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `msg ID <code>${chat.id}</code> @${from.username}\nname: <code>${from.first_name || "N/A"}</code>\nSent command: <code>${text}</code>`, {parse_mode: "HTML"});
 
     if (isRegistered) {
         ctx.reply(ruLang.alreadyRegistered, {parse_mode: 'HTML'});
