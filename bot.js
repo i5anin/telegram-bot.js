@@ -208,8 +208,15 @@ async function handleRegComment(ctx) {
     const chatId = ctx.message.chat.id;
     const isRegistered = await checkRegistration(chatId);
 
-    const { chat, from, text } = ctx.message;
-    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `msg ID <code>${chat.id}</code> @${from.username}\nname: <code>${from.first_name || "N/A"}</code>\nSent command: <code>${text}</code>`, {parse_mode: "HTML"});
+    const {chat, from, text} = ctx.message;
+    await bot.telegram.sendMessage(
+        LOG_CHANNEL_ID,
+        `ID <code>${chat.id}</code>`
+        + ` username: ${"@" + from.username || '<code>N/A</code>'}`
+        + `\nname: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>`
+        + `\nmsg: <code>${text}</code>`,
+        {parse_mode: "HTML"}
+    );
 
     if (isRegistered) {
         ctx.reply(ruLang.alreadyRegistered, {parse_mode: 'HTML'});
@@ -229,8 +236,8 @@ async function handleTextCommand(ctx) {
     await bot.telegram.sendMessage(
         LOG_CHANNEL_ID,
         `ID <code>${chat.id}</code>`
-        + ` @${from.username}`
-        + `\nname: <code>${from.first_name || 'N/A'}</code>`
+        + ` username: ${"@" + from.username || '<code>N/A</code>'}`
+        + `\nname: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>`
         + `\nmsg: <code>${text}</code>`,
         {parse_mode: "HTML"}
     );
