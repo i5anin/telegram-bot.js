@@ -228,20 +228,19 @@ async function handleTextCommand(ctx) {
     const {text, chat, from} = ctx.message
     await bot.telegram.sendMessage(
         LOG_CHANNEL_ID,
-        `msg ID <code>${chat.id}</code>`
+        `ID <code>${chat.id}</code>`
         + ` @${from.username}`
         + `\nname: <code>${from.first_name || 'N/A'}</code>`
-        + `\nОтправил сообщение: <code>${text}</code>`,
+        + `\nmsg: <code>${text}</code>`,
         {parse_mode: "HTML"}
     );
 
     if (isAwaitFio) {
-        if (/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\.[А-Яа-яёЁ]\.$/
-            .test(text)) {
-            // Проверяет Иванов И.И.
+        if (/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\. ?[А-Яа-яёЁ]\.$/.test(text)) {
+            const cleanedText = text.replace(/\. /g, '.');  // Удаляем пробелы после точек
             const data = await fetchData(WEB_SERVICE_URL + '/add_user.php', {
-                id: chat.id, fio: text, username: from.username, active: 1,
-            })
+                id: chat.id, fio: cleanedText, username: from.username, active: 1,
+            });
             console.log("Data from fetchData: ", data);
             if (data) {
                 // Тут вы можете обработать ответ от сервера.
