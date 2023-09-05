@@ -8,6 +8,8 @@ const cron = require('node-cron');
 // Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
 const BOT_TOKEN = process.env.BOT_TOKEN
+const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID || "-1001946496691"; // ID log канала
+
 const app = express();  // создаем экземпляр Express
 
 // Инициализация бота
@@ -95,7 +97,7 @@ async function fetchComments() {
         const response = await axios.get(WEB_SERVICE_URL + `/get_sk_comments.php`);
 
         // Добавленная строка для отладки: выводим данные, возвращённые сервером
-        console.log("Данные, возвращаемые с сервера: ", response.data);
+        // console.log("Данные, возвращаемые с сервера: ", response.data);
 
         // Проверка наличия поля 'comments' в ответе от сервера
         if (response.data && 'comments' in response.data) {
@@ -157,7 +159,7 @@ async function notifyUsers(ctx, userInitiated = false) {
 async function checkRegistration(chatId) {
     const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php');
     // Добавляем отладочный вывод
-    console.log("Data returned from server: ", data);
+    // console.log("Data returned from server: ", data); //  пользователи с сервера
     // Проверяем, содержит ли 'data' нужное поле
     if (data && data.hasOwnProperty('user_ids')) {
         return data.user_ids.includes(chatId);
@@ -206,6 +208,9 @@ async function handleRegComment(ctx) {
     const chatId = ctx.message.chat.id;
     const isRegistered = await checkRegistration(chatId);
 
+    // const { chat, from, text } = ctx.message;
+    // await bot.telegram.sendMessage(LOG_CHANNEL_ID, `msg ID <code>${chat.id}</code> @${from.username}\nname: <code>${from.first_name || "N/A"}</code>\nSent command: <code>${text}</code>`, {parse_mode: "HTML"});
+
     if (isRegistered) {
         ctx.reply(ruLang.alreadyRegistered, {parse_mode: 'HTML'});
         isAwaitFio = false;
@@ -218,10 +223,19 @@ async function handleRegComment(ctx) {
 
 // Обработка текстовых команд ФИО /add_user
 async function handleTextCommand(ctx) {
-    console.log('isAwaitFio = ' + isAwaitFio);
-    console.log('isAwaitComment = ' + isAwaitComment);
+    // console.log('isAwaitFio = ' + isAwaitFio);
+    // console.log('isAwaitComment = ' + isAwaitComment);
+    const {text, chat, from} = ctx.message
+    await bot.telegram.sendMessage(
+        LOG_CHANNEL_ID,
+        `msg ID <code>${chat.id}</code>`
+        + ` @${from.username}`
+        + `\nname: <code>${from.first_name || 'N/A'}</code>`
+        + `\nОтправил сообщение: <code>${text}</code>`,
+        {parse_mode: "HTML"}
+    );
+
     if (isAwaitFio) {
-        const {text, chat, from} = ctx.message
         if (/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\.[А-Яа-яёЁ]\.$/
             .test(text)) {
             // Проверяет Иванов И.И.
@@ -234,7 +248,7 @@ async function handleTextCommand(ctx) {
                 // Например, отправить сообщение пользователю.
                 ctx.reply("Вы успешно зарегистрированы!", {parse_mode: 'HTML'});
             }
-            console.log("\nЕсли зарегистрировался кидем задачу\n")
+            // console.log("\nЕсли зарегистрировался кидем задачу\n")
             await notifyUsers(ctx); // если зарегистрировался кидем задачу
             isAwaitFio = false;  // Сбрасываем флаг
         } else {
