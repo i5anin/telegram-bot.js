@@ -1,93 +1,94 @@
-require('dotenv').config();
-const express = require('express');
-const {Telegraf} = require('telegraf');
-const axios = require('axios');
-const ruLang = require('./ru_lang');
-const cron = require('node-cron');
+require('dotenv').config()
+const express = require('express')
+const { Telegraf } = require('telegraf')
+const axios = require('axios')
+const ruLang = require('./ru_lang')
+const cron = require('node-cron')
 
 // Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
 const BOT_TOKEN = process.env.BOT_TOKEN
-const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID || "-1001946496691"; // ID log канала
-const HOST_IP = process.env.HOST_IP || 'localhost';
-const HOST_PORT = process.env.HOST_PORT || 3000;
+const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID || '-1001946496691' // ID log канала
+const HOST_IP = process.env.HOST_IP || 'localhost'
+const HOST_PORT = process.env.HOST_PORT || 3000
+const GRAND_ADMIN = process.env.GRAND_ADMIN
 
-const app = express();  // создаем экземпляр Express
+const app = express()  // создаем экземпляр Express
 
 // Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
 
 // Middleware для чтения заголовков
 app.use((req, res, next) => {
-    const token = req.headers['x-telegram-bot-api-secret-token'];
+    const token = req.headers['x-telegram-bot-api-secret-token']
     if (token) {
-        console.log(`Token received: ${token}`);
+        console.log(`Token received: ${token}`)
     }
-    next();
-});
+    next()
+})
 
 // Настройка веб-хука
 // bot.telegram.setWebhook('https://pfforum-js.onrender.com');
 
 // ! ------------ Флаги ------------
-let isAwaitFio = false;
-let isAwaitComment = false;
-let userInitiated = false;
+let isAwaitFio = false
+let isAwaitComment = false
+let userInitiated = false
 // ! -------------------------------
 
 // let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
 
 // Функция для уведомления всех пользователей
 async function notifyAllUsers() {
-    const allComments = await fetchComments();
-    const data = await fetchData(WEB_SERVICE_URL + "/get_user_id.php"); // Получить список пользователей /get_user_id.php повторяется
+    const allComments = await fetchComments()
+    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php') // Получить список пользователей /get_user_id.php повторяется
 
-    if (!data || !data.hasOwnProperty("user_ids")) {
-        console.error("The server response did not contain 'user_ids'");
-        return;
+    if (!data || !data.hasOwnProperty('user_ids')) {
+        console.error('The server response did not contain \'user_ids\'')
+        return
     }
 
-    const allUsers = data.user_ids;
+    const allUsers = data.user_ids
 
     for (const chatId of allUsers) {
         // Проверяем, ожидаем ли мы комментарий от этого пользователя
         if (userStates.get(chatId)) {
-            continue;
+            continue
         }
 
-        const userComments = allComments.filter(comment => comment.user_id === chatId);
+        const userComments = allComments.filter(comment => comment.user_id === chatId)
 
         if (userComments.length > 0) {
-            const comment = userComments[0];
-            let message = "<code>Cron</code>\nВам нужно прокомментировать следующую задачу:\n"
+            const comment = userComments[0]
+            let message = '<code>Cron</code>\nВам нужно прокомментировать следующую задачу:\n'
                 + `<code>(1/${userComments.length})</code>\n`
                 + `Название: <code>${comment.name}</code>\n`
                 + `Обозначение: <code>${comment.description}</code>\n`
                 + `Дата: <code>${comment.date}</code>\n`
-                + `ID: <code>${comment.id_task}</code>`;
+                + `ID: <code>${comment.id_task}</code>`
 
-            await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"});
+            await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
 
             // Устанавливаем состояние ожидания для пользователя
-            userStates.set(chatId, {isAwaitingComment: true, taskId: comment.id_task});
+            userStates.set(chatId, { isAwaitingComment: true, taskId: comment.id_task })
         }
     }
-    isAwaitComment = true;
+    isAwaitComment = true
 }
 
 
 // Функция для выполнения GET-запросов
 async function fetchData(url, params) {
     try {
-        const response = await axios.get(url, {params});
+        const response = await axios.get(url, { params })
         if (!response.data) {
-            console.error("Сервер ответил без данных.");
-            return null;
+            console.error('Сервер ответил без данных.')
+            return null
         }
-        return response.data;
+        return response.data
     } catch (error) {
-        console.error(ruLang.serverError, error);
-        return null;
+        console.error(ruLang.serverError, error)
+        return null
     }
 }
 
@@ -96,51 +97,48 @@ async function fetchData(url, params) {
 async function fetchComments() {
     try {
         // Получение данных от сервера
-        const response = await axios.get(WEB_SERVICE_URL + `/get_sk_comments.php`); //получить список коментариев
+        const response = await axios.get(WEB_SERVICE_URL + `/get_sk_comments.php`) //получить список коментариев
 
         // Добавленная строка для отладки: выводим данные, возвращённые сервером
         // console.log("Данные, возвращаемые с сервера: ", response.data);
 
         // Проверка наличия поля 'comments' в ответе от сервера
         if (response.data && 'comments' in response.data) {
-            return response.data.comments;
+            return response.data.comments
         } else {
-            console.warn("The field 'comments' was not found in the returned data.");
-            return null;
+            console.warn('The field \'comments\' was not found in the returned data.')
+            return null
         }
     } catch (error) {
         // В случае ошибки выводим её в консоль
-        console.error('Ошибка при получении комментариев:', error);
-        return null;
+        console.error('Ошибка при получении комментариев:', error)
+        return null
     }
 }
 
 // Функция для уведомления пользователей о комментариях
-async function notifyUsers(ctx, userInitiated = false) {
-    const chatId = ctx.message.chat.id;
+async function notifyUsers(ctx, userInitiated) {
+    const chatId = ctx.message.chat.id
 
     // Переместим эту строку ближе к месту использования
-    let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
+    let currentTaskId = null // Эта переменная может хранить ID текущей задачи для комментария
 
     try {
-        const uncommentedTasks = await fetchComments();
+        const uncommentedTasks = await fetchComments()
         if (!uncommentedTasks) {
-            return bot.telegram.sendMessage(chatId, "Произошла ошибка при получении комментариев.", {parse_mode: "HTML"});
+            return bot.telegram.sendMessage(chatId, 'Произошла ошибка при получении комментариев.', { parse_mode: 'HTML' }) // ! надо поправить если вообще ничего нет
         }
 
-        const userActualComments = uncommentedTasks.filter(({user_id}) => user_id === chatId);
-
-        // console.log(chatId);
-
+        const userActualComments = uncommentedTasks.filter(({ user_id }) => user_id === chatId)
         if (userActualComments.length === 0) {
-            // if (userInitiated) {
-            return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
-            // }
-            // return;
+            if (userInitiated) {
+                return bot.telegram.sendMessage(chatId, 'Пустые комментарии не найдены.', { parse_mode: 'HTML' })
+            }
+            return
         }
 
         // Установим currentTaskId теперь, когда мы уверены, что он нужен
-        currentTaskId = userActualComments[0].id_task;
+        currentTaskId = userActualComments[0].id_task
 
         // Готовим и отправляем сообщение
         const message = `Пожалуйста, прокомментируйте следующую операцию:\n`
@@ -148,26 +146,26 @@ async function notifyUsers(ctx, userInitiated = false) {
             + `Название: <code>${userActualComments[0].name}</code>\n`
             + `Обозначение: <code>${userActualComments[0].description}</code>\n`
             + `Дата: <code>${userActualComments[0].date}</code>\n`
-            + `id: <code>${currentTaskId}</code>`;
+            + `id: <code>${currentTaskId}</code>`
 
-        await bot.telegram.sendMessage(chatId, message, {parse_mode: "HTML"});
+        await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
     } catch (error) {
-        console.error('Error in notifyUsers:', error);
+        console.error('Error in notifyUsers:', error)
     }
 }
 
 
 // Функция для проверки регистрации пользователя на Сервере
 async function checkRegistration(chatId) {
-    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php'); // ! Получить список пользоватеолей
+    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php') // ! Получить список пользоватеолей
     // Добавляем отладочный вывод
     // console.log("Data returned from server: ", data); //  пользователи с сервера
     // Проверяем, содержит ли 'data' нужное поле
     if (data && data.hasOwnProperty('user_ids')) {
-        return data.user_ids.includes(chatId);
+        return data.user_ids.includes(chatId)
     } else {
-        console.error("The server response did not contain 'user_ids'");
-        return false;
+        console.error('The server response did not contain \'user_ids\'')
+        return false
     }
 }
 
@@ -175,24 +173,27 @@ async function checkRegistration(chatId) {
 // Функция для добавления комментария в базу MySQL
 async function handleAddComment(ctx) {
     if (!ctx) {
-        console.error("Context is undefined!");
-        return;
+        console.error('Context is undefined!')
+        return
     }
 
-    const chatId = ctx.message.chat.id;
-    const userState = userStates.get(chatId);
+    const chatId = ctx.message.chat.id
+    const userState = userStates.get(chatId)
 
     if (userState && userState.isAwaitingComment) {
-        const userComment = ctx.message.text;
+        const userComment = ctx.message.text
 
         try {
-            await fetchData(WEB_SERVICE_URL + `/update_comment.php`, {id_task: userState.taskId, comment: userComment}); // ! Обновить комментарий
-            await bot.telegram.sendMessage(chatId, "Комментарий добавлен успешно.", {parse_mode: "HTML"});
-            userStates.set(chatId, {isAwaitingComment: false, taskId: null});  // Обновляем состояние пользователя
+            await fetchData(WEB_SERVICE_URL + `/update_comment.php`, {
+                id_task: userState.taskId,
+                comment: userComment,
+            }) // ! Обновить комментарий
+            await bot.telegram.sendMessage(chatId, 'Комментарий добавлен успешно.', { parse_mode: 'HTML' })
+            userStates.set(chatId, { isAwaitingComment: false, taskId: null })  // Обновляем состояние пользователя
         } catch (error) {
-            await bot.telegram.sendMessage(chatId, "Ошибка при добавлении комментария: " + error, {parse_mode: "HTML"});
-            console.error("Ошибка при добавлении комментария:", error);
-            userStates.set(chatId, {isAwaitingComment: true, taskId: userState.taskId});  // Обновляем состояние пользователя
+            await bot.telegram.sendMessage(chatId, 'Ошибка при добавлении комментария: ' + error, { parse_mode: 'HTML' })
+            console.error('Ошибка при добавлении комментария:', error)
+            userStates.set(chatId, { isAwaitingComment: true, taskId: userState.taskId })  // Обновляем состояние пользователя
         }
     }
     // else {
@@ -203,25 +204,26 @@ async function handleAddComment(ctx) {
 
 // ! reg
 async function handleRegComment(ctx) {
-    const chatId = ctx.message.chat.id;
-    const isRegistered = await checkRegistration(chatId);
+    const chatId = ctx.message.chat.id
+    const isRegistered = await checkRegistration(chatId)
 
-    const {chat, from, text} = ctx.message;
-    await bot.telegram.sendMessage(
-        LOG_CHANNEL_ID,
-        `ID <code>${chat.id}</code>`
-        + ` username: ${"@" + from.username || '<code>N/A</code>'}`
-        + `\nname: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>`
-        + `\nmsg: <code>${text}</code>`,
-        {parse_mode: "HTML"}
-    );
-
+    const { chat, from, text } = ctx.message
+    if (chat.id != GRAND_ADMIN) {
+        await bot.telegram.sendMessage(
+            LOG_CHANNEL_ID,
+            `ID <code>${chat.id}</code>`
+            + ` username: ${'@' + from.username || '<code>N/A</code>'}`
+            + `\nname: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>`
+            + `\nmsg: <code>${text}</code>`,
+            { parse_mode: 'HTML' },
+        )
+    }
     if (isRegistered) {
-        ctx.reply(ruLang.alreadyRegistered, {parse_mode: 'HTML'});
-        isAwaitFio = false;
+        ctx.reply(ruLang.alreadyRegistered, { parse_mode: 'HTML' })
+        isAwaitFio = false
     } else {
-        ctx.reply(ruLang.notRegistered, {parse_mode: 'HTML'});
-        isAwaitFio = true;
+        ctx.reply(ruLang.notRegistered, { parse_mode: 'HTML' })
+        isAwaitFio = true
     }
 }
 
@@ -230,31 +232,59 @@ async function handleRegComment(ctx) {
 async function handleTextCommand(ctx) {
     // console.log('isAwaitFio = ' + isAwaitFio);
     // console.log('isAwaitComment = ' + isAwaitComment);
-    const {text, chat, from} = ctx.message
-    await bot.telegram.sendMessage(
-        LOG_CHANNEL_ID,
-        `ID <code>${chat.id}</code>`
-        + ` username: ${"@" + from.username || '<code>N/A</code>'}`
-        + `\nname: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>`
-        + `\nmsg: <code>${text}</code>`,
-        {parse_mode: "HTML"}
-    );
 
+    const { text, chat, from } = ctx.message
+    if (chat.id != GRAND_ADMIN) {
+        await bot.telegram.sendMessage(
+            LOG_CHANNEL_ID,
+            `ID <code>${chat.id}</code>`
+            + ` username: ${'@' + from.username || '<code>N/A</code>'}`
+            + `\nname: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>`
+            + `\nmsg: <code>${text}</code>`,
+            { parse_mode: 'HTML' },
+        )
+    }
     if (isAwaitFio) {
         if (/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\. ?[А-Яа-яёЁ]\.$/.test(text)) {
-            const cleanedText = text.replace(/\. /g, '.');  // Удаляем пробелы после точек
-            const data = await fetchData(WEB_SERVICE_URL + '/add_user.php', { // ! Добавить пользователя
-                id: chat.id, fio: cleanedText, username: from.username, active: 1,
-            });
-            // console.log("Data from fetchData: ", data);
-            if (data) {
-                // Тут вы можете обработать ответ от сервера.
-                // Например, отправить сообщение пользователю.
-                ctx.reply("Вы успешно зарегистрированы!", {parse_mode: 'HTML'});
+            const cleanedText = text.replace(/\. /g, '.')  // Удаляем пробелы после точек
+            const encodedFio = encodeURIComponent(cleanedText)// Процентное кодирование для URL
+            const userId = chat.id
+
+            // Запрос на добавление пользователя
+            const dataAddUser = await fetchData(WEB_SERVICE_URL + '/add_user.php', {
+                id: userId,
+                fio: cleanedText,
+                username: from.username,
+                active: 1,
+            })
+
+            // Запрос на добавление пользователя
+            const dataRankUp = await fetchData(WEB_SERVICE_URL + '/rank_up.php', { id_user: userId, fio: encodedFio })
+
+            // Логирование в LOG_CHANNEL_ID для rank_up для add_user
+            if (dataRankUp && dataAddUser) {
+                await bot.telegram.sendMessage(
+                    LOG_CHANNEL_ID,
+                    `⭐ Пользователь добавлен.`
+                    + `\nДобавлена кастомная метка:`
+                    + `\nID: <code>${userId}</code>`
+                    + `\nfio: <code>${cleanedText}</code>`,
+                    { parse_mode: 'HTML' },
+                )
+            } else {
+                await bot.telegram.sendMessage(
+                    LOG_CHANNEL_ID,
+                    `⚠️Ошибка регистрации`
+                    + `\nID: <code>${userId}</code>`
+                    + `\nfio: <code>${cleanedText}</code>`,
+                    { parse_mode: 'HTML' },
+                )
             }
-            // console.log("\nЕсли зарегистрировался кидем задачу\n")
-            await notifyUsers(ctx); // если зарегистрировался кидем задачу
-            isAwaitFio = false;  // Сбрасываем флаг
+
+            ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
+
+            await notifyUsers(ctx) // если зарегистрировался кидем задачу
+            isAwaitFio = false  // Сбрасываем флаг
         } else {
             ctx.reply(ruLang.invalidData)
         }
@@ -262,7 +292,7 @@ async function handleTextCommand(ctx) {
 
     } else if (isAwaitComment) {  // Добавленная часть
         // Вызываем уже существующую функцию обработки комментария
-        await handleAddComment(ctx);
+        await handleAddComment(ctx)
     }
 }
 
@@ -278,18 +308,18 @@ bot.on('text', handleTextCommand) // обработка текстовых ко�
 
 // ! ------------------ cron ------------------
 bot.launch()
-    .catch(err => console.error('Error while launching the bot:', err));
-const userStates = new Map();
+    .catch(err => console.error('Error while launching the bot:', err))
+const userStates = new Map()
 cron.schedule('*/2 * * * *', async () => {
-    console.log('Running a task every 2 minutes');
-    await notifyAllUsers();
-});
+    console.log('Running a task every 2 minutes')
+    await notifyAllUsers()
+})
 
 
 // ! ------------------ server start ------------------
 app.listen(HOST_PORT, HOST_IP, () => {
-    console.log(`! Server is running ${HOST_PORT}`);
-});
+    console.log(`! Server is running ${HOST_PORT}`)
+})
 
 
 
