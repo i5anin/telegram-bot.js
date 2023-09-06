@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 });
 
 // Настройка веб-хука
-bot.telegram.setWebhook('https://pfforum-js.onrender.com');
+// bot.telegram.setWebhook('https://pfforum-js.onrender.com');
 
 // ! ------------ Флаги ------------
 let isAwaitFio = false;
@@ -35,12 +35,12 @@ let isAwaitComment = false;
 let userInitiated = false;
 // ! -------------------------------
 
-let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
+// let currentTaskId = null; // Эта переменная может хранить ID текущей задачи для комментария
 
 // Функция для уведомления всех пользователей
 async function notifyAllUsers() {
     const allComments = await fetchComments();
-    const data = await fetchData(WEB_SERVICE_URL + "/get_user_id.php"); // Получить список пользователей
+    const data = await fetchData(WEB_SERVICE_URL + "/get_user_id.php"); // Получить список пользователей /get_user_id.php повторяется
 
     if (!data || !data.hasOwnProperty("user_ids")) {
         console.error("The server response did not contain 'user_ids'");
@@ -60,7 +60,7 @@ async function notifyAllUsers() {
         if (userComments.length > 0) {
             const comment = userComments[0];
             let message = "<code>Cron</code>\nВам нужно прокомментировать следующую задачу:\n"
-                + `<code>(1/${userActualComments.length})</code>\n`
+                + `<code>(1/${userComments.length})</code>\n`
                 + `Название: <code>${comment.name}</code>\n`
                 + `Обозначение: <code>${comment.description}</code>\n`
                 + `Дата: <code>${comment.date}</code>\n`
@@ -136,7 +136,7 @@ async function notifyUsers(ctx, userInitiated = false) {
             // if (userInitiated) {
             return bot.telegram.sendMessage(chatId, "Пустые комментарии не найдены.", {parse_mode: "HTML"});
             // }
-            return;
+            // return;
         }
 
         // Установим currentTaskId теперь, когда мы уверены, что он нужен
@@ -188,20 +188,16 @@ async function handleAddComment(ctx) {
         try {
             await fetchData(WEB_SERVICE_URL + `/update_comment.php`, {id_task: userState.taskId, comment: userComment}); // ! Обновить комментарий
             await bot.telegram.sendMessage(chatId, "Комментарий добавлен успешно.", {parse_mode: "HTML"});
-            // console.log("Комментарий добавлен успешно.");
-
-            // Обновляем состояние пользователя
-            userStates.set(chatId, {isAwaitingComment: false, taskId: null});
+            userStates.set(chatId, {isAwaitingComment: false, taskId: null});  // Обновляем состояние пользователя
         } catch (error) {
             await bot.telegram.sendMessage(chatId, "Ошибка при добавлении комментария: " + error, {parse_mode: "HTML"});
             console.error("Ошибка при добавлении комментария:", error);
-
-            // Обновляем состояние пользователя
-            userStates.set(chatId, {isAwaitingComment: true, taskId: userState.taskId});
+            userStates.set(chatId, {isAwaitingComment: true, taskId: userState.taskId});  // Обновляем состояние пользователя
         }
-    } else {
-        console.error("No comment is awaited from this user at the moment.");
     }
+    // else {
+    //     console.error("No comment is awaited from this user at the moment.");
+    // }
 }
 
 
