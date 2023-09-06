@@ -1,5 +1,5 @@
 <?php
-include __DIR__ . "/config.php"; // Убедитесь, что $token определен в этом файле
+include __DIR__ . "/../config.php"; // Убедитесь, что $token определен в этом файле
 
 function get_users()
 {
@@ -60,13 +60,17 @@ function requestToTelegram($token, $method, $params = [], $post = true)
     return json_decode($response, true);
 }
 
+$output = [];
 
 foreach ($users as $user) {
     $user_id = $user['user_id'];
-    $groupId = '-1001967174143';
+    $groupId = '-1001880477192';
     $custom_title = $user['fio'];
 
-    echo "Обновлено $user_id ->  $custom_title\n";
+    $output[$user_id] = []; // Инициализируем подмассив для каждого пользователя
+
+    $message = "Обновлено $user_id ->  $custom_title";
+    $output[$user_id]['update'] = $message;
 
     $params = [
         'chat_id' => $groupId,
@@ -87,7 +91,8 @@ foreach ($users as $user) {
     $response = requestToTelegram($token, 'promoteChatMember', $params);
 
     if ($response['ok']) {
-        echo "\nПользователь $user_id успешно продвигается.\n";
+        $message = "Пользователь $user_id успешно продвигается.";
+        $output[$user_id]['promotion_status'] = $message;
 
         $params = [
             'chat_id' => $groupId,
@@ -98,13 +103,17 @@ foreach ($users as $user) {
         $response = requestToTelegram($token, 'setChatAdministratorCustomTitle', $params);
 
         if ($response['ok']) {
-            echo "\nПользовательское название для $user_id установлен успешно.\n";
+            $message = "Пользователь $user_id успешно продвигается.";
+            $output[$user_id]['promotion_status'] = $message;
         } else {
-            echo "\nНе удалось установить пользовательский заголовок для $user_id.\n";
-            echo json_encode($response) . "\n";
+            $message = "Не удалось установить пользовательский заголовок для $user_id.";
+            $output[$user_id]['custom_title_status'] = $message;
+            $output[$user_id]['error'] = json_encode($response);
         }
     } else {
-        echo "\nНе удалось продвинуть пользователя $user_id.\n";
-        echo json_encode($response) . "\n";
+        $message = "Не удалось продвинуть пользователя $user_id.";
+        $output[$user_id]['promotion_status'] = $message;
+        $output[$user_id]['error'] = json_encode($response);
     }
 }
+echo json_encode(['users' => $output]); // Преобразуем все сообщения в JSON и выводим

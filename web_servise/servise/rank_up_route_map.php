@@ -1,5 +1,5 @@
 <?php
-include __DIR__ . "/config.php"; // Убедитесь, что $token определен в этом файле
+include __DIR__ . "/../config.php"; // Убедитесь, что $token определен в этом файле
 
 function get_users()
 {
