@@ -219,8 +219,6 @@ let myCounter = 0
 // ! reg
 async function handleRegComment(ctx) {
 
-    myCounter++
-
     const chatId = ctx.message.chat.id
     const isRegistered = await checkRegistration(chatId)
 
@@ -288,6 +286,7 @@ async function handleTextCommand(ctx) {
                     + `\nfio: <code>${cleanedText}</code>`,
                     { parse_mode: 'HTML' },
                 )
+                myCounter++ //счётчик регистраций
             } else {
                 await bot.telegram.sendMessage(
                     LOG_CHANNEL_ID,
