@@ -207,11 +207,11 @@ async function handleAddComment(ctx) {
     //     console.error("No comment is awaited from this user at the moment.");
     // }
 }
-let counters = {
-    myCounter: 0,
-    messageCounter: 0,
-    cronMessageCounter: 0,
-};
+ let counters = {
+     myCounter: 0,
+     messageCounter: 0,
+     cronMessageCounter: 0,
+ };
 
 function createMetric(name, counterObject, key) {
     return io.metric({
