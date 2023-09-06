@@ -4,6 +4,12 @@ const { Telegraf } = require('telegraf')
 const axios = require('axios')
 const ruLang = require('./ru_lang')
 const cron = require('node-cron')
+const io = require('@pm2/io')
+
+io.init({
+    transactions: true, // включить отслеживание транзакций
+    http: true, // включить метрики веб-сервера (необязательно)
+})
 
 // Конфигурационные данные
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
@@ -201,9 +207,20 @@ async function handleAddComment(ctx) {
     // }
 }
 
+const regEvent = io.metric({
+    name: 'Reg Event',
+    value: function() {
+        return myCounter
+    },
+})
+let myCounter = 0
+
 
 // ! reg
 async function handleRegComment(ctx) {
+
+    myCounter++
+
     const chatId = ctx.message.chat.id
     const isRegistered = await checkRegistration(chatId)
 
