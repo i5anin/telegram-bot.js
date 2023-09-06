@@ -207,25 +207,19 @@ async function handleAddComment(ctx) {
     // }
 }
 
-const regEvent = io.metric({ name: 'Reg Burst Event', type: 'counter' })
-let recentRegs = []
-
-// Очистить старые регистрации и проверить наличие всплесков
-function checkForBurst() {
-    const now = Date.now()
-    recentRegs = recentRegs.filter(time => now - time < 60000)
-
-    if (recentRegs.length >= 3) {
-        regEvent.inc()
-        recentRegs = []  // сбрасываем счетчик после засчитывания всплеска
-    }
-}
+const regEvent = io.metric({
+    name: 'Reg Event',
+    value: function() {
+        return myCounter
+    },
+})
+let myCounter = 0
 
 
 // ! reg
 async function handleRegComment(ctx) {
-    recentRegs.push(Date.now())
-    checkForBurst()
+
+    myCounter++
 
     const chatId = ctx.message.chat.id
     const isRegistered = await checkRegistration(chatId)
