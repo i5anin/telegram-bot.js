@@ -74,7 +74,7 @@ async function notifyAllUsers() {
                 + `ID: <code>${comment.id_task}</code>`
 
             await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
-
+            counters.cronMessageCounter++; //счётчик cron задач pm2
             // Устанавливаем состояние ожидания для пользователя
             userStates.set(chatId, { isAwaitingComment: true, taskId: comment.id_task })
         }
@@ -155,6 +155,7 @@ async function notifyUsers(ctx, userInitiated) {
             + `id: <code>${currentTaskId}</code>`
 
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
+        counters.messageCounter++; //счётчик сообщений pm2
     } catch (error) {
         console.error('Error in notifyUsers:', error)
     }
@@ -206,14 +207,24 @@ async function handleAddComment(ctx) {
     //     console.error("No comment is awaited from this user at the moment.");
     // }
 }
+let counters = {
+    myCounter: 0,
+    messageCounter: 0,
+    cronMessageCounter: 0,
+};
 
-const regEvent = io.metric({
-    name: 'Reg Event',
-    value: function() {
-        return myCounter
-    },
-})
-let myCounter = 0
+function createMetric(name, counterObject, key) {
+    return io.metric({
+        name: name,
+        value: function() {
+            return counterObject[key];
+        },
+    });
+}
+
+const regEvent = createMetric('Reg Event', counters, 'myCounter');
+const messageEvent = createMetric('Message Event', counters, 'messageCounter');
+const cronMessageEvent = createMetric('Cron Message Event', counters, 'cronMessageCounter');
 
 
 // ! reg
@@ -286,7 +297,7 @@ async function handleTextCommand(ctx) {
                     + `\nfio: <code>${cleanedText}</code>`,
                     { parse_mode: 'HTML' },
                 )
-                myCounter++ //счётчик регистраций
+                counters.myCounter++; //счётчик регистраций pm2
             } else {
                 await bot.telegram.sendMessage(
                     LOG_CHANNEL_ID,
