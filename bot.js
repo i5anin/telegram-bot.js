@@ -9,6 +9,8 @@ const cron = require('node-cron');
 const WEB_SERVICE_URL = 'https://bot.pf-forum.ru/web_servise'
 const BOT_TOKEN = process.env.BOT_TOKEN
 const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID || "-1001946496691"; // ID log канала
+const HOST_IP = process.env.HOST_IP || 'localhost';
+const HOST_PORT = process.env.HOST_PORT || 3000;
 
 const app = express();  // создаем экземпляр Express
 
@@ -285,13 +287,9 @@ cron.schedule('*/1 * * * *', async () => {
     await notifyAllUsers();
 });
 
-app.listen(8443, '192.168.0.153', () => {
-    console.log('Server is running on port 8443');
+app.listen(HOST_PORT, HOST_IP, () => {
+    console.log(`! Server is running ${HOST_PORT}`);
 });
-
-// app.listen(8443,  () => {
-//     console.log('Server is running on port 8443');
-// });
 
 
 
