@@ -40,7 +40,7 @@ let currentTaskId = null; // Эта переменная может хранит
 // Функция для уведомления всех пользователей
 async function notifyAllUsers() {
     const allComments = await fetchComments();
-    const data = await fetchData(WEB_SERVICE_URL + "/get_user_id.php");
+    const data = await fetchData(WEB_SERVICE_URL + "/get_user_id.php"); // Получить список пользователей
 
     if (!data || !data.hasOwnProperty("user_ids")) {
         console.error("The server response did not contain 'user_ids'");
@@ -96,7 +96,7 @@ async function fetchData(url, params) {
 async function fetchComments() {
     try {
         // Получение данных от сервера
-        const response = await axios.get(WEB_SERVICE_URL + `/get_sk_comments.php`);
+        const response = await axios.get(WEB_SERVICE_URL + `/get_sk_comments.php`); //получить список коментариев
 
         // Добавленная строка для отладки: выводим данные, возвращённые сервером
         // console.log("Данные, возвращаемые с сервера: ", response.data);
@@ -159,7 +159,7 @@ async function notifyUsers(ctx, userInitiated = false) {
 
 // Функция для проверки регистрации пользователя на Сервере
 async function checkRegistration(chatId) {
-    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php');
+    const data = await fetchData(WEB_SERVICE_URL + '/get_user_id.php'); // ! Получить список пользоватеолей
     // Добавляем отладочный вывод
     // console.log("Data returned from server: ", data); //  пользователи с сервера
     // Проверяем, содержит ли 'data' нужное поле
@@ -175,7 +175,7 @@ async function checkRegistration(chatId) {
 // Функция для добавления комментария в базу MySQL
 async function handleAddComment(ctx) {
     if (!ctx) {
-        console.log("Context is undefined!");
+        console.error("Context is undefined!");
         return;
     }
 
@@ -186,7 +186,7 @@ async function handleAddComment(ctx) {
         const userComment = ctx.message.text;
 
         try {
-            await fetchData(WEB_SERVICE_URL + `/update_comment.php`, {id_task: userState.taskId, comment: userComment});
+            await fetchData(WEB_SERVICE_URL + `/update_comment.php`, {id_task: userState.taskId, comment: userComment}); // ! Обновить комментарий
             await bot.telegram.sendMessage(chatId, "Комментарий добавлен успешно.", {parse_mode: "HTML"});
             // console.log("Комментарий добавлен успешно.");
 
@@ -194,13 +194,13 @@ async function handleAddComment(ctx) {
             userStates.set(chatId, {isAwaitingComment: false, taskId: null});
         } catch (error) {
             await bot.telegram.sendMessage(chatId, "Ошибка при добавлении комментария: " + error, {parse_mode: "HTML"});
-            // console.log("Ошибка при добавлении комментария:", error);
+            console.error("Ошибка при добавлении комментария:", error);
 
             // Обновляем состояние пользователя
             userStates.set(chatId, {isAwaitingComment: true, taskId: userState.taskId});
         }
     } else {
-        console.log("No comment is awaited from this user at the moment.");
+        console.error("No comment is awaited from this user at the moment.");
     }
 }
 
@@ -247,7 +247,7 @@ async function handleTextCommand(ctx) {
     if (isAwaitFio) {
         if (/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\. ?[А-Яа-яёЁ]\.$/.test(text)) {
             const cleanedText = text.replace(/\. /g, '.');  // Удаляем пробелы после точек
-            const data = await fetchData(WEB_SERVICE_URL + '/add_user.php', {
+            const data = await fetchData(WEB_SERVICE_URL + '/add_user.php', { // ! Добавить пользователя
                 id: chat.id, fio: cleanedText, username: from.username, active: 1,
             });
             // console.log("Data from fetchData: ", data);
@@ -279,14 +279,18 @@ bot.command('reg', handleRegComment) // reg
 
 bot.on('text', handleTextCommand) // обработка текстовых команд
 
+
+// ! ------------------ cron ------------------
 bot.launch()
     .catch(err => console.error('Error while launching the bot:', err));
 const userStates = new Map();
-cron.schedule('*/1 * * * *', async () => {
-    console.log('Running a task every 10 minutes');
+cron.schedule('*/2 * * * *', async () => {
+    console.log('Running a task every 2 minutes');
     await notifyAllUsers();
 });
 
+
+// ! ------------------ server start ------------------
 app.listen(HOST_PORT, HOST_IP, () => {
     console.log(`! Server is running ${HOST_PORT}`);
 });
