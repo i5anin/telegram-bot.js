@@ -74,7 +74,7 @@ async function notifyAllUsers() {
                 + `ID: <code>${comment.id_task}</code>`
 
             await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
-            counters.cronMessageCounter++; //счётчик cron задач pm2
+            counters.cronMessageCounter++ //счётчик cron задач pm2
             // Устанавливаем состояние ожидания для пользователя
             userStates.set(chatId, { isAwaitingComment: true, taskId: comment.id_task })
         }
@@ -155,7 +155,7 @@ async function notifyUsers(ctx, userInitiated) {
             + `id: <code>${currentTaskId}</code>`
 
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
-        counters.messageCounter++; //счётчик сообщений pm2
+        counters.messageCounter++ //счётчик сообщений pm2
     } catch (error) {
         console.error('Error in notifyUsers:', error)
     }
@@ -207,24 +207,25 @@ async function handleAddComment(ctx) {
     //     console.error("No comment is awaited from this user at the moment.");
     // }
 }
- let counters = {
-     myCounter: 0,
-     messageCounter: 0,
-     cronMessageCounter: 0,
- };
+
+let counters = {
+    myCounter: 0,
+    messageCounter: 0,
+    cronMessageCounter: 0,
+}
 
 function createMetric(name, counterObject, key) {
     return io.metric({
         name: name,
         value: function() {
-            return counterObject[key];
+            return counterObject[key]
         },
-    });
+    })
 }
 
-const regEvent = createMetric('Reg Event', counters, 'myCounter');
-const messageEvent = createMetric('Message Event', counters, 'messageCounter');
-const cronMessageEvent = createMetric('Cron Message Event', counters, 'cronMessageCounter');
+const regEvent = createMetric('Reg Event', counters, 'myCounter')
+const messageEvent = createMetric('Message Event', counters, 'messageCounter')
+const cronMessageEvent = createMetric('Cron Message Event', counters, 'cronMessageCounter')
 
 
 // ! reg
@@ -286,27 +287,31 @@ async function handleTextCommand(ctx) {
 
             // Запрос на добавление пользователя
             const dataRankUp = await fetchData(WEB_SERVICE_URL + '/rank_up.php', { id_user: userId, fio: encodedFio })
+            const dataRankUp2 = await fetchData(WEB_SERVICE_URL + '/rank_up2.php', { id_user: userId, fio: encodedFio })
 
             // Логирование в LOG_CHANNEL_ID для rank_up для add_user
-            if (dataRankUp && dataAddUser) {
+            if (dataRankUp || dataAddUser) {
                 await bot.telegram.sendMessage(
                     LOG_CHANNEL_ID,
                     `⭐ Пользователь добавлен.`
                     + `\nДобавлена кастомная метка:`
                     + `\nID: <code>${userId}</code>`
-                    + `\nfio: <code>${cleanedText}</code>`,
+                    + `\nfio: <code>${cleanedText}</code>`
+                    + `\n\ndataRankUp: <code>${dataRankUp}</code>`
+                    + `\ndataAddUser: <code>${dataAddUser}</code>`,
                     { parse_mode: 'HTML' },
                 )
-                counters.myCounter++; //счётчик регистраций pm2
-            } else {
-                await bot.telegram.sendMessage(
-                    LOG_CHANNEL_ID,
-                    `⚠️Ошибка регистрации`
-                    + `\nID: <code>${userId}</code>`
-                    + `\nfio: <code>${cleanedText}</code>`,
-                    { parse_mode: 'HTML' },
-                )
+                counters.myCounter++ //счётчик регистраций pm2
             }
+            // } else {
+            //     await bot.telegram.sendMessage(
+            //         LOG_CHANNEL_ID,
+            //         `⚠️Ошибка регистрации`
+            //         + `\nID: <code>${userId}</code>`
+            //         + `\nfio: <code>${cleanedText}</code>`,
+            //         { parse_mode: 'HTML' },
+            //     )
+            // }
 
             ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
 
@@ -326,19 +331,17 @@ async function handleTextCommand(ctx) {
 // ! ------------------ command ------------------
 
 bot.command('new_comment', (ctx) => notifyUsers(ctx, true)) // Оповещения с флагом userInitiated=true
-
 bot.command('start', handleRegComment) // start
 bot.command('reg', handleRegComment) // reg
 
 bot.on('text', handleTextCommand) // обработка текстовых команд
-
 
 // ! ------------------ cron ------------------
 bot.launch()
     .catch(err => console.error('Error while launching the bot:', err))
 const userStates = new Map()
 cron.schedule('*/2 * * * *', async () => {
-    console.log('Running a task every 2 minutes')
+    // console.log('Running a task every 2 minutes')
     await notifyAllUsers()
 })
 
