@@ -108,7 +108,7 @@ async function fetchData(url, params) {
     try {
         const response = await axios.get(url, { params })
         if (!response.data) {
-            console.log('Сервер ответил без данных./n') //Сервер ответил без данных
+            console.log('Сервер ответил без данных. GET-запрос/n') //Сервер ответил без данных
             return null
         }
         return response.data
@@ -384,8 +384,9 @@ bot.on('text', handleTextCommand) // обработка текстовых ко�
 
 // ! ------------------ cron ------------------
 bot.launch().catch((err) =>
-    console.log('Error while launching the bot:', err),
+    console.error('Error while launching the bot:', err)
 )
+
 const userStates = new Map()
 cron.schedule('*/20 * * * *', async () => {
     // console.log('Running a task every 20 minutes')
