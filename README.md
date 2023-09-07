@@ -20,8 +20,8 @@
 
 ### /rank_up.php и /rank_up2.php
 
--   **id_user:** userId
--   **fio:** encodedFio
+-   **id_user:** `userId`
+-   **fio:** `encodedFio`
 
 ### /get_user_id.php
 
@@ -42,5 +42,5 @@
 
 ### /update_comment.php
 
--   **id_task:** userState.taskId,
--   **comment:** userComment,
+-   **id_task:** `userState.taskId`,
+-   **comment:** `userComment`,
