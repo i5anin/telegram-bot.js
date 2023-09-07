@@ -235,7 +235,7 @@ async function handleRegComment(ctx) {
     const isRegistered = await checkRegistration(chatId)
 
     const { chat, from, text } = ctx.message
-    if (chat.id = GRAND_ADMIN) {
+    if (chat.id !== GRAND_ADMIN) {
         const username = from.username ? '@' + from.username : '<code>N/A</code>'
         await bot.telegram.sendMessage(
             LOG_CHANNEL_ID,
@@ -262,7 +262,7 @@ async function handleTextCommand(ctx) {
     // console.log('isAwaitComment = ' + isAwaitComment);
 
     const { text, chat, from } = ctx.message
-    if (chat.id = GRAND_ADMIN) {
+    if (chat.id !== GRAND_ADMIN) {
         const username = from.username ? '@' + from.username : '<code>N/A</code>'
         await bot.telegram.sendMessage(
             LOG_CHANNEL_ID,
