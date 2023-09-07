@@ -395,12 +395,14 @@ cron.schedule('*/20 * * * *', async () => {
 cron.schedule('*/20 * * * *', async () => { // Запускать каждые 20 минут
     try {
         const currentTime = new Date()
-        const message = `Задача выполнена. ${currentTime.getHours()}:${currentTime.getMinutes()}`
+        const message = `Задача выполнена. ${currentTime.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`
         await bot.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
     } catch (error) {
         console.error(`Произошла ошибка в крон-задаче: ${error}`)
     }
 })
+
+
 
 // ! ------------------ server start ------------------
 app.listen(HOST_PORT, HOST_IP, () => {
