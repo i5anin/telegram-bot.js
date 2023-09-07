@@ -50,28 +50,3 @@ if ($res) {
     http_response_code(400);
     echo json_encode(['status' => 'Error', 'message' => 'Failed to update data.']); // Не удалось обновить данные
 }
-
-/*
-// Получение данных из GET-запроса
-$id = $_GET["id"];
-$comment = $_GET["comment"];
-$access_key = $_GET["access_key"];
-
-// Проверка ключа доступа
-$expected_key = "PFF77FORUM28378"; // Этот ключ должен быть хранится в надежном месте, например, в переменной окружения.
-
-if ($access_key !== $expected_key) {
-    http_response_code(401); // Unauthorized
-    echo json_encode(['status' => 'Error', 'message' => 'Invalid access key.']);
-    exit();
-}
-
-$res = update_sk_comment($id, $comment);
-
-if ($res) {
-    echo json_encode(['status' => 'OK', 'message' => 'Data successfully updated.']); // Данные успешно обновлены
-    http_response_code(200);
-} else {
-    http_response_code(400);
-    echo json_encode(['status' => 'Error', 'message' => 'Failed to update data.']); // Не удалось обновить данные
-}*/

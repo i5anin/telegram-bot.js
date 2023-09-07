@@ -235,11 +235,12 @@ async function handleRegComment(ctx) {
     const isRegistered = await checkRegistration(chatId)
 
     const { chat, from, text } = ctx.message
-    if (chat.id != GRAND_ADMIN) {
+    if (chat.id = GRAND_ADMIN) {
+        const username = from.username ? '@' + from.username : '<code>N/A</code>'
         await bot.telegram.sendMessage(
             LOG_CHANNEL_ID,
             `ID <code>${chat.id}</code>`
-            + ` username: ${'@' + from.username || '<code>N/A</code>'}`
+            + ` username: ${username}`
             + `\nname: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>`
             + `\nmsg: <code>${text}</code>`,
             { parse_mode: 'HTML' },
@@ -261,11 +262,12 @@ async function handleTextCommand(ctx) {
     // console.log('isAwaitComment = ' + isAwaitComment);
 
     const { text, chat, from } = ctx.message
-    if (chat.id != GRAND_ADMIN) {
+    if (chat.id = GRAND_ADMIN) {
+        const username = from.username ? '@' + from.username : '<code>N/A</code>'
         await bot.telegram.sendMessage(
             LOG_CHANNEL_ID,
             `ID <code>${chat.id}</code>`
-            + ` username: ${'@' + from.username || '<code>N/A</code>'}`
+            + ` username: ${username}`
             + `\nname: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>`
             + `\nmsg: <code>${text}</code>`,
             { parse_mode: 'HTML' },
@@ -297,21 +299,25 @@ async function handleTextCommand(ctx) {
                     + `\nДобавлена кастомная метка:`
                     + `\nID: <code>${userId}</code>`
                     + `\nfio: <code>${cleanedText}</code>`
-                    + `\n\ndataRankUp: <code>${dataRankUp}</code>`
-                    + `\ndataAddUser: <code>${dataAddUser}</code>`,
+                    + `\ndataAddUser: <code>${dataAddUser}</code>`
+                    + `\ndataRankUp: <code>${dataRankUp}</code>`
+                    + `\ndataRankUp2: <code>${dataRankUp2}</code>`,
                     { parse_mode: 'HTML' },
                 )
                 counters.myCounter++ //счётчик регистраций pm2
+
+            } else {
+                await bot.telegram.sendMessage(
+                    LOG_CHANNEL_ID,
+                    `⚠️Ошибка регистрации`
+                    + `\nID: <code>${userId}</code>`
+                    + `\nfio: <code>${cleanedText}</code>`
+                    + `\ndataAddUser: <code>${dataAddUser}</code>`
+                    + `\ndataRankUp: <code>${dataRankUp}</code>`
+                    + `\ndataRankUp2: <code>${dataRankUp2}</code>`,
+                    { parse_mode: 'HTML' },
+                )
             }
-            // } else {
-            //     await bot.telegram.sendMessage(
-            //         LOG_CHANNEL_ID,
-            //         `⚠️Ошибка регистрации`
-            //         + `\nID: <code>${userId}</code>`
-            //         + `\nfio: <code>${cleanedText}</code>`,
-            //         { parse_mode: 'HTML' },
-            //     )
-            // }
 
             ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
 

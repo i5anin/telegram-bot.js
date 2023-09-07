@@ -38,5 +38,5 @@ if (isset($comments['error'])) {
 } elseif (!empty($comments)) {
     echo json_encode(['comments' => $comments]);
 } else {
-    echo json_encode(['error' => 'Комментарии не найдены']);
+    echo json_encode(['error' => 'Comments not found']);
 }

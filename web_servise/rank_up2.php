@@ -76,7 +76,7 @@ $params = [
 $response = requestToTelegram($token, 'promoteChatMember', $params);
 
 if ($response['ok']) {
-    $response_messages[] = "Пользователь $user_id успешно продвигается.";
+    $response_messages[] = "OК The user $user_id is successfully promoted.";
 
     $params = [
         'chat_id' => $groupId,
@@ -87,13 +87,13 @@ if ($response['ok']) {
     $response = requestToTelegram($token, 'setChatAdministratorCustomTitle', $params);
 
     if ($response['ok']) {
-        $response_messages[] = "Пользовательское название для $user_id установлен успешно.";
+        $response_messages[] = "OK The custom title for $user_id is set successfully.";
     } else {
-        $response_messages[] = "Не удалось установить пользовательский заголовок для $user_id.";
+        $response_messages[] = "Failed to set a custom header for $user_id.";
         $response_messages[] = json_encode($response);
     }
 } else {
-    $response_messages[] = "Не удалось установить пользовательский заголовок для $user_id.";
+    $response_messages[] = "Failed to set a custom header for $user_id.";
     $response_messages[] = json_encode($response);
 }
 
