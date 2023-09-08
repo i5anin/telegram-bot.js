@@ -46,3 +46,57 @@
 
 -   **id_task:** `userState.taskId`,
 -   **comment:** `userComment`,
+
+## 1. уведомления всех пользователей
+
+```js
+async function notifyAllUsers() {}
+```
+
+## 2. выполнения GET-запросов
+
+```js
+async function fetchData(url, params) {}
+```
+
+## 3. Проверка комминтариев
+
+```js
+async function fetchComments() {}
+```
+
+## 4. уведомления пользователей о комментариях
+
+```js
+async function notifyUsers(ctx, userInitiated) {}
+```
+
+## 5. проверки регистрации пользователя на Сервере
+
+```js
+async function checkRegistration(chatId) {}
+```
+
+## 6. Создание метрик
+
+```js
+function createMetric(name, counterObject, key) {}
+```
+
+## 7. обработка команды /reg
+
+```js
+async function handleRegComment(ctx) {}
+```
+
+## 8. отправки сообщения в лог
+
+```js
+async function sendToLog(ctx) {}
+```
+
+## 9. бработка текстовых команд ФИО /add_user
+
+```js
+async function handleTextCommand(ctx) {}
+```
