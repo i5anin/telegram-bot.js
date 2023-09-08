@@ -76,7 +76,7 @@ $params = [
 $response = requestToTelegram($token, 'promoteChatMember', $params);
 
 if ($response['ok']) {
-    $response_messages[] = "OК The user $user_id is successfully promoted.";
+    $response_messages[] = "OK The user $user_id is successfully promoted.";
 
     $params = [
         'chat_id' => $groupId,
