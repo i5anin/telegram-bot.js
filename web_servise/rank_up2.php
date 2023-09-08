@@ -1,28 +1,30 @@
 <?php
-include __DIR__ . "/config.php"; // Убедитесь, что $token определен в этом файле
+include __DIR__ . "/config.php"; // Включаем файл конфигурации с токеном
 
 function get_id_fio_user($id, $fio)
 {
     if (!is_numeric($id)) return false;
-
-    // Регулярное выражение для проверки формата ФИО
     if (!preg_match('/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\.[А-Яа-яёЁ]\.$/u', $fio)) return false;
-
     return true;
 }
 
-// Извлечение параметров из GET-запроса
+if (!isset($_GET['id_user'], $_GET['fio'])) {
+    exit(json_encode(['success' => false, 'messages' => 'Missing query parameters.']));
+}
+
+
 $id = $_GET['id_user'];
 $fio = $_GET['fio'];
 
-$isValid = get_id_fio_user($id, $fio);
-
-$response_messages = [];
-
-if (!$isValid) {
-    $response_messages[] = "Неверные параметры запроса.";
-    exit;
+if (!get_id_fio_user($id, $fio)) {
+    exit(json_encode(['success' => false, 'messages' => 'Invalid query parameters.']));
 }
+
+$response_messages = [
+    'id' => $id,
+    'user' => $fio,
+];
+
 
 function requestToTelegram($token, $method, $params = [], $post = true)
 {
@@ -41,61 +43,49 @@ function requestToTelegram($token, $method, $params = [], $post = true)
     ];
 
     $context = stream_context_create($options);
-
     $response = @file_get_contents($url, false, $context);
+
     if ($response === false) {
         return ['ok' => false, 'error_code' => 500, 'description' => 'Internal server error'];
     }
+
     return json_decode($response, true);
 }
 
-
-
-$user_id = $_GET['id_user'];
-$custom_title = $_GET['fio'];
 $groupId = '-1001880477192';
-
-$response_messages[] = "Обновлено $user_id ->  $custom_title";
-
 $params = [
     'chat_id' => $groupId,
-    'user_id' => $user_id,
-    'can_manage_chat' => true, // администратор может получить доступ к журналу событий чата, статистике чата, статистике сообщений в каналах, видеть участников канала, видеть анонимных администраторов в супергруппах и игнорировать режим замедления.
-    'can_post_messages' => false, // администратор может создавать посты в канале. Только для каналов.
-    'can_edit_messages' => false, // администратор может редактировать сообщения других пользователей и закреплять сообщения. Только для каналов.
-    'can_delete_messages' => false, // администратор может удалять сообщения других пользователей.
-    'can_manage_video_chats' => true, // администратор может управлять видеочатами.
-    'can_restrict_members' => false, // администратор может ограничивать, блокировать или разблокировать участников чата.
-    'can_promote_members' => false,      // администратор может добавлять новых администраторов с подмножеством своих привилегий или понижать администраторов, которых он повысил, непосредственно или косвенно.
-    'can_change_info' => false,   // администратор может изменять название чата, фото и другие настройки.
-    'can_invite_users' => false, // администратор может приглашать новых пользователей в чат.
-    'can_pin_messages' => false,  // администратор может закреплять сообщения. Только для супергрупп.
+    'user_id' => $id,
+    'can_manage_chat' => true, // получить доступ к журналу событий чата, статистике чата, статистике сообщений в каналах, видеть участников канала, видеть анонимных администраторов в супергруппах и игнорировать режим замедления.
+    'can_post_messages' => false, // создавать посты в канале. Только для каналов.
+    'can_edit_messages' => false, // редактировать сообщения других пользователей и закреплять сообщения. Только для каналов.
+    'can_delete_messages' => false, // удалять сообщения других пользователей.
+    'can_manage_video_chats' => true, // управлять видеочатами.
+    'can_restrict_members' => false, // ограничивать, блокировать или разблокировать участников чата.
+    'can_promote_members' => false,      // добавлять новых администраторов с подмножеством своих привилегий или понижать администраторов, которых он повысил, непосредственно или косвенно.
+    'can_change_info' => false,   // изменять название чата, фото и другие настройки.
+    'can_invite_users' => false, // приглашать новых пользователей в чат.
+    'can_pin_messages' => false,  // закреплять сообщения. Только для супергрупп.
     'can_manage_topics' => false // пользователь может создавать, переименовывать, закрывать и повторно открывать темы на форуме. Только для супергрупп.
 ];
 
 $response = requestToTelegram($token, 'promoteChatMember', $params);
 
 if ($response['ok']) {
-    $response_messages[] = "OК The user $user_id is successfully promoted.";
+    $response_messages['promoted'] = 'successful';
 
-    $params = [
-        'chat_id' => $groupId,
-        'user_id' => $user_id,
-        'custom_title' => $custom_title
-    ];
-
+    $params['custom_title'] = $fio;
     $response = requestToTelegram($token, 'setChatAdministratorCustomTitle', $params);
 
     if ($response['ok']) {
-        $response_messages[] = "OK The custom title for $user_id is set successfully.";
+        $response_messages['custom_title'] = 'successful';
     } else {
-        $response_messages[] = "Failed to set a custom header for $user_id.";
-        $response_messages[] = json_encode($response);
+        $response_messages['custom_title'] = 'failed';
     }
 } else {
-    $response_messages[] = "Failed to set a custom header for $user_id.";
-    $response_messages[] = json_encode($response);
+    $response_messages['promoted'] = 'failed';
+    $response_messages['custom_title'] = 'failed';
 }
 
 header('Content-Type: application/json');
-echo json_encode(['messages' => $response_messages]);
+echo json_encode(['success' => true, 'messages' => $response_messages]);
