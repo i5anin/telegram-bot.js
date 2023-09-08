@@ -55,6 +55,29 @@ $user_id = $_GET['id_user'];
 $custom_title = $_GET['fio'];
 $groupId = '-1001967174143';
 
+
+// Проверяем, существует ли пользователь в группе
+$checkUserParams = [
+    'chat_id' => $groupId,
+    'user_id' => $user_id,
+];
+
+$checkUserResponse = requestToTelegram($token, 'getChatMember', $checkUserParams);
+
+if ($checkUserResponse['ok']) {
+    // Пользователь уже существует в группе
+    $response_messages[] = "Пользователь с ID $user_id уже находится в группе.";
+
+    // Дополнительная обработка или вывод сообщения, если необходимо
+
+    header('Content-Type: application/json');
+    echo json_encode(['messages' => $response_messages]);
+    exit;
+}
+
+// Если пользователь не существует в группе, продолжаем с повышением пользователя
+
+
 $response_messages[] = "Обновлено $user_id ->  $custom_title";
 
 $params = [
