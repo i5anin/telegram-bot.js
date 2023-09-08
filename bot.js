@@ -406,8 +406,10 @@ cron.schedule('*/20 * * * *', async () => { // Запускать каждую �
     }
 })
 
+// Генерируем случайный номер экземпляра от 1 до 100
+const instanceNumber = Math.floor(Math.random() * 100) + 1;
 
-// ! ------------------ server start ------------------
+// Выводим сообщение о запуске сервера с номером экземпляра
 app.listen(HOST_PORT, HOST_IP, () => {
-    console.log(`! Server is running ${HOST_PORT}`)
-})
+    console.log(`! Server is running ${HOST_PORT} (Instance ${instanceNumber})`);
+});
