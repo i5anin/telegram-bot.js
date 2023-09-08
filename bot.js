@@ -330,6 +330,8 @@ async function handleTextCommand(ctx) {
                 },
             )
 
+            ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
+
             // Запрос на добавление пользователя
             const dataRankUp = await fetchData(
                 WEB_SERVICE_URL + '/rank_up.php',
@@ -341,13 +343,10 @@ async function handleTextCommand(ctx) {
             )
 
             const defMsg = `\nID: <code>${userId}</code>` +
-                `\nfio: <code>${cleanedText}</code>` +
-                `\ndataAddUser: <code>${dataAddUser}</code>` +
-                `\ndataRankUp: <code>${dataRankUp}</code>` +
-                `\ndataRankUp2: <code>${dataRankUp2}</code>`
+                `\nfio: <code>${cleanedText}</code>`
 
             // Логирование в LOG_CHANNEL_ID для rank_up для add_user
-            if (dataRankUp || dataAddUser) {
+            if (dataAddUser) {
                 await bot.telegram.sendMessage(
                     LOG_CHANNEL_ID,
                     `⭐ Пользователь добавлен.` +
@@ -362,9 +361,6 @@ async function handleTextCommand(ctx) {
                     { parse_mode: 'HTML' },
                 )
             }
-
-            ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
-
             await notifyUsers(ctx) // если зарегистрировался кидем задачу
             isAwaitFio = false // Сбрасываем флаг
         } else {

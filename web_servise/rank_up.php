@@ -69,7 +69,10 @@ $params = [
     'can_manage_topics' => false // пользователь может создавать, переименовывать, закрывать и повторно открывать темы на форуме. Только для супергрупп.
 ];
 
+// Здесь начинается новый фрагмент кода
 $response = requestToTelegram($token, 'promoteChatMember', $params);
+
+$success = true; // переменная, чтобы отслеживать успешность всех операций
 
 if ($response['ok']) {
     $response_messages['promoted'] = 'successful';
@@ -80,12 +83,19 @@ if ($response['ok']) {
     if ($response['ok']) {
         $response_messages['custom_title'] = 'successful';
     } else {
+        $success = false;
         $response_messages['custom_title'] = 'failed';
+        $response_messages['custom_title_error'] = $response['description'] ?? 'Unknown error';
     }
 } else {
+    $success = false;
     $response_messages['promoted'] = 'failed';
+    $response_messages['promoted_error'] = $response['description'] ?? 'Unknown error';
     $response_messages['custom_title'] = 'failed';
+    $response_messages['custom_title_error'] = 'Skipped due to previous error';
 }
 
+// Здесь заканчивается новый фрагмент кода
+file_put_contents("telegram_response.log", json_encode($response));
 header('Content-Type: application/json');
-echo json_encode(['success' => true, 'messages' => $response_messages]);
+echo json_encode(['success' => $success, 'messages' => $response_messages]);
