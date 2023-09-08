@@ -24,6 +24,9 @@ const app = express() // создаем экземпляр Express
 // Инициализация бота
 const bot = new Telegraf(BOT_TOKEN)
 
+// Генерируем случайный номер экземпляра от 1 до 100
+const instanceNumber = Math.floor(Math.random() * 100) + 1
+
 // Middleware для чтения заголовков
 app.use((req, res, next) => {
     const token = req.headers['x-telegram-bot-api-secret-token']
@@ -379,12 +382,17 @@ async function handleTextCommand(ctx) {
 bot.command('new_comment', (ctx) => notifyUsers(ctx, true)) // Оповещения с флагом userInitiated=true
 bot.command('start', handleRegComment) // start
 bot.command('reg', handleRegComment) // reg
+bot.command('status', async (ctx) => {
+    await ctx.reply(`Текущий номер экземпляра: ${instanceNumber}`);
+});
+
+
 
 bot.on('text', handleTextCommand) // обработка текстовых команд
 
 // ! ------------------ cron ------------------
 bot.launch().catch((err) =>
-    console.error('Error while launching the bot:', err)
+    console.error('Error while launching the bot:', err),
 )
 
 const userStates = new Map()
@@ -396,7 +404,7 @@ cron.schedule('*/20 * * * *', async () => {
 cron.schedule('*/20 * * * *', async () => { // Запускать каждую минуту
     try {
         const currentTime = new Date()
-        const message = `Задача выполнена. <code>${currentTime.toLocaleTimeString('ru-RU', {
+        const message = `Задача выполнена (Instance ${instanceNumber}). <code>${currentTime.toLocaleTimeString('ru-RU', {
             hour: '2-digit',
             minute: '2-digit',
         })}</code>`
@@ -406,10 +414,8 @@ cron.schedule('*/20 * * * *', async () => { // Запускать каждую �
     }
 })
 
-// Генерируем случайный номер экземпляра от 1 до 100
-const instanceNumber = Math.floor(Math.random() * 100) + 1;
 
 // Выводим сообщение о запуске сервера с номером экземпляра
 app.listen(HOST_PORT, HOST_IP, () => {
-    console.log(`! Server is running ${HOST_PORT} (Instance ${instanceNumber})`);
-});
+    console.log(`! Server is running ${HOST_PORT} (Instance ${instanceNumber})`)
+})
