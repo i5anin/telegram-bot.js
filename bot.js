@@ -276,7 +276,7 @@ async function handleRegComment(ctx) {
 
     const { chat } = ctx.message
 
-    if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx)
+    if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx) // chat.id=number GRAND_ADMIN=string
 
     if (isRegistered) {
         ctx.reply(ruLang.alreadyRegistered, { parse_mode: 'HTML' })
@@ -308,7 +308,7 @@ async function handleTextCommand(ctx) {
     // console.log('isAwaitComment = ' + isAwaitComment);
 
     const { text, chat, from } = ctx.message
-    if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx)
+    if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx) // chat.id=number GRAND_ADMIN=string
 
     if (isAwaitFio) {
         if (/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\. ?[А-Яа-яёЁ]\.$/.test(text)) {
