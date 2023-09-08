@@ -2,8 +2,6 @@
 
 ## WEB_SERVICE_URL
 
-## WebService
-
 ### /get_sk_comments.php
 
 переделать отправляем id 390895078 принимаем comments от него
