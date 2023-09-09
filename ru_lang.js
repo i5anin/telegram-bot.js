@@ -2,7 +2,7 @@
 module.exports = {
     alreadyRegistered: 'Вы уже зарегистрированы!',
     notRegistered:
-        'Не зарегистрированы. \nВведите данные в формате <code>Иванов И.И.</code>',
+        'Не зарегистрированы. \nВведите данные в формате:\n<code>Иванов И.И.</code>',
     registrationSuccess: 'Регистрация прошла успешно!',
     registrationError: 'Ошибка регистрации: ',
     serverError: 'Ошибка сервера.',
