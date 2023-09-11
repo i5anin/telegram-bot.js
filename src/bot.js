@@ -1,12 +1,11 @@
 require('dotenv').config()
 const express = require('express')
 const { Telegraf } = require('telegraf')
-// const axios = require('axios')
-// const ruLang = require('./ru_lang')
-const initCronJobs = require('./cron')
-const handleTextCommand = require('./text')
-const handleRegComment = require('./reg')
-const notifyUsers = require('./notify')
+
+import initCronJobs from '@/cron'
+import handleTextCommand from '@/text'
+import handleRegComment from '@/reg'
+import notifyUsers from '@/notify'
 
 // --------------- Configurations ----------------
 const {
@@ -49,7 +48,7 @@ const state = {
 // -------------- Command Handlers ---------------
 bot.command('reg', (ctx) => handleRegComment(ctx, state.isAwaitFio = true))
 bot.command('start', (ctx) => handleRegComment(ctx, state.isAwaitFio = true))
-bot.command('new_comment', (ctx) => notifyUsers(ctx, bot,state))
+bot.command('new_comment', (ctx) => notifyUsers(ctx, bot, state))
 bot.command('status', async (ctx) => {
     await ctx.reply(`Текущий номер экземпляра: ${instanceNumber}`)
 })
