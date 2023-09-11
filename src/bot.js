@@ -1,8 +1,8 @@
 require('dotenv').config()
 const express = require('express')
 const { Telegraf } = require('telegraf')
-const axios = require('axios')
-const ruLang = require('./ru_lang')
+// const axios = require('axios')
+// const ruLang = require('./ru_lang')
 const initCronJobs = require('./cron')
 const handleTextCommand = require('./text')
 const handleRegComment = require('./reg')
@@ -53,6 +53,16 @@ bot.command('new_comment', (ctx) => notifyUsers(ctx, bot,state))
 bot.command('status', async (ctx) => {
     await ctx.reply(`Текущий номер экземпляра: ${instanceNumber}`)
 })
+bot.command('help', (ctx) => {
+    ctx.reply(`Доступные команды:
+
+- /start: Начать работу с ботом и регистрация
+- /reg: Регистрация пользователя
+- /new_comment: Получить новые комментарии
+
+В случае ошибки напишите мне @i5anin.`)
+})
+
 // ----------------- Text Handler ----------------
 bot.on('text', async (ctx) => {
     await handleTextCommand(ctx, state, bot)
