@@ -4,7 +4,7 @@
 
 ### [/get_sk_comments.php](https://bot.pf-forum.ru/web_servise/get_sk_comments.php)
 
-переделать отправляем id 390895078 принимаем comments от него
+**FIXIT:** отправляем id 390895078 принимаем comments от него
 
 ```json
 {
@@ -30,7 +30,7 @@ https://bot.pf-forum.ru/web_servise/rank_up.php?id_user=5804836711&fio=%D0%94%D1
 
 ### /get_user_id.php
 
-переделать на проверку на true и показать его ФИО (для лога)
+**FIXIT:** на проверку на true и показать его ФИО (для лога)
 
 ```json
 {

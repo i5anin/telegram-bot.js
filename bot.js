@@ -397,18 +397,18 @@ cron.schedule('*/20 * * * *', async () => {
     await notifyAllUsers()
 })
 
-cron.schedule('*/20 * * * *', async () => { // Запускать каждую минуту
-    try {
-        const currentTime = new Date()
-        const message = `Задача выполнена (Instance ${instanceNumber}). <code>${currentTime.toLocaleTimeString('ru-RU', {
-            hour: '2-digit',
-            minute: '2-digit',
-        })}</code>`
-        await bot.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
-    } catch (error) {
-        console.error(`Произошла ошибка в крон-задаче: ${error}`)
-    }
-})
+// cron.schedule('*/20 * * * *', async () => { // Запускать каждую минуту
+//     try {
+//         const currentTime = new Date()
+//         const message = `Задача выполнена (Instance ${instanceNumber}). <code>${currentTime.toLocaleTimeString('ru-RU', {
+//             hour: '2-digit',
+//             minute: '2-digit',
+//         })}</code>`
+//         await bot.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
+//     } catch (error) {
+//         console.error(`Произошла ошибка в крон-задаче: ${error}`)
+//     }
+// })
 
 
 // Выводим сообщение о запуске сервера с номером экземпляра
