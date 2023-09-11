@@ -20,10 +20,7 @@
 }
 ```
 
-### [/rank_up.php](https://bot.pf-forum.ru/web_servise/rank_up.php) и /rank_up2.php
-
-Пример
-https://bot.pf-forum.ru/web_servise/rank_up.php?id_user=5804836711&fio=%D0%94%D1%80%D0%B0%D0%B3%D1%83%D0%BD%20%D0%94.%D0%92.
+### [/rank_up.php](https://bot.pf-forum.ru/web_servise/rank_up.php?id_user=5804836711&fio=%D0%94%D1%80%D0%B0%D0%B3%D1%83%D0%BD%20%D0%94.%D0%92.) и /rank_up2.php
 
 -   **id_user:** `userId`
 -   **fio:** `encodedFio`
