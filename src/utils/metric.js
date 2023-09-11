@@ -15,6 +15,6 @@ function createMetric(name, counterObject, key) {
     })
 }
 
-createMetric('Reg Event', state, 'myCounter')
+createMetric('Reg Event', state.myCounter, 'myCounter')
 createMetric('Message Event', state, 'messageCounter')
 createMetric('Cron Message Event', state, 'cronMessageCounter')

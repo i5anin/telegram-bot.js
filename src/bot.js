@@ -1,11 +1,21 @@
 require('dotenv').config()
-const express = require('express')
+// const express = require('express')
 const { Telegraf } = require('telegraf')
 
-import initCronJobs from '@/cron'
-import handleTextCommand from '@/text'
-import handleRegComment from '@/reg'
-import notifyUsers from '@/notify'
+// import initCronJobs from './cron'
+// import handleTextCommand from './text'
+// import handleRegComment from './reg'
+// import notifyUsers from './notify'
+
+const initCronJobs = require('#src/cron')
+const handleTextCommand = require('#src/text')
+const handleRegComment = require('#src/reg')
+const notifyUsers = require('#src/notify')
+
+// const initCronJobs = require('./cron')
+// const handleTextCommand = require('./text')
+// const handleRegComment = require('./reg')
+// const notifyUsers = require('./notify')
 
 // --------------- Configurations ----------------
 const {
@@ -16,7 +26,7 @@ const {
 } = process.env
 
 // ------------- Initialize App & Bot ------------
-const app = express()
+// const app = express()
 const bot = new Telegraf(BOT_TOKEN)
 
 // --------------- Global Variables --------------
@@ -29,12 +39,11 @@ global.SECRET_KEY = process.env.SECRET_KEY
 const instanceNumber = Math.floor(Math.random() * 100) + 1
 
 // ---------------- Middleware -------------------
-app.use((req, res, next) => {
-    const token = req.headers['x-telegram-bot-api-secret-token']
-    if (token) console.log(`Token received: ${token}`)
-    next()
-})
-
+// app.use((req, res, next) => {
+//     const token = req.headers['x-telegram-bot-api-secret-token']
+//     if (token) console.log(`Token received: ${token}`)
+//     next()
+// })
 // ------------- State Management ----------------
 const state = {
     isAwaitFio: false,
@@ -76,6 +85,10 @@ bot.launch().catch((err) => {
 initCronJobs()
 
 // --------------- Start Server ------------------
-app.listen(HOST_PORT, HOST_IP, () => {
-    console.log(`Server is running on ${HOST_PORT} (Instance ${instanceNumber})`)
-})
+// app.get("/list",(reg,res)=>{
+//     res.send([1,2,3])
+// })
+//
+// app.listen(HOST_PORT, HOST_IP, () => {
+//     console.log(`Server is running on ${HOST_PORT} (Instance ${instanceNumber})`)
+// })
