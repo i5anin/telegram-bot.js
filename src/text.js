@@ -13,8 +13,6 @@ module.exports = async function handleTextCommand(ctx, state, bot) {
 
     const { text, chat, from } = ctx.message
     if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx) // chat.id=number GRAND_ADMIN=string
-    console.log(state.isAwaitFio)
-    console.log(state.isAwaitComment)
     if (state.isAwaitFio) {
         if (/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\. ?[А-Яа-яёЁ]\.$/.test(text)) {
             const cleanedText = text.replace(/\. /g, '.') // Удаляем пробелы после точек
