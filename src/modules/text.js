@@ -1,88 +1,80 @@
-// Обработка текстовых команд ФИО /add_user
-const ruLang = require('#src/utils/ru_lang')
-const fetchData = require('#src/utils/helpers')
-const notifyUsers = require('#src/modules/notify')
-const handleAddComment = require('#src/modules/comment')
+const ruLang = require('#src/utils/ru_lang');
+const fetchData = require('#src/utils/helpers');
+const { notifyUsers } = require('#src/modules/notify');
+const handleAddComment = require('#src/modules/comment');
+const { sendToLog } = require('#src/utils/log') // Добавление лога
 
 module.exports = async function handleTextCommand(ctx, state, bot) {
+    // Константы
+    const USER_API = 'https://bot.pf-forum.ru/api/users';
+    const GRAND_ADMIN = process.env.GRAND_ADMIN;
+    const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID || '-1001946496691';
 
-    const USER_API = 'https://bot.pf-forum.ru/api/users'
-    const COMMENT_API = 'https://bot.pf-forum.ru/api/comment'
-    const GRAND_ADMIN = process.env.GRAND_ADMIN
-    const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID || '-1001946496691'
+    // Деструктуризация полей из сообщения
+    const { text, chat, from } = ctx.message;
 
-    const { text, chat, from } = ctx.message
-    if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx) // chat.id=number GRAND_ADMIN=string
+    // Если это не админ, отправляем лог
+    if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx); // функция sendToLog должна быть определена где-то в вашем коде
+
+    // Ранний выход для улучшения читаемости
+    if (!state.isAwaitFio && !state.isAwaitComment) return;
+
+    // Обработка ожидания ФИО
     if (state.isAwaitFio) {
-        if (/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\. ?[А-Яа-яёЁ]\.$/.test(text)) {
-            const cleanedText = text.replace(/\. /g, '.') // Удаляем пробелы после точек
-            const encodedFio = encodeURIComponent(cleanedText) // Процентное кодирование для URL
-            const userId = chat.id
-
-            // Запрос на добавление пользователя
-            const dataAddUser = await fetchData(
-                USER_API + '/add.php',
-                {
-                    id: userId,
-                    fio: cleanedText,
-                    username: from.username,
-                    active: 1,
-                },
-            )
-
-            ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
-
-            // Запрос на добавление пользователя
-            try {
-                const dataRankUp = await fetchData(
-                    USER_API + '/rank_up.php',
-                    { id_user: userId, fio: encodedFio },
-                );
-
-                const dataRankUp2 = await fetchData(
-                    USER_API + '/rank_up2.php',
-                    { id_user: userId, fio: encodedFio },
-                );
-
-                // Ваша логика в случае успешного выполнения
-
-            } catch (error) {
-                // Логирование ошибки и отправка сообщения админу
-                console.error('Ошибка при выполнении /rank_up или /rank_up2:', error);
-                await bot.telegram.sendMessage(
-                    GRAND_ADMIN,
-                    `⚠️ Ошибка при выполнении /rank_up или /rank_up2: ${error.message}`,
-                    { parse_mode: 'HTML' }
-                );
-            }
-
-            const defMsg = `\nID: <code>${userId}</code>` +
-                `\nfio: <code>${cleanedText}</code>`
-
-            // Логирование в LOG_CHANNEL_ID для rank_up для add_user
-            if (dataAddUser) {
-                await bot.telegram.sendMessage(
-                    LOG_CHANNEL_ID,
-                    `⭐ Пользователь добавлен.` +
-                    `\nДобавлена кастомная метка:` + defMsg,
-                    { parse_mode: 'HTML' },
-                )
-                state.myCounter++ //счётчик регистраций pm2
-            } else {
-                await bot.telegram.sendMessage(
-                    LOG_CHANNEL_ID,
-                    `⚠️Ошибка регистрации` + defMsg,
-                    { parse_mode: 'HTML' },
-                )
-            }
-            await notifyUsers(ctx, bot, state) // если зарегистрировался кидем задачу
-            state.isAwaitFio = false // Сбрасываем флаг
-        } else {
-            ctx.reply(ruLang.invalidData) // при запросе комментария "Формат введенных данных неверный."
+        if (!/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\. ?[А-Яа-яёЁ]\.$/.test(text)) {
+            ctx.reply(ruLang.invalidData);
+            return;
         }
-    } else if (state.isAwaitComment) {
-        // Добавленная часть
-        // Вызываем уже существующую функцию обработки комментария
-        await handleAddComment(ctx)
+
+        // Дальнейшая логика обработки ФИО
+        const cleanedText = text.replace(/\. /g, '.');
+        const encodedFio = encodeURIComponent(cleanedText);
+        const userId = chat.id;
+
+        // Запрос на добавление пользователя
+        const dataAddUser = await fetchData(
+            `${USER_API}/add.php`,
+            {
+                id: userId,
+                fio: cleanedText,
+                username: from.username,
+                active: 1,
+            },
+        );
+
+        ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' });
+
+        try {
+            // Запросы на повышение ранга
+            await fetchData(`${USER_API}/rank_up.php`, { id_user: userId, fio: encodedFio });
+            await fetchData(`${USER_API}/rank_up2.php`, { id_user: userId, fio: encodedFio });
+
+            // Ваша логика в случае успешного выполнения
+        } catch (error) {
+            console.error('Ошибка при выполнении /rank_up или /rank_up2:', error);
+            await bot.telegram.sendMessage(
+                GRAND_ADMIN,
+                `⚠️ Ошибка при выполнении /rank_up или /rank_up2: ${error.message}`,
+                { parse_mode: 'HTML' },
+            );
+        }
+
+        const defMsg = `\nID: <code>${userId}</code>` +
+            `\nfio: <code>${cleanedText}</code>`;
+
+        await bot.telegram.sendMessage(
+            LOG_CHANNEL_ID,
+            dataAddUser ? `⭐ Пользователь добавлен.\nДобавлена кастомная метка:${defMsg}` :
+                `⚠️Ошибка регистрации${defMsg}`,
+            { parse_mode: 'HTML' },
+        );
+
+        await notifyUsers(ctx, bot, state);
+        state.isAwaitFio = false;
     }
-}
+
+    // Обработка ожидания комментария
+    if (state.isAwaitComment) {
+        await handleAddComment(ctx);
+    }
+};

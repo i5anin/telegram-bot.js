@@ -1,3 +1,4 @@
+// Функция лог в спец чат
 async function sendToLog(ctx) {
     const { chat, from, text } = ctx.message
     const username = from.username ? '@' + from.username : '<code>N/A</code>'
@@ -11,3 +12,10 @@ async function sendToLog(ctx) {
         { parse_mode: 'HTML' },
     )
 }
+
+// Функция для обработки команды /status
+async function handleStatusCommand(ctx,instanceNumber) {
+    await ctx.reply(`Текущий номер экземпляра: ${instanceNumber}`);
+}
+
+module.exports = { handleStatusCommand, sendToLog };

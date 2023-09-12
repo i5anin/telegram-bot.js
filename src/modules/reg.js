@@ -1,40 +1,36 @@
 // Подключаем необходимые модули и переменные
 const axios = require('axios');
 const ruLang = require('#src/utils/ru_lang');  // Локализация сообщений
+const { sendToLog } = require('#src/utils/log') // Добавление лога
+
 
 // Функция для проверки, зарегистрирован ли пользователь на сервере
 async function checkRegistration(chatId) {
-    const url = `${USER_API}/get.php?id=${chatId}`;  // Формируем URL для запроса
+    const url = `${USER_API}/get.php?id=${chatId}`;
     try {
-        const response = await axios.get(url);  // Делаем GET-запрос на сервер
-        // Проверяем, существует ли пользователь в базе данных
-        if (response.data.exists === true) {
-            return true;  // Если да, возвращаем true
-        }
-        return false;  // Если нет, возвращаем false
+        const response = await axios.get(url);
+        return response.data.exists === true;  // Возвращаем результат сразу
     } catch (error) {
-        return false;  // В случае ошибки также возвращаем false
+        return false;
     }
 }
 
-// Функция обработки команды "/reg"
 // Асинхронная функция для обработки команды регистрации
 module.exports = async function handleRegComment(ctx, state) {
-    const chatId = ctx.message.chat.id;  // Получаем ID чата
-    const isRegistered = await checkRegistration(chatId);  // Проверяем регистрацию
+    const chatId = ctx.message.chat.id;
     const { chat } = ctx.message;
 
-    // Если чат не является чатом администратора, отправляем лог
-    if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx);
-
-    // Отправляем соответствующее сообщение на основе статуса регистрации
-    if (isRegistered) {
-        // Если пользователь уже зарегистрирован
-        ctx.reply(ruLang.alreadyRegistered, { parse_mode: 'HTML' });
-        state.isAwaitFio = false;  // Отключаем ожидание ФИО
-    } else {
-        // Если пользователь не зарегистрирован
-        ctx.reply(ruLang.notRegistered, { parse_mode: 'HTML' });
-        state.isAwaitFio = true;  // Включаем ожидание ФИО
+    // Ранний выход, если чат НЕ является чатом администратора
+    if (chat.id !== parseInt(GRAND_ADMIN)) {
+        await sendToLog(ctx);
     }
+
+    const isRegistered = await checkRegistration(chatId);
+
+    // Определяем, какой текст и статус должны быть установлены
+    const textToReply = isRegistered ? ruLang.alreadyRegistered : ruLang.notRegistered;
+    state.isAwaitFio = !isRegistered;
+
+    // Отправляем сообщение
+    ctx.reply(textToReply, { parse_mode: 'HTML' });
 }

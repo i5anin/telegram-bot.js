@@ -1,102 +1,76 @@
-const fetchData = require('#src/utils/helpers')
-const { fetchComments } = require('./comment');
-// Функция для уведомления пользователей о комментариях
-module.exports = async function notifyUsers(ctx, bot, state) {
-    const chatId = ctx.message.chat.id
+// Импортируем необходимые функции
+const fetchData = require('#src/utils/helpers');
+const { fetchComments } = require('#src/modules/comment');
+
+// Функция для уведомления одного пользователя о некомментированных задачах
+async function notifyUsers(ctx, bot, state) {
+    const chatId = ctx.message.chat.id; // Получаем ID чата из контекста сообщения
 
     try {
-        // Здесь мы передаем chatId в функцию fetchComments
-        const uncommentedTasks = await fetchComments(chatId)
+        // Получаем список некомментированных задач для данного пользователя
+        const uncommentedTasks = await fetchComments(chatId);
 
-        // Обработка различных сценариев ошибок или пустого массива
+        // Проверяем, есть ли какие-либо некомментированные задачи
         if (!uncommentedTasks || uncommentedTasks.length === 0) {
-            const errorMessage = uncommentedTasks ? 'Пустые комментарии не найдены.' : 'Произошла ошибка при получении комментариев.'
-            if (userInitiated || !uncommentedTasks) {
-                return bot.telegram.sendMessage(chatId, errorMessage, { parse_mode: 'HTML' })
-            }
-            return
+            const errorMessage = uncommentedTasks ? 'Пустые комментарии не найдены.' : 'Произошла ошибка при получении комментариев.';
+            return bot.telegram.sendMessage(chatId, errorMessage, { parse_mode: 'HTML' });
         }
 
-        const userActualComments = uncommentedTasks.filter(
-            ({ user_id }) => user_id === chatId,
-        )
+        // Фильтруем задачи, оставляем только те, которые принадлежат текущему пользователю
+        const userActualComments = uncommentedTasks.filter(({ user_id }) => user_id === chatId);
 
-        // Установим currentTaskId теперь, когда мы уверены, что он нужен
-        const currentTaskId = userActualComments[0]?.id_task
+        // Если нет задач, которые нужно комментировать, выходим из функции
+        if (userActualComments.length === 0) return;
 
-        // Готовим и отправляем сообщение
-        const message = `Пожалуйста, прокомментируйте следующую операцию:\n` +
-            `<code>(1/${userActualComments.length})</code>\n` +
-            `Название: <code>${userActualComments[0]?.name}</code>\n` +
-            `Обозначение: <code>${userActualComments[0]?.description}</code>\n` +
-            `Дата: <code>${userActualComments[0]?.date}</code>\n` +
-            `id: <code>${currentTaskId}</code>`
+        // Формируем сообщение для пользователя
+        const { id_task, name, description, date } = userActualComments[0];
+        const message = `Пожалуйста, прокомментируйте следующую операцию:\n<code>(1/${userActualComments.length})</code>\nНазвание: <code>${name}</code>\nОбозначение: <code>${description}</code>\nДата: <code>${date}</code>\nid: <code>${id_task}</code>`;
 
-        await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
+        // Отправляем сообщение
+        await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' });
 
-        // Если у вас есть счётчик сообщений pm2, вы можете инкрементировать его здесь
-        state.messageCounter++
+        // Увеличиваем счетчик сообщений
+        state.messageCounter++;
 
     } catch (error) {
-        console.log('Error in notifyUsers:', error)
+        // Логируем ошибку, если что-то пошло не так
+        console.log('Error in notifyUsers:', error);
     }
 }
 
-// Функция для уведомления ВСЕХ пользователей
-async function notifyAllUsers() {
-    // Загружаем все комментарии с внешнего источника
-    const allComments = await fetchComments()
+// Функция для уведомления всех пользователей
+async function notifyAllUsers(bot, state, userStates, USER_API) {
+    const allComments = await fetchComments(); // Получаем все комментарии
+    const data = await fetchData(USER_API + '/get_all.php'); // Получаем всех пользователей
 
-    // Запрашиваем список всех пользователей с сервера
-    const data = await fetchData(USER_API + '/get_all.php') // Получить список пользователей /get_user_id.php повторяется
-
-    // Проверяем, правильно ли получены данные
+    // Проверяем, получены ли данные корректно
     if (!data || !data.hasOwnProperty('user_ids')) {
-        console.log('The server response did not contain \'user_ids\'')
-        return
+        console.log("The server response did not contain 'user_ids'");
+        return;
     }
 
-    // Получаем массив всех пользователей
-    const allUsers = data.user_ids
+    // Проходимся по всем пользователям и уведомляем их
+    for (const chatId of data.user_ids) {
+        if (userStates.get(chatId)) continue; // Если у пользователя уже есть задача для комментирования, пропускаем
 
-    // Цикл по всем пользователям
-    for (const chatId of allUsers) {
-        // Если у пользователя уже ожидается комментарий, пропускаем его
-        if (userStates.get(chatId)) continue
+        const userComments = allComments.filter(comment => comment.user_id === chatId);
+        if (userComments.length === 0) continue;
 
-        // Фильтруем комментарии, оставляем только те, что принадлежат текущему пользователю
-        const userComments = allComments.filter(
-            (comment) => comment.user_id === chatId,
-        )
+        // Формируем и отправляем сообщение
+        const { id_task, name, description, date } = userComments[0];
+        const message = `<code>Cron</code>\nВам нужно прокомментировать следующую задачу:\n<code>(1/${userComments.length})</code>\nНазвание: <code>${name}</code>\nОбозначение: <code>${description}</code>\nДата: <code>${date}</code>\nID: <code>${id_task}</code>`;
+        await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' });
 
-        // Если у пользователя есть комментарии
-        if (userComments.length > 0) {
-            // Возьмем первый комментарий для дальнейшей обработки
-            const comment = userComments[0]
-            // Формируем сообщение для пользователя
-            let message =
-                '<code>Cron</code>\nВам нужно прокомментировать следующую задачу:\n' +
-                `<code>(1/${userComments.length})</code>\n` +
-                `Название: <code>${comment.name}</code>\n` +
-                `Обозначение: <code>${comment.description}</code>\n` +
-                `Дата: <code>${comment.date}</code>\n` +
-                `ID: <code>${comment.id_task}</code>`
+        // Увеличиваем счетчик сообщений cron
+        state.cronMessageCounter++;
 
-            // Формируем сообщение для пользователя
-            await bot.telegram.sendMessage(chatId, message, {
-                parse_mode: 'HTML',
-            })
-
-            // Увеличиваем счетчик отправленных cron сообщений
-            state.cronMessageCounter++
-
-            // Устанавливаем состояние ожидания комментария от пользователя
-            userStates.set(chatId, {
-                isAwaitingComment: true,
-                taskId: comment.id_task,
-            })
-        }
+        // Устанавливаем статус ожидания комментария для пользователя
+        userStates.set(chatId, { isAwaitingComment: true, taskId: id_task });
     }
-    // Устанавливаем флаг, что ожидание комментария включено
-    state.isAwaitComment = true
+
+    // Устанавливаем флаг, что ожидание комментариев включено
+    state.isAwaitComment = true;
 }
+
+// Экспортируем функции
+module.exports = { notifyUsers, notifyAllUsers };
