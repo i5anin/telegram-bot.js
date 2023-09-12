@@ -2,7 +2,7 @@ require('dotenv').config()  // Загрузка переменных среды 
 const { Telegraf } = require('telegraf')
 
 const initCronJobs = require('#src/modules/cron')  // Планировщик задач (cron jobs)
-const handleTextCommand = require('#src/modules/text')  // Обработка текстовых сообщений
+const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
 const { handleRegComment } = require('#src/modules/reg')  // Обработка команды регистрации
 const { notifyUsers } = require('#src/modules/notify')  // Уведомления пользователя
 const { handleAddComment } = require('#src/modules/comment')  // Добавление комментариев
@@ -71,9 +71,13 @@ const instanceNumber = Math.floor(Math.random() * 100) + 1
 // Обработчики команд
 bot.command('help', handleHelpCommand)
 
-bot.command(['start', 'reg'], (ctx) => handleCommand(ctx, userStates, async (ctx, userState) => {
-    await handleRegComment(ctx, userState.isAwaitFio = true)
-}))
+bot.command(['start', 'reg'],async (ctx) => {
+    const chatId = ctx.chat.id;
+    const userState = userStates.get(chatId) || initializeUserState(ctx);
+    userState.isAwaitFio = true;  // Установка флага
+    userStates.set(chatId, userState);  // Обновление состояния
+    await handleRegComment(ctx, userState);  // Теперь передаем уже существующий объект состояния
+});
 
 bot.command('new_comment', (ctx) => handleCommand(ctx, notifyUsers))
 
@@ -81,10 +85,16 @@ bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 
 
 // Обработчик текста
+// Обработчик текста
 bot.on('text', async (ctx) => {
-    await handleTextCommand(ctx, state, bot)
-    await handleAddComment(ctx, userStates, bot) // передаем необходимые переменные в функцию
-})
+    const chatId = ctx.chat.id;
+    const userState = userStates.get(chatId) || initializeUserState(ctx);
+
+    await handleTextCommand(ctx, userState, bot);
+    await handleAddComment(ctx, userStates, bot);
+    userStates.set(chatId, userState);
+});
+
 
 // Запуск бота
 bot.launch().catch((err) => {

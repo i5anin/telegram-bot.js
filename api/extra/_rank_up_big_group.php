@@ -1,9 +1,9 @@
 <?php
-include __DIR__ . "/../config.php"; // Убедитесь, что $token определен в этом файле
+include __DIR__ . "/config.php"; // Убедитесь, что $token определен в этом файле
 
 function get_users()
 {
-    $dbConfig = require 'sql_config.php';
+    $dbConfig = require __DIR__ . '/sql_config.php';
 
     $server = $dbConfig['server'];
     $user = $dbConfig['user'];
@@ -93,6 +93,9 @@ foreach ($users as $user) {
     if ($response['ok']) {
         $message = "Пользователь $user_id успешно продвигается.";
         $output[$user_id]['promotion_status'] = $message;
+
+        // Add a 30-second delay here
+        sleep(1);
 
         $params = [
             'chat_id' => $groupId,
