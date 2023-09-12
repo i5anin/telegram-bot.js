@@ -106,3 +106,4 @@ dist
 state.db
 .idea
 
+session_db.json

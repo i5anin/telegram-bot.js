@@ -56,7 +56,7 @@ const instanceNumber = Math.floor(Math.random() * 100) + 1
 
 // Обработчики команд
 bot.command(['start', 'reg'], (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true))
-bot.command('new_comment', (ctx) => notifyUsers(ctx))
+bot.command('new_comment', (ctx) => notifyUsers(ctx,ctx.session.isAwaitComment = true))
 bot.command('status', handleStatusCommand)  // Использование вынесенной функции
 
 
