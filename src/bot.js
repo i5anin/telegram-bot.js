@@ -3,7 +3,7 @@ const { Telegraf } = require('telegraf')
 
 const initCronJobs = require('#src/modules/cron')  // Планировщик задач (cron jobs)
 const handleTextCommand = require('#src/modules/text')  // Обработка текстовых сообщений
-const handleRegComment = require('#src/modules/reg')  // Обработка команды регистрации
+const { handleRegComment } = require('#src/modules/reg')  // Обработка команды регистрации
 const { notifyUsers } = require('#src/modules/notify')  // Уведомления пользователя
 const { handleAddComment } = require('#src/modules/comment')  // Добавление комментариев
 const { handleHelpCommand } = require('#src/modules/help') // Добавление лога
@@ -52,15 +52,30 @@ bot.command('reg', async (ctx) => {
     }
 })
 
+function initializeUserState(ctx) {
+    const chatId = ctx.chat.id
+    return userStates.get(chatId) || { isAwaitFio: false, isAwaitComment: false, userInitiated: false }
+}
+
+function handleCommand(ctx, handler) {
+    const userState = initializeUserState(ctx)
+    handler(ctx, userState)
+    userStates.set(ctx.chat.id, userState)
+}
+
 // Номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 100) + 1
 
 // Обработчики команд
-bot.command('reg', (ctx) => handleRegComment(ctx, state.isAwaitFio = true))
-bot.command('start', (ctx) => handleRegComment(ctx, state.isAwaitFio = true))
-bot.command('new_comment', (ctx) => notifyUsers(ctx, bot, state))
-bot.command('status', handleStatusCommand)  // Использование вынесенной функции
 bot.command('help', handleHelpCommand)
+
+bot.command(['start', 'reg'], (ctx) => handleCommand(ctx, (ctx, userState) => {
+    handleRegComment(ctx, userState.isAwaitFio = true)
+}))
+
+bot.command('new_comment', (ctx) => handleCommand(ctx, notifyUsers))
+bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber));
+
 
 
 // Обработчик текста

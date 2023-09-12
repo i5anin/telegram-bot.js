@@ -16,7 +16,7 @@ async function checkRegistration(chatId) {
 }
 
 // Асинхронная функция для обработки команды регистрации
-module.exports = async function handleRegComment(ctx, state) {
+async function handleRegComment(ctx, state) {
     const chatId = ctx.message.chat.id;
     const { chat } = ctx.message;
 
@@ -34,3 +34,5 @@ module.exports = async function handleRegComment(ctx, state) {
     // Отправляем сообщение
     ctx.reply(textToReply, { parse_mode: 'HTML' });
 }
+
+module.exports = {handleRegComment}
