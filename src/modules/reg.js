@@ -28,7 +28,7 @@ async function handleRegComment(ctx, userState) {
 
     // Определяем, какой текст и статус должны быть установлены
     const textToReply = isRegistered ? ruLang.alreadyRegistered : ruLang.notRegistered
-    userState.isAwaitFio = !isRegistered;
+    ctx.session.isAwaitFio = !isRegistered;
 
     // Отправляем сообщение
     ctx.reply(textToReply, { parse_mode: 'HTML' })

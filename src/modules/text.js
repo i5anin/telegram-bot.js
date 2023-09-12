@@ -4,7 +4,7 @@ const { notifyUsers } = require('#src/modules/notify')
 const { handleAddComment } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log') // Добавление лога
 
-async function handleTextCommand(ctx, userState, bot) {
+async function handleTextCommand(ctx) {
     // Константы
     const USER_API = 'https://bot.pf-forum.ru/api/users'
     const GRAND_ADMIN = process.env.GRAND_ADMIN
@@ -17,10 +17,10 @@ async function handleTextCommand(ctx, userState, bot) {
     if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx) // функция sendToLog должна быть определена где-то в вашем коде
 
     // Ранний выход для улучшения читаемости
-    if (!state.isAwaitFio && !state.isAwaitComment) return
+    if (!ctx.session.isAwaitFio && !ctx.session.isAwaitComment) return
 
     // Обработка ожидания ФИО
-    if (userState.isAwaitFio) {
+    if (ctx.session.isAwaitFio) {
         if (!/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\. ?[А-Яа-яёЁ]\.$/.test(text)) {
             ctx.reply(ruLang.invalidData)
             return
@@ -69,12 +69,12 @@ async function handleTextCommand(ctx, userState, bot) {
             { parse_mode: 'HTML' },
         )
 
-        await notifyUsers(ctx, bot, state)
-        userState.isAwaitFio = false
+        await notifyUsers(ctx)
+        ctx.session.isAwaitFio = false
     }
 
     // Обработка ожидания комментария
-    if (userState.isAwaitComment) {
+    if (ctx.session.isAwaitComment) {
         await handleAddComment(ctx)
     }
 }

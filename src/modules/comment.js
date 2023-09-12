@@ -1,4 +1,4 @@
-const fetchData = require('#src/utils/helpers');
+const fetchData = require('#src/utils/helpers')
 
 async function fetchComments() {
     const url = COMMENT_API + '/get_all.php?key=' + SECRET_KEY
@@ -24,21 +24,21 @@ async function fetchComments() {
 }
 
 // Функция для добавления комментария в базу MySQL
-async function handleAddComment(ctx, userStates, bot) {
+async function handleAddComment(ctx) {
     if (!ctx) {
         console.log('Context is undefined!')
         return
     }
 
     const chatId = ctx.message.chat.id
-    const userState = userStates.get(chatId)
+    // const userState = userStates.get(chatId)
 
-    if (userState && userState.isAwaitingComment) {
+    if (ctx.session.isAwaitingComment) {
         const userComment = ctx.message.text
 
         try {
             await fetchData(COMMENT_API + `/update.php`, {
-                id_task: userState.taskId,
+                id_task: ctx.session.id,
                 comment: userComment,
             }) // ! Обновить комментарий
             await bot.telegram.sendMessage(
@@ -46,7 +46,8 @@ async function handleAddComment(ctx, userStates, bot) {
                 'Комментарий добавлен успешно.',
                 { parse_mode: 'HTML' },
             )
-            userStates.set(chatId, { isAwaitingComment: false, taskId: null }) // Обновляем состояние пользователя
+            ctx.session.isAwaitingComment = false
+            // userStates.set(chatId, { isAwaitingComment: false, taskId: null }) // Обновляем состояние пользователя
         } catch (error) {
             await bot.telegram.sendMessage(
                 chatId,
@@ -54,10 +55,10 @@ async function handleAddComment(ctx, userStates, bot) {
                 { parse_mode: 'HTML' },
             )
             console.log('Ошибка при добавлении комментария:', error)
-            userStates.set(chatId, {
-                isAwaitingComment: true,
-                taskId: userState.taskId,
-            }) // Обновляем состояние пользователя
+            // userStates.set(chatId, {
+            ctx.session.isAwaitingComment = true
+            //     taskId: userState.taskId,
+            // }) // Обновляем состояние пользователя
         }
     } else {
         console.log('No comment is awaited from this user at the moment.')
@@ -67,5 +68,5 @@ async function handleAddComment(ctx, userStates, bot) {
 
 module.exports = {
     fetchComments,
-    handleAddComment
-};
+    handleAddComment,
+}
