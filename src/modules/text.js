@@ -1,8 +1,8 @@
 // Обработка текстовых команд ФИО /add_user
-const ruLang = require('./ru_lang')
-const fetchData = require('./helpers')
-const notifyUsers = require('./notify')
-const handleAddComment = require('./comment')
+const ruLang = require('#src/utils/ru_lang')
+const fetchData = require('#src/utils/helpers')
+const notifyUsers = require('#src/modules/notify')
+const handleAddComment = require('#src/modules/comment')
 
 module.exports = async function handleTextCommand(ctx, state, bot) {
 
@@ -33,14 +33,28 @@ module.exports = async function handleTextCommand(ctx, state, bot) {
             ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
 
             // Запрос на добавление пользователя
-            const dataRankUp = await fetchData(
-                USER_API + '/rank_up.php',
-                { id_user: userId, fio: encodedFio },
-            )
-            const dataRankUp2 = await fetchData(
-                USER_API + '/rank_up2.php',
-                { id_user: userId, fio: encodedFio },
-            )
+            try {
+                const dataRankUp = await fetchData(
+                    USER_API + '/rank_up.php',
+                    { id_user: userId, fio: encodedFio },
+                );
+
+                const dataRankUp2 = await fetchData(
+                    USER_API + '/rank_up2.php',
+                    { id_user: userId, fio: encodedFio },
+                );
+
+                // Ваша логика в случае успешного выполнения
+
+            } catch (error) {
+                // Логирование ошибки и отправка сообщения админу
+                console.error('Ошибка при выполнении /rank_up или /rank_up2:', error);
+                await bot.telegram.sendMessage(
+                    GRAND_ADMIN,
+                    `⚠️ Ошибка при выполнении /rank_up или /rank_up2: ${error.message}`,
+                    { parse_mode: 'HTML' }
+                );
+            }
 
             const defMsg = `\nID: <code>${userId}</code>` +
                 `\nfio: <code>${cleanedText}</code>`
@@ -64,7 +78,7 @@ module.exports = async function handleTextCommand(ctx, state, bot) {
             await notifyUsers(ctx, bot, state) // если зарегистрировался кидем задачу
             state.isAwaitFio = false // Сбрасываем флаг
         } else {
-            ctx.reply(ruLang.invalidData)
+            ctx.reply(ruLang.invalidData) // при запросе комментария "Формат введенных данных неверный."
         }
     } else if (state.isAwaitComment) {
         // Добавленная часть

@@ -3,7 +3,7 @@
 const axios = require('axios');
 // const GRAND_ADMIN = process.env.GRAND_ADMIN
 
-const ruLang = require('./ru_lang')
+const ruLang = require('#src/utils/ru_lang')
 
 async function checkRegistration(chatId) {
     const url = `${USER_API}/get.php?id=${chatId}`

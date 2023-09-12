@@ -1,5 +1,5 @@
-const fetchData = require('./helpers')
-const fetchComments = require('./comment')
+const fetchData = require('#src/utils/helpers')
+const { fetchComments } = require('./comment');
 // Функция для уведомления пользователей о комментариях
 module.exports = async function notifyUsers(ctx, bot, state) {
     const chatId = ctx.message.chat.id
@@ -98,5 +98,5 @@ async function notifyAllUsers() {
         }
     }
     // Устанавливаем флаг, что ожидание комментария включено
-    isAwaitComment = true
+    state.isAwaitComment = true
 }

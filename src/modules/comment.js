@@ -1,6 +1,6 @@
-const fetchData = require('./helpers');
+const fetchData = require('#src/utils/helpers');
 
-module.exports = async function fetchComments() {
+async function fetchComments() {
     const url = COMMENT_API + '/get_all.php?key=' + SECRET_KEY
     try {
         const response = await fetch(url)
@@ -24,7 +24,7 @@ module.exports = async function fetchComments() {
 }
 
 // Функция для добавления комментария в базу MySQL
-async function handleAddComment(ctx) {
+async function handleAddComment(ctx, userStates, bot) {
     if (!ctx) {
         console.log('Context is undefined!')
         return
@@ -61,5 +61,11 @@ async function handleAddComment(ctx) {
         }
     } else {
         console.log('No comment is awaited from this user at the moment.')
+        // нет комментариев в этот момент ошибка при регистрации
     }
 }
+
+module.exports = {
+    fetchComments,
+    handleAddComment
+};

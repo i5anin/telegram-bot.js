@@ -1,17 +1,22 @@
 // Функция для выполнения GET-запросов
 const axios = require('axios')
-const ruLang = require('./ru_lang')
+const ruLang = require('#src/utils/ru_lang')
 
-module.exports = async function fetchData(url, params) {
+module.exports = async function fetchData(url, params, method = 'GET') {
     try {
-        const response = await axios.get(url, { params })
+        const response = await axios({
+            url,
+            method,
+            params: method === 'GET' ? params : {},
+            data: method === 'POST' ? params : {},
+        });
         if (!response.data) {
-            console.log('Сервер ответил без данных. GET-запрос/n') //Сервер ответил без данных
+            console.log('Сервер ответил без данных. GET-запрос\n'); //Сервер ответил без данных
             return null
         }
         return response.data
     } catch (error) {
-        console.log(ruLang.serverError, error)//Ошибка сервера
+        console.log(ruLang.serverError, error); //Ошибка сервера
         return null
     }
 }
