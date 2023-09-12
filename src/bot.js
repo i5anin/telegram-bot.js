@@ -50,6 +50,12 @@ global.stateCounter = {
     cronMessage: 0,
 }
 
+function resetFlags(ctx) {
+    ctx.session.isAwaitFio = false;
+    ctx.session.isAwaitComment = false;
+    ctx.session.userInitiated = false;
+}
+
 
 // Номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 100) + 1

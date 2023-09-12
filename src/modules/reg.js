@@ -17,7 +17,7 @@ async function checkRegistration(chatId) {
 }
 
 // Асинхронная функция для обработки команды регистрации
-async function handleRegComment(ctx, userState) {
+async function handleRegComment(ctx) {
     const chatId = ctx.message.chat.id
     const { chat } = ctx.message
 
