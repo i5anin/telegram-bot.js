@@ -57,11 +57,13 @@ function initializeUserState(ctx) {
     return userStates.get(chatId) || { isAwaitFio: false, isAwaitComment: false, userInitiated: false }
 }
 
-function handleCommand(ctx, handler) {
-    const userState = initializeUserState(ctx)
+function handleCommand(ctx, userStates, handler) {
+    const chatId = ctx.chat.id
+    const userState = userStates.get(chatId) || { isAwaitFio: false, isAwaitComment: false, userInitiated: false }
     handler(ctx, userState)
-    userStates.set(ctx.chat.id, userState)
+    userStates.set(chatId, userState)
 }
+
 
 // Номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 100) + 1
@@ -69,13 +71,13 @@ const instanceNumber = Math.floor(Math.random() * 100) + 1
 // Обработчики команд
 bot.command('help', handleHelpCommand)
 
-bot.command(['start', 'reg'], (ctx) => handleCommand(ctx, (ctx, userState) => {
-    handleRegComment(ctx, userState.isAwaitFio = true)
+bot.command(['start', 'reg'], (ctx) => handleCommand(ctx, userStates, async (ctx, userState) => {
+    await handleRegComment(ctx, userState.isAwaitFio = true)
 }))
 
 bot.command('new_comment', (ctx) => handleCommand(ctx, notifyUsers))
-bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber));
 
+bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 
 
 // Обработчик текста

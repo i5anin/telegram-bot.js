@@ -21,9 +21,7 @@ async function handleRegComment(ctx, state) {
     const { chat } = ctx.message;
 
     // Ранний выход, если чат НЕ является чатом администратора
-    if (chat.id !== parseInt(GRAND_ADMIN)) {
-        await sendToLog(ctx);
-    }
+    if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx);
 
     const isRegistered = await checkRegistration(chatId);
 
