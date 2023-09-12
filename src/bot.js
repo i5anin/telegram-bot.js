@@ -31,9 +31,6 @@ bot.use((ctx, next) => {
 })
 
 
-
-
-
 // Создание хранилища состояний для пользователей
 // const userStates = new Map()
 
@@ -51,9 +48,9 @@ global.stateCounter = {
 }
 
 function resetFlags(ctx) {
-    ctx.session.isAwaitFio = false;
-    ctx.session.isAwaitComment = false;
-    ctx.session.userInitiated = false;
+    ctx.session.isAwaitFio = false
+    ctx.session.isAwaitComment = false
+    ctx.session.userInitiated = false
 }
 
 
@@ -62,8 +59,8 @@ const instanceNumber = Math.floor(Math.random() * 100) + 1
 
 // Обработчики команд
 bot.command(['start', 'reg'], (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true))
-bot.command('new_comment', (ctx) => notifyUsers(ctx,ctx.session.isAwaitComment = true))
-bot.command('status', handleStatusCommand)  // Использование вынесенной функции
+bot.command('new_comment', (ctx) => notifyUsers(ctx, ctx.session.isAwaitComment = true))
+bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))// Использование вынесенной функции
 
 
 // Обработчик текста

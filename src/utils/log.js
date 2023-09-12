@@ -14,8 +14,8 @@ async function sendToLog(ctx) {
 }
 
 // Функция для обработки команды /status
-async function handleStatusCommand(ctx,instanceNumber) {
-    await ctx.reply(`Текущий номер экземпляра: ${instanceNumber}`);
+async function handleStatusCommand(ctx, instanceNumber) {
+    await ctx.reply(`Текущий номер экземпляра: ${instanceNumber}`)
 }
 
-module.exports = { handleStatusCommand, sendToLog };
+module.exports = { handleStatusCommand, sendToLog }
