@@ -8,29 +8,38 @@ const bot = new Telegraf(process.env.BOT_TOKEN)
 const localSession = new LocalSession({ database: 'session_db.json' })
 bot.use(localSession.middleware())
 
+// Инициализация сессии
+bot.use((ctx, next) => {
+    ctx.session = ctx.session || { counter: 0 }
+    return next()
+})
+
+const MESSAGES = {
+    INIT: 'Счетчик инициализирован',
+    ADD: 'Счетчик увеличен:',
+    SUBTRACT: 'Счетчик уменьшен:',
+    GET: 'Текущее значение счетчика:',
+}
+
 // Инициализируем состояние при старте диалога
 bot.command('start', (ctx) => {
-    ctx.session = ctx.session || {}
     ctx.session.counter = 0
-    ctx.reply('Счетчик инициализирован')
+    ctx.reply(MESSAGES.INIT)
 })
 
 // Используем состояние в обработчиках
 bot.command('add', (ctx) => {
-    ctx.session = ctx.session || {}
     ctx.session.counter++
-    ctx.reply(`Счетчик увеличен: ${ctx.session.counter}`)
+    ctx.reply(`${MESSAGES.ADD} ${ctx.session.counter}`)
 })
 
 bot.command('subtract', (ctx) => {
-    ctx.session = ctx.session || {}
     ctx.session.counter--
-    ctx.reply(`Счетчик уменьшен: ${ctx.session.counter}`)
+    ctx.reply(`${MESSAGES.SUBTRACT} ${ctx.session.counter}`)
 })
 
 bot.command('get', (ctx) => {
-    ctx.session = ctx.session || {}
-    ctx.reply(`Текущее значение счетчика: ${ctx.session.counter}`)
+    ctx.reply(`${MESSAGES.GET} ${ctx.session.counter}`)
 })
 
 bot.launch()
