@@ -60,10 +60,11 @@ async function handleAddComment(ctx) {
             //     taskId: userState.taskId,
             // }) // Обновляем состояние пользователя
         }
-    } else {
-        console.log('No comment is awaited from this user at the moment.')
-        // нет комментариев в этот момент ошибка при регистрации
     }
+    // else {
+    //     console.log('No comment is awaited from this user at the moment.')
+    //     // нет комментариев в этот момент ошибка при регистрации
+    // }
 }
 
 module.exports = {
