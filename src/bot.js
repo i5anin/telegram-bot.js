@@ -10,6 +10,9 @@ const { handleHelpCommand } = require('#src/modules/help') // Добавлени
 
 const { handleStatusCommand } = require('#src/utils/log') // Добавление лога
 
+const localSession = new LocalSession({ database: 'session_db.json' })
+bot.use(localSession.middleware())
+
 
 // Загрузка конфигурационных переменных из .env файла
 const { BOT_TOKEN } = process.env
@@ -17,8 +20,18 @@ const { BOT_TOKEN } = process.env
 // Инициализация Telegraf бота
 const bot = new Telegraf(BOT_TOKEN)
 
+bot.use((ctx, next) => {
+    ctx.session = ctx.session || { //  найти ||(или) добавить
+        counter: 0,
+        isAwaitFio: false,
+        isAwaitComment: false,
+        userInitiated: false
+    }
+    return next()
+})
+
 // Создание хранилища состояний для пользователей
-const userStates = new Map()
+// const userStates = new Map()
 
 // Установка глобальных переменных
 global.USER_API = 'https://bot.pf-forum.ru/api/users'
@@ -38,18 +51,18 @@ bot.command('reg', async (ctx) => {
     const chatId = ctx.chat.id
 
     // Установка начального состояния для пользователя
-    userStates.set(chatId, {
-        isAwaitFio: false,
-        isAwaitComment: false,
-        userInitiated: false,
-    })
+    // userStates.set(chatId, {
+    //     isAwaitFio: false,
+    //     isAwaitComment: false,
+    //     userInitiated: false,
+    // })
 
     // Попытка обработать команду регистрации
-    try {
-        await handleRegComment(ctx, userStates.get(chatId).isAwaitFio = true)
-    } catch (error) {
-        console.error('Error in handleRegComment:', error)
-    }
+    // try {
+    //     await handleRegComment(ctx, userStates.get(chatId).isAwaitFio = true)
+    // } catch (error) {
+    //     console.error('Error in handleRegComment:', error)
+    // }
 })
 
 function initializeUserState(ctx) {
@@ -85,14 +98,8 @@ bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 
 
 // Обработчик текста
-// Обработчик текста
 bot.on('text', async (ctx) => {
     const chatId = ctx.chat.id;
-    const userState = userStates.get(chatId) || initializeUserState(ctx);
-
-    await handleTextCommand(ctx, userState, bot);
-    await handleAddComment(ctx, userStates, bot);
-    userStates.set(chatId, userState);
 });
 
 
