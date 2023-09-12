@@ -1,35 +1,40 @@
-// Функция для проверки регистрации пользователя на Сервере
-// Проверка регистрации пользователя
+// Подключаем необходимые модули и переменные
 const axios = require('axios');
-// const GRAND_ADMIN = process.env.GRAND_ADMIN
+const ruLang = require('#src/utils/ru_lang');  // Локализация сообщений
 
-const ruLang = require('#src/utils/ru_lang')
-
+// Функция для проверки, зарегистрирован ли пользователь на сервере
 async function checkRegistration(chatId) {
-    const url = `${USER_API}/get.php?id=${chatId}`
+    const url = `${USER_API}/get.php?id=${chatId}`;  // Формируем URL для запроса
     try {
-        const response = await axios.get(url)
+        const response = await axios.get(url);  // Делаем GET-запрос на сервер
+        // Проверяем, существует ли пользователь в базе данных
         if (response.data.exists === true) {
-            return true
+            return true;  // Если да, возвращаем true
         }
-        return false
+        return false;  // Если нет, возвращаем false
     } catch (error) {
-        return false
+        return false;  // В случае ошибки также возвращаем false
     }
 }
 
-// ! reg
+// Функция обработки команды "/reg"
+// Асинхронная функция для обработки команды регистрации
 module.exports = async function handleRegComment(ctx, state) {
-    const chatId = ctx.message.chat.id
-    const isRegistered = await checkRegistration(chatId)
-    const { chat } = ctx.message
-    if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx)
+    const chatId = ctx.message.chat.id;  // Получаем ID чата
+    const isRegistered = await checkRegistration(chatId);  // Проверяем регистрацию
+    const { chat } = ctx.message;
+
+    // Если чат не является чатом администратора, отправляем лог
+    if (chat.id !== parseInt(GRAND_ADMIN)) await sendToLog(ctx);
+
+    // Отправляем соответствующее сообщение на основе статуса регистрации
     if (isRegistered) {
-        ctx.reply(ruLang.alreadyRegistered, { parse_mode: 'HTML' })
-        state.isAwaitFio  = false
+        // Если пользователь уже зарегистрирован
+        ctx.reply(ruLang.alreadyRegistered, { parse_mode: 'HTML' });
+        state.isAwaitFio = false;  // Отключаем ожидание ФИО
     } else {
-        ctx.reply(ruLang.notRegistered, { parse_mode: 'HTML' })
-        state.isAwaitFio  = true
+        // Если пользователь не зарегистрирован
+        ctx.reply(ruLang.notRegistered, { parse_mode: 'HTML' });
+        state.isAwaitFio = true;  // Включаем ожидание ФИО
     }
 }
-
