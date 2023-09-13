@@ -30,12 +30,27 @@ const fetchUsers = async () => {
     }
 }
 
+const fetchGroupTitle = async (groupId) => {
+    try {
+        const chat = await bot.telegram.getChat(groupId)
+        return chat.title || 'Неизвестная группа'
+    } catch (error) {
+        console.error(
+            `Не удалось получить название группы ${groupId}: ${error}`
+        )
+        return 'Неизвестная группа'
+    }
+}
+
 const compareGroups = async () => {
-    const [adminsGroup1, adminsGroup2, usersData] = await Promise.all([
-        fetchAdmins(groupId1),
-        fetchAdmins(groupId2),
-        fetchUsers(),
-    ])
+    const [adminsGroup1, adminsGroup2, usersData, title1, title2] =
+        await Promise.all([
+            fetchAdmins(groupId1),
+            fetchAdmins(groupId2),
+            fetchUsers(),
+            fetchGroupTitle(groupId1),
+            fetchGroupTitle(groupId2),
+        ])
 
     for (const userData of usersData) {
         const userId = userData.user_id.toString()
@@ -56,15 +71,15 @@ const compareGroups = async () => {
         const label2 = admin2 ? admin2.custom_title : 'Нет метки'
 
         if (admin1) {
-            console.log(`1 группа кастомная метка  ${label1}`)
+            console.log(`${title1} кастомная метка  ${label1}`)
         } else {
-            console.log('отсутствует в группе 1')
+            console.log(`отсутствует в группе ${title1}`)
         }
 
         if (admin2) {
-            console.log(`2 группа кастомная метка  ${label2}`)
+            console.log(`${title2} кастомная метка  ${label2}`)
         } else {
-            console.log('отсутствует в группе 2')
+            console.log(`отсутствует в группе ${title2}`)
         }
 
         if (
