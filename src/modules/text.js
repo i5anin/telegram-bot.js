@@ -21,7 +21,7 @@ async function handleTextCommand(ctx) {
 
     // Обработка ожидания ФИО
     if (ctx.session.isAwaitFio) {
-        if (!/^[А-Яа-яёЁëË]+\s[А-Яа-яёЁëË]\. ?[А-Яа-яёЁëË]\.$/.test(text)) {
+        if (!/^[А-Яа-яёЁëË]+\s[А-Яа-яёЁëË]\. ?[А-Яа-яёЁëË]\.$/.test(text)) { //налог с диакритическим знаком "ë" 
             ctx.reply(ruLang.invalidData)
             return
         }
