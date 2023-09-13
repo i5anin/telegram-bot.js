@@ -20,7 +20,7 @@ if ($mysqli->connect_error) {
 $mysqli->set_charset('utf8mb4');
 
 // Подготавливаем запрос
-if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `name`, `description` FROM `sk_comment` WHERE `user_id` = ? AND `completed` = 0")) {
+if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`,`type` FROM `sk_comment` WHERE `user_id` = ? AND `completed` = 0")) {
 
     // Привязываем параметры
     $stmt->bind_param("i", $_GET['user_id']);
@@ -29,7 +29,8 @@ if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `name`, `desc
     $stmt->execute();
 
     // Привязываем результаты к переменным
-    $stmt->bind_result($id_task, $user_id, $date, $name, $description);
+    $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type);
+
 
     // Инициализируем массив для хранения результатов
     $comments = [];
@@ -37,11 +38,13 @@ if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `name`, `desc
     // Получаем и сохраняем все строки результата
     while ($stmt->fetch()) {
         $comments[] = [
-            'id_task' => $id_task,
-            'user_id' => $user_id,
-            'date' => $date,
-            'name' => $name,
-            'description' => $description,
+            `id_task` => $id_task,
+            `user_id` => $user_id,
+            `date` => $date,
+            `specs_nom_id` => $specs_nom_id,
+            `det_name` => $det_name,
+            `type` => $type,
+            `smena_id` => $smena_id
         ];
     }
 
