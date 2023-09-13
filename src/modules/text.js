@@ -21,7 +21,7 @@ async function handleTextCommand(ctx) {
 
     // Обработка ожидания ФИО
     if (ctx.session.isAwaitFio) {
-        if (!/^[А-Яа-яёЁ]+\s[А-Яа-яёЁ]\. ?[А-Яа-яёЁ]\.$/.test(text)) {
+        if (!/^[А-Яа-яёЁëË]+\s[А-Яа-яёЁëË]\. ?[А-Яа-яёЁëË]\.$/.test(text)) {
             ctx.reply(ruLang.invalidData)
             return
         }
