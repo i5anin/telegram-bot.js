@@ -25,13 +25,19 @@ bot.use(localSession.middleware())
 // Сессионный middleware
 bot.use((ctx, next) => {
     ctx.session = ctx.session || {
-        counter: 0,
         isAwaitFio: false,
         isAwaitComment: false,
         userInitiated: false,
     }
     return next()
 })
+// Функция для сброса флагов сессии
+function resetFlags(ctx) {
+    ctx.session.isAwaitFio = false
+    ctx.session.isAwaitComment = false
+    ctx.session.userInitiated = false
+}
+
 
 // Глобальные переменные
 global.USER_API = 'https://bot.pf-forum.ru/api/users'
@@ -46,22 +52,33 @@ global.stateCounter = {
     cronMessage: 0,
 }
 
-// Функция для сброса флагов сессии
-function resetFlags(ctx) {
-    ctx.session.isAwaitFio = false
-    ctx.session.isAwaitComment = false
-    ctx.session.userInitiated = false
-}
+
 
 // Случайный номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 100) + 1
 console.log('instanceNumber : ' + instanceNumber)
 
 // Обработчики команд
-bot.command(['start', 'reg'], (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true))
-bot.command('new_comment', (ctx) => notifyUsers(ctx, ctx.session.isAwaitComment = true))
+bot.command(['start', 'reg'], async (ctx) => {
+    try {
+        resetFlags(ctx);
+        await handleRegComment(ctx, ctx.session.isAwaitFio = true);
+    } catch (error) {
+        console.error('Error in handleRegComment:', error);
+    }
+});
+
+bot.command('new_comment', async (ctx) => {
+    try {
+        resetFlags(ctx);
+        await notifyUsers(ctx, ctx.session.isAwaitComment = true);
+    } catch (error) {
+        console.error('Error in notifyUsers:', error);
+    }
+});
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 bot.command('help', handleHelpCommand)
+
 
 // Обработчик текстовых сообщений
 bot.on('text', async (ctx) => {
