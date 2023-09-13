@@ -10,6 +10,7 @@ const { handleRegComment } = require('#src/modules/reg')
 const { notifyUsers } = require('#src/modules/notify')
 const { handleAddComment } = require('#src/modules/comment')
 const { handleStatusCommand } = require('#src/utils/log')
+const { handleHelpCommand } = require('#src/modules/help') // Добавлени
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -60,6 +61,7 @@ console.log('instanceNumber : ' + instanceNumber)
 bot.command(['start', 'reg'], (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true))
 bot.command('new_comment', (ctx) => notifyUsers(ctx, ctx.session.isAwaitComment = true))
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
+bot.command('help', handleHelpCommand)
 
 // Обработчик текстовых сообщений
 bot.on('text', async (ctx) => {
