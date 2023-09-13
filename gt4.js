@@ -5,7 +5,8 @@ const axios = require('axios')
 const { BOT_TOKEN_ORIG } = process.env
 const bot = new Telegraf(BOT_TOKEN_ORIG)
 
-const groupId1 = '-1001967174143'
+ const groupId1 = '-1001967174143' //Электронная маршрутка
+//const groupId1 = '-1001880477192' //ООО ПФ-ФОРУМ
 
 const fetchAdmins = async (groupId) => {
     try {
@@ -66,6 +67,8 @@ const promoteUserToAdmin = async (userId, groupId, fio) => {
     }
 }
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
 const compareLists = async () => {
     const [adminsGroup1, usersData] = await Promise.all([
         fetchAdmins(groupId1),
@@ -78,12 +81,19 @@ const compareLists = async () => {
         )
     })
 
+    // Получить информацию о группе
+    const groupInfo = await bot.telegram.getChat(groupId1)
+    console.log(`Начало операций для группы ${groupInfo.title}`)
+
     for (let user of missingInAdmins) {
         const isInGroup = await checkIfUserInGroup(user.user_id, groupId1)
         if (isInGroup) {
             await promoteUserToAdmin(user.user_id, groupId1, user.fio)
+            await delay(1000) // Задержка в 1 секунду
         }
     }
+
+    console.log(`Конец операций для группы ${groupInfo.title}`)
 }
 
 compareLists().catch((err) => console.error(err))
