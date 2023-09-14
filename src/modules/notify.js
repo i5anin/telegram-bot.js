@@ -23,9 +23,13 @@ async function notifyUsers(ctx) {
         if (userActualComments.length === 0) return
 
         // Формируем сообщение для пользователя
-        const { id_task, name, description, date } = userActualComments[0]
-        const message = `Пожалуйста, прокомментируйте следующую операцию:\n<code>(1/${userActualComments.length})</code>\nНазвание: <code>${name}</code>\nОбозначение: <code>${description}</code>\nДата: <code>${date}</code>\nid: <code>${id_task}</code>`
-
+        const { id_task, kolvo_brak, det_name, date } = userActualComments[0]
+        const message = `Пожалуйста, прокомментируйте следующую операцию:`
+            +`<code>(1/${userActualComments.length})</code>\n\n`
+            +`Название и обозначение:\n<code>${det_name}</code>\n`
+            +`Брак: <code>${kolvo_brak}</code>\n`
+            +`Дата: <code>${date}</code>\n`
+            +`ID: <code>${id_task}</code>`
         // Отправляем сообщение
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
 
@@ -57,8 +61,13 @@ async function notifyAllUsers(ctx) {
         if (userComments.length === 0) continue
 
         // Формируем и отправляем сообщение
-        const { id_task, name, description, date } = userComments[0]
-        const message = `<code>Cron</code>\nВам нужно прокомментировать следующую задачу:\n<code>(1/${userComments.length})</code>\nНазвание: <code>${name}</code>\nОбозначение: <code>${description}</code>\nДата: <code>${date}</code>\nID: <code>${id_task}</code>`
+        const { id_task, kolvo_brak, det_name, date } = userComments[0]
+        const message = `<code>Cron</code>\nВам нужно прокомментировать следующую задачу:`
+            +`<code>(1/${userComments.length})</code>\n\n`
+            +`Название и обозначение:\n<code>${det_name}</code>\n`
+            +`Брак: <code>${kolvo_brak}</code>\n`
+            +`Дата: <code>${date}</code>\n`
+            +`ID: <code>${id_task}</code>`
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
 
         // Увеличиваем счетчик сообщений cron
