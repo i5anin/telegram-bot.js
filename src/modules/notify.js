@@ -33,6 +33,8 @@ async function notifyUsers(ctx) {
             + `ID: <code>${id_task}</code>`
         // Отправляем сообщение
         ctx.session.userComments = userActualComments[0]
+        ctx.session.id_task = id_task
+        console.log('ctx.session.id_task = ', ctx.session.id_task)
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
 
         // Увеличиваем счетчик сообщений
@@ -73,6 +75,8 @@ async function notifyAllUsers(ctx) {
             + `ID: <code>${id_task}</code>\n`
             + `<code>Cron</code>`
         ctx.session.userComments = userComments[0]
+        ctx.session.id_task = id_task
+        console.log('ctx.session.id_task = ', ctx.session.id_task)
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
 
         // Увеличиваем счетчик сообщений cron
