@@ -6,7 +6,6 @@ $dbConfig = require 'sql_config.php';
 // Извлекаем секретный ключ из конфигурации
 $SECRET_KEY = $dbConfig['key'] ?? null;
 
-// Проверка на наличие секретного ключа
 if ($SECRET_KEY === null) {
     http_response_code(500);
     echo json_encode(['error' => 'Secret key not configured']);
@@ -16,14 +15,12 @@ if ($SECRET_KEY === null) {
 // Получаем ключ из GET-параметров
 $provided_key = $_GET['key'] ?? null;
 
-// Проверка на наличие ключа в запросе
 if ($provided_key === null) {
     http_response_code(400);
     echo json_encode(['error' => 'Key not provided']);
     exit;
 }
 
-// Проверка секретного ключа
 if ($provided_key !== $SECRET_KEY) {
     http_response_code(403);
     echo json_encode(['error' => 'Invalid secret key']);
@@ -36,32 +33,21 @@ $user = $dbConfig['user'];
 $pass = $dbConfig['pass'];
 $db = $dbConfig['db'];
 
-// Подключение к БД
 $mysqli = new mysqli($server, $user, $pass, $db);
 
-// Проверка подключения
 if ($mysqli->connect_error) {
     http_response_code(500);
     echo json_encode(['error' => "Connection failed: " . $mysqli->connect_error]);
     exit;
 }
 
-// Устанавливаем кодировку
 $mysqli->set_charset('utf8mb4');
 
-// Подготавливаем запрос на выборку всех незавершенных комментариев
-if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`, `type` FROM `sk_comment` WHERE `completed` = 0")) {
-
-    // Выполняем запрос
+if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`, `type`, `kolvo_brak` FROM `sk_comment` WHERE `completed` = 0")) {
     $stmt->execute();
+    $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type, $kolvo_brak); // добавлено kolvo_brak
 
-    // Привязываем результаты к переменным
-    $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type);
-
-    // Инициализируем массив для хранения результатов
     $comments = [];
-
-    // Получаем и сохраняем все строки результата
     while ($stmt->fetch()) {
         $comments[] = [
             'id_task' => $id_task,
@@ -69,24 +55,21 @@ if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id
             'date' => $date,
             'specs_nom_id' => $specs_nom_id,
             'det_name' => $det_name,
-            'type' => $type
+            'type' => $type,
+            'kolvo_brak' => $kolvo_brak // добавлено kolvo_brak
         ];
     }
 
-    // Закрываем запрос
     $stmt->close();
 
-    // Проверяем, нашлись ли какие-то результаты
     if (!empty($comments)) {
         echo json_encode(['comments' => $comments]);
     } else {
         echo json_encode(['error' => 'Comments not found']);
     }
-
 } else {
     http_response_code(500);
     echo json_encode(['error' => 'Failed to prepare SQL query']);
 }
 
-// Закрываем подключение к БД
 $mysqli->close();
