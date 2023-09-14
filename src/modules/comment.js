@@ -1,4 +1,5 @@
 const fetchData = require('#src/utils/helpers')
+
 //fetchComments
 async function fetchComments() {
     const url = COMMENT_API + '/get_all.php?key=' + SECRET_KEY
@@ -35,7 +36,7 @@ async function handleAddComment(ctx) {
 
     if (ctx.session.isAwaitingComment) {
         const userComment = ctx.message.text
-
+        console.log("ctx.session.isAwaitingComment = ",ctx.session.isAwaitingComment)
         try {
             await fetchData(COMMENT_API + `/update.php`, {
                 id_task: ctx.session.id,

@@ -1,11 +1,12 @@
 // Импортируем необходимые функции
 const fetchData = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
+const { sendToLog } = require('#src/utils/log')
 
 // Функция для уведомления одного пользователя о некомментированных задачах
 async function notifyUsers(ctx) {
     const chatId = ctx.message.chat.id // Получаем ID чата из контекста сообщения
-
+    await sendToLog(ctx)
     try {
         // Получаем список некомментированных задач для данного пользователя
         const uncommentedTasks = await fetchComments(chatId)

@@ -1,5 +1,8 @@
 // Функция для обработки команды /help
+const { sendToLog } = require('#src/utils/log') // Добавление лога
+
 function handleHelpCommand(ctx) {
+    sendToLog(ctx)
     ctx.reply(`Доступные команды:
 
 - /start: Начать работу с ботом и регистрация
