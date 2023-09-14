@@ -1,5 +1,5 @@
 const fetchData = require('#src/utils/helpers')
-
+//fetchComments
 async function fetchComments() {
     const url = COMMENT_API + '/get_all.php?key=' + SECRET_KEY
     try {
