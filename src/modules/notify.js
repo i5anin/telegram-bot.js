@@ -49,41 +49,42 @@ async function notifyUsers(ctx) {
 
 // Функция для уведомления всех пользователей
 async function notifyAllUsers(ctx) {
-    const allComments = await fetchComments() // Получаем все комментарии
-    const data = await fetchData(USER_API + '/get_all.php') // Получаем всех пользователей
+    const allComments = await fetchComments(); // Получаем все комментарии
+    const data = await fetchData(`${COMMENT_API}/get_all.php?key=${SECRET_KEY}`); // Получаем всех пользователей
 
-    // Проверяем, получены ли данные корректно
-    if (!data || !data.hasOwnProperty('user_ids')) {
-        console.log('The server response did not contain \'user_ids\'')
-        return
-    }
+    console.log("Data received from the server: ", JSON.stringify(data, null, 2));
+
+    // Извлекаем user_ids из comments
+    const user_ids = [...new Set(data.comments.map(comment => comment.user_id))];
+
+    console.log('Extracted user_ids:', user_ids);
 
     // Проходимся по всем пользователям и уведомляем их
-    for (const chatId of data.user_ids) {
-        // if (userStates.get(chatId)) continue // Если у пользователя уже есть задача для комментирования, пропускаем
+    for (const chatId of user_ids) {
+        console.log(`Processing chatId: ${chatId}`); // Для отладки
 
-        const userComments = allComments.filter(comment => comment.user_id === chatId)
-        if (userComments.length === 0) continue
+        const userComments = allComments.filter(comment => comment.user_id === chatId);
+        if (userComments.length === 0) continue;
 
-        // Формируем и отправляем сообщение
-        const { id_task, kolvo_brak, det_name, date } = userComments[0]
+        console.log(`Sending message to chatId: ${chatId}`); // Для отладки
+
+        const { id_task, kolvo_brak, det_name, date } = userComments[0];
         const message = `Вам нужно прокомментировать следующую задачу:`
             + `<code>(1/${userComments.length})</code>\n\n`
             + `Название и обозначение:\n<code>${det_name}</code>\n`
             + `Брак: <code>${kolvo_brak}</code>\n`
             + `Дата: <code>${date}</code>\n`
             + `ID: <code>${id_task}</code>\n`
-            + `<code>Cron</code>`
-        ctx.session.userComments = userComments[0]
-        ctx.session.id_task = id_task
-        console.log('ctx.session.id_task = ', ctx.session.id_task)
-        await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
+            + `<code>Cron</code>`;
 
-        // Увеличиваем счетчик сообщений cron
-        stateCounter.cronMessage++
-
-        // Устанавливаем статус ожидания комментария для пользователя
-        ctx.session.isAwaitComment = true
+        ctx.session.userComments = userComments[0];
+        ctx.session.id_task = id_task;
+        try {
+            await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' });
+            console.log(`Message sent to chatId: ${chatId}`); // Для отладки
+        } catch (error) {
+            console.error(`Failed to send message to chatId: ${chatId}`, error); // Для отладки
+        }
     }
 }
 
