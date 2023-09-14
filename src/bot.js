@@ -31,6 +31,7 @@ bot.use((ctx, next) => {
     }
     return next()
 })
+
 // Функция для сброса флагов сессии
 function resetFlags(ctx) {
     ctx.session.isAwaitFio = false
@@ -53,7 +54,6 @@ global.stateCounter = {
 }
 
 
-
 // Случайный номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 100) + 1
 console.log('instanceNumber : ' + instanceNumber)
@@ -61,21 +61,17 @@ console.log('instanceNumber : ' + instanceNumber)
 // Обработчики команд
 bot.command(['start', 'reg'], async (ctx) => {
     try {
-        resetFlags(ctx);
-        await handleRegComment(ctx, ctx.session.isAwaitFio = true);
+        resetFlags(ctx)
+        await handleRegComment(ctx, ctx.session.isAwaitFio = true)
     } catch (error) {
-        console.error('Error in handleRegComment:', error);
+        console.error('Error in handleRegComment:', error)
     }
-});
+})
 
 bot.command('new_comment', async (ctx) => {
-    try {
-        resetFlags(ctx);
-        await notifyUsers(ctx, ctx.session.isAwaitComment = true);
-    } catch (error) {
-        console.error('Error in notifyUsers:', error);
-    }
-});
+    resetFlags(ctx)
+    await notifyUsers(ctx)
+})
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 bot.command('help', handleHelpCommand)
 

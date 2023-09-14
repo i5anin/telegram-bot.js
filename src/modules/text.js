@@ -5,21 +5,19 @@ const { handleAddComment } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log') // Добавление лога
 
 async function handleTextCommand(ctx) {
+    await sendToLog(ctx) // функция sendToLog
     // Константы
     const USER_API = 'https://bot.pf-forum.ru/api/users'
-    // const GRAND_ADMIN = process.env.GRAND_ADMIN
-    const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID || '-1001946496691'
 
     // Деструктуризация полей из сообщения
     const { text, chat, from } = ctx.message
-
-        await sendToLog(ctx) // функция sendToLog
 
     // Ранний выход для улучшения читаемости
     if (!ctx.session.isAwaitFio && !ctx.session.isAwaitComment) return
 
     // Обработка ожидания ФИО
     if (ctx.session.isAwaitFio) {
+        console.log('ctx.session.isAwaitFio=', ctx.session.isAwaitFio)
         if (!/^[А-Яа-яёЁëË]+\s[А-Яа-яёЁëË]\. ?[А-Яа-яёЁëË]\.$/.test(text)) { //налог с диакритическим знаком "ë"
             ctx.reply(ruLang.invalidData)
             return
@@ -54,6 +52,7 @@ async function handleTextCommand(ctx) {
         ctx.session.isAwaitFio = false
     }
 
+    console.log('ctx.session.isAwaitComment = ', ctx.session.isAwaitComment)
     // Обработка ожидания комментария
     if (ctx.session.isAwaitComment) {
         await handleAddComment(ctx)

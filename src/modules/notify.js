@@ -26,12 +26,13 @@ async function notifyUsers(ctx) {
         // Формируем сообщение для пользователя
         const { id_task, kolvo_brak, det_name, date } = userActualComments[0]
         const message = `Пожалуйста, прокомментируйте следующую операцию:`
-            +`<code>(1/${userActualComments.length})</code>\n\n`
-            +`Название и обозначение:\n<code>${det_name}</code>\n`
-            +`Брак: <code>${kolvo_brak}</code>\n`
-            +`Дата: <code>${date}</code>\n`
-            +`ID: <code>${id_task}</code>`
+            + `<code>(1/${userActualComments.length})</code>\n\n`
+            + `Название и обозначение:\n<code>${det_name}</code>\n`
+            + `Брак: <code>${kolvo_brak}</code>\n`
+            + `Дата: <code>${date}</code>\n`
+            + `ID: <code>${id_task}</code>`
         // Отправляем сообщение
+        ctx.session.userComments = userActualComments[0]
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
 
         // Увеличиваем счетчик сообщений
@@ -41,6 +42,7 @@ async function notifyUsers(ctx) {
         // Логируем ошибку, если что-то пошло не так
         console.log('Error in notifyUsers:', error)
     }
+    ctx.session.isAwaitComment = true
 }
 
 // Функция для уведомления всех пользователей
@@ -63,23 +65,22 @@ async function notifyAllUsers(ctx) {
 
         // Формируем и отправляем сообщение
         const { id_task, kolvo_brak, det_name, date } = userComments[0]
-        const message = `<code>Cron</code>\nВам нужно прокомментировать следующую задачу:`
-            +`<code>(1/${userComments.length})</code>\n\n`
-            +`Название и обозначение:\n<code>${det_name}</code>\n`
-            +`Брак: <code>${kolvo_brak}</code>\n`
-            +`Дата: <code>${date}</code>\n`
-            +`ID: <code>${id_task}</code>`
+        const message = `Вам нужно прокомментировать следующую задачу:`
+            + `<code>(1/${userComments.length})</code>\n\n`
+            + `Название и обозначение:\n<code>${det_name}</code>\n`
+            + `Брак: <code>${kolvo_brak}</code>\n`
+            + `Дата: <code>${date}</code>\n`
+            + `ID: <code>${id_task}</code>\n`
+            + `<code>Cron</code>`
+        ctx.session.userComments = userComments[0]
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
 
         // Увеличиваем счетчик сообщений cron
         stateCounter.cronMessage++
 
         // Устанавливаем статус ожидания комментария для пользователя
-        ctx.session.isAwaitingComment = true
+        ctx.session.isAwaitComment = true
     }
-
-    // Устанавливаем флаг, что ожидание комментариев включено
-    ctx.session.isAwaitComment = true
 }
 
 // Экспортируем функции
