@@ -6,6 +6,7 @@ $dbConfig = require 'sql_config.php';
 // Извлекаем секретный ключ из конфигурации
 $SECRET_KEY = $dbConfig['key'] ?? null;
 
+// Проверка на наличие секретного ключа
 if ($SECRET_KEY === null) {
     http_response_code(500);
     echo json_encode(['error' => 'Secret key not configured']);
@@ -15,6 +16,7 @@ if ($SECRET_KEY === null) {
 // Получаем ключ из GET-параметров
 $provided_key = $_GET['key'] ?? null;
 
+// Проверка на наличие ключа в запросе
 if ($provided_key === null) {
     http_response_code(400);
     echo json_encode(['error' => 'Key not provided']);
@@ -48,13 +50,13 @@ if ($mysqli->connect_error) {
 $mysqli->set_charset('utf8mb4');
 
 // Подготавливаем запрос на выборку всех незавершенных комментариев
-if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `name`, `description` FROM `sk_comment` WHERE `completed` = 0")) {
+if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`, `type` FROM `sk_comment` WHERE `completed` = 0")) {
 
     // Выполняем запрос
     $stmt->execute();
 
     // Привязываем результаты к переменным
-    $stmt->bind_result($id_task, $user_id, $date, $name, $description);
+    $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type);
 
     // Инициализируем массив для хранения результатов
     $comments = [];
@@ -65,8 +67,9 @@ if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `name`, `desc
             'id_task' => $id_task,
             'user_id' => $user_id,
             'date' => $date,
-            'name' => $name,
-            'description' => $description,
+            'specs_nom_id' => $specs_nom_id,
+            'det_name' => $det_name,
+            'type' => $type
         ];
     }
 
@@ -79,7 +82,9 @@ if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `name`, `desc
     } else {
         echo json_encode(['error' => 'Comments not found']);
     }
+
 } else {
+    http_response_code(500);
     echo json_encode(['error' => 'Failed to prepare SQL query']);
 }
 
