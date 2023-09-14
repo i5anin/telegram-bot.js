@@ -48,45 +48,63 @@ async function notifyUsers(ctx) {
 }
 
 // Функция для уведомления всех пользователей
-async function notifyAllUsers(ctx) {
-    const allComments = await fetchComments(); // Получаем все комментарии
-    const data = await fetchData(`${COMMENT_API}/get_all.php?key=${SECRET_KEY}`); // Получаем всех пользователей
+// Вспомогательная функция для создания задержки
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
 
-    console.log("Data received from the server: ", JSON.stringify(data, null, 2));
-
-    // Извлекаем user_ids из comments
+// Функция для уведомления всех пользователей
+async function notifyAllUsers(ctx) { // Добавлен ctx в качестве аргумента
+    const allComments = await fetchComments();
+    const data = await fetchData(`${COMMENT_API}/get_all.php?key=${SECRET_KEY}`);
     const user_ids = [...new Set(data.comments.map(comment => comment.user_id))];
 
-    console.log('Extracted user_ids:', user_ids);
-
-    // Проходимся по всем пользователям и уведомляем их
     for (const chatId of user_ids) {
-        console.log(`Processing chatId: ${chatId}`); // Для отладки
+        console.log(`Processing chatId: ${chatId}`);
 
         const userComments = allComments.filter(comment => comment.user_id === chatId);
         if (userComments.length === 0) continue;
 
-        console.log(`Sending message to chatId: ${chatId}`); // Для отладки
-
         const { id_task, kolvo_brak, det_name, date } = userComments[0];
+
+        // Проверяем, отправлялось ли сообщение ранее
+        if (ctx.session.sentMessages && ctx.session.sentMessages.includes(id_task)) {
+            console.log(`Message for id_task ${id_task} already sent to chatId: ${chatId}`);
+            continue; // Пропустить, если сообщение уже отправлялось
+        }
+
         const message = `Вам нужно прокомментировать следующую задачу:`
             + `<code>(1/${userComments.length})</code>\n\n`
-            + `Название и обозначение:\n<code>${det_name}</code>\n`
+            + `Название и обозначение:\n`
+            + `<code>${det_name}</code>\n`
             + `Брак: <code>${kolvo_brak}</code>\n`
             + `Дата: <code>${date}</code>\n`
             + `ID: <code>${id_task}</code>\n`
             + `<code>Cron</code>`;
 
-        ctx.session.userComments = userComments[0];
-        ctx.session.id_task = id_task;
         try {
             await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' });
-            console.log(`Message sent to chatId: ${chatId}`); // Для отладки
+            console.log(`Message sent to chatId: ${chatId}`);
+
+            // Запоминаем, что сообщение отправлено
+            if (!ctx.session.sentMessages) {
+                ctx.session.sentMessages = [];
+            }
+            ctx.session.sentMessages.push(id_task);
+
+            await sleep(5000); // Задержка на 5 секунд
         } catch (error) {
-            console.error(`Failed to send message to chatId: ${chatId}`, error); // Для отладки
+            console.error(`Failed to send message to chatId: ${chatId}`, error);
+            try {
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Failed to send message to chatId: ${chatId}\nError: ${error}`, { parse_mode: 'HTML' });
+            } catch (logError) {
+                console.error(`Failed to send log message: ${logError}`);
+            }
         }
     }
 }
+
+
 
 // Экспортируем функции
 module.exports = { notifyUsers, notifyAllUsers }
