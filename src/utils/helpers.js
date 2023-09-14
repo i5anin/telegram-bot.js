@@ -16,6 +16,11 @@ module.exports = async function fetchData(url, params, method = 'GET') {
         }
         return response.data
     } catch (error) {
+        await bot.telegram.sendMessage(
+            LOG_CHANNEL_ID,
+            `\n<code>${error}</code>`,
+            { parse_mode: 'HTML' }
+        );
         console.log(ruLang.serverError, error); //Ошибка сервера
         return null
     }

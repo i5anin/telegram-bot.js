@@ -52,6 +52,11 @@ async function morningNotification() {
         }
     } catch (error) {
         console.error('Error fetching data:', error)
+        await bot.telegram.sendMessage(
+            LOG_CHANNEL_ID,
+            `\n<code>${error}</code>`,
+            { parse_mode: 'HTML' }
+        );
     }
 }
 

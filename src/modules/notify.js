@@ -43,6 +43,11 @@ async function notifyUsers(ctx) {
     } catch (error) {
         // Логируем ошибку, если что-то пошло не так
         console.log('Error in notifyUsers:', error)
+        await bot.telegram.sendMessage(
+            LOG_CHANNEL_ID,
+            `\n<code>${error}</code>`,
+            { parse_mode: 'HTML' }
+        );
     }
     ctx.session.isAwaitComment = true
 }
@@ -96,8 +101,13 @@ async function notifyAllUsers(ctx) { // Добавлен ctx в качестве
         } catch (error) {
             console.error(`Failed to send message to chatId: ${chatId}`, error);
             try {
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Failed to send message to chatId: ${chatId}\nError: ${error}`, { parse_mode: 'HTML' });
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение на chatId: ${chatId}\nError: ${error}`, { parse_mode: 'HTML' });
             } catch (logError) {
+                await bot.telegram.sendMessage(
+                    LOG_CHANNEL_ID,
+                    `\n<code>${error}</code>`,
+                    { parse_mode: 'HTML' }
+                );
                 console.error(`Failed to send log message: ${logError}`);
             }
         }

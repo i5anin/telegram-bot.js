@@ -12,6 +12,11 @@ async function checkRegistration(chatId) {
         const response = await axios.get(url)
         return response.data.exists === true  // Возвращаем результат сразу
     } catch (error) {
+        await bot.telegram.sendMessage(
+            LOG_CHANNEL_ID,
+            `\n<code>${error}</code>`,
+            { parse_mode: 'HTML' }
+        );
         return false
     }
 }
