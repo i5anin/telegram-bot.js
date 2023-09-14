@@ -28,7 +28,7 @@ async function handleTextCommand(ctx) {
 
         // Дальнейшая логика обработки ФИО
         const cleanedText = text.replace(/ë/g, 'ё').replace(/Ë/g, 'Ё').replace(/\. /g, '.');
-        const encodedFio = encodeURIComponent(cleanedText)
+        // const encodedFio = encodeURIComponent(cleanedText)
         const userId = chat.id
 
         // Запрос на добавление пользователя
@@ -44,25 +44,25 @@ async function handleTextCommand(ctx) {
 
         ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
 
-        try {
-            // Запросы на повышение ранга
-            const rankUpResponse = await fetch(`${USER_API}/rank_up.php?id_user=${userId}&fio=${encodedFio}`);
-            const rankUp2Response = await fetch(`${USER_API}/rank_up2.php?id_user=${userId}&fio=${encodedFio}`);
-            console.log(rankUpResponse);
-            await bot.telegram.sendMessage(
-                GRAND_ADMIN,
-                `Выполнено: \n<code>${rankUpResponse}</code>\n<code>${rankUp2Response}</code>`,
-                { parse_mode: 'HTML' },
-            )
-            // Ваша логика в случае успешного выполнения
-        } catch (error) {
-            console.error('Ошибка при выполнении /rank_up или /rank_up2:', error)
-            await bot.telegram.sendMessage(
-                GRAND_ADMIN,
-                `⚠️ Ошибка при выполнении /rank_up или /rank_up2: <code>${error.message}</code>`,
-                { parse_mode: 'HTML' },
-            )
-        }
+        // try {
+        //     // Запросы на повышение ранга
+        //     const rankUpResponse = await fetch(`${USER_API}/rank_up.php?id_user=${userId}&fio=${encodedFio}`);
+        //     const rankUp2Response = await fetch(`${USER_API}/rank_up2.php?id_user=${userId}&fio=${encodedFio}`);
+        //     console.log(rankUpResponse);
+        //     await bot.telegram.sendMessage(
+        //         GRAND_ADMIN,
+        //         `Выполнено: \n<code>${rankUpResponse}</code>\n<code>${rankUp2Response}</code>`,
+        //         { parse_mode: 'HTML' },
+        //     )
+        //     // Ваша логика в случае успешного выполнения
+        // } catch (error) {
+        //     console.error('Ошибка при выполнении /rank_up или /rank_up2:', error)
+        //     await bot.telegram.sendMessage(
+        //         GRAND_ADMIN,
+        //         `⚠️ Ошибка при выполнении /rank_up или /rank_up2: <code>${error.message}</code>`,
+        //         { parse_mode: 'HTML' },
+        //     )
+        // }
 
         const defMsg = `\nID: <code>${userId}</code>` +
             `\nfio: <code>${cleanedText}</code>`
