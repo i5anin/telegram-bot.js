@@ -4,13 +4,13 @@ const { Telegraf } = require('telegraf')
 const LocalSession = require('telegraf-session-local')
 
 // Импорт модулей
-const initCronJobs = require('#src/modules/cron')
 const { handleTextCommand } = require('#src/modules/text')
 const { handleRegComment } = require('#src/modules/reg')
 const { notifyUsers } = require('#src/modules/notify')
 const { handleAddComment } = require('#src/modules/comment')
 const { handleStatusCommand } = require('#src/utils/log')
 const { handleHelpCommand } = require('#src/modules/help') // Добавлени
+const { morningNotification, initCronJobs } = require('#src/modules/cron') // Добавлени
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -43,6 +43,7 @@ function resetFlags(ctx) {
 // Глобальные переменные
 global.USER_API = 'https://bot.pf-forum.ru/api/users'
 global.COMMENT_API = 'https://bot.pf-forum.ru/api/comment'
+global.OPLATA_API = 'https://bot.pf-forum.ru/api/oplata'
 global.GRAND_ADMIN = process.env.GRAND_ADMIN
 global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
 global.SECRET_KEY = process.env.SECRET_KEY
@@ -74,6 +75,8 @@ bot.command('new_comment', async (ctx) => {
 })
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 bot.command('help', handleHelpCommand)
+
+bot.command('oplata', morningNotification)
 
 
 // Обработчик текстовых сообщений
