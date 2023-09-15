@@ -96,7 +96,7 @@ bot.command('new_comment_all', async (ctx) => {
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 bot.command('help', handleHelpCommand)
 bot.command('oplata', oplataNotification)
-bot.command('msg', async (ctx) => handleMsgCommand())
+bot.command('msg', async (ctx) => handleMsgCommand(ctx))
 
 
 // Обработчик текстовых сообщений
