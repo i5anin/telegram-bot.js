@@ -24,7 +24,7 @@ async function morningNotification() {
         const response = await axios.get(`${OPLATA_API}/get.php?key=${SECRET_KEY}`)
         if (response.data && response.data.payments) {
             const payments = response.data.payments
-            console.log('Payments received:', payments)
+            // console.log('Payments received:', payments)
 
             // Формируем сообщение для администратора
             let message = 'Отчет по оплате:\n'
@@ -53,7 +53,7 @@ async function morningNotification() {
             console.error('No payments found')
         }
     } catch (error) {
-        console.error('Error fetching data:', error)
+        // console.error('Error fetching data:', error)
         await bot.telegram.sendMessage(
             LOG_CHANNEL_ID,
             `Попытка отправить сообщение <code>${e_ADMIN_IDS}</code> оплата \n<code>${error}</code>`,
