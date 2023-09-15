@@ -48,6 +48,7 @@ global.OPLATA_API = 'https://bot.pf-forum.ru/api/oplata'
 global.GRAND_ADMIN = process.env.GRAND_ADMIN
 global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
 global.SECRET_KEY = process.env.SECRET_KEY
+global.DIR_OPLATA = process.env.DIR_OPLATA
 global.bot = bot
 global.stateCounter = {
     my: 0,
