@@ -59,7 +59,7 @@ global.stateCounter = {
 
 // Случайный номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 100) + 1
-console.log('instanceNumber : ' + instanceNumber)
+console.log('!!! Номер запущенного экземпляра : ' + instanceNumber)
 
 // Обработчики команд
 bot.command(['start', 'reg'], async (ctx) => {

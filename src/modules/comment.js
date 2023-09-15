@@ -20,12 +20,12 @@ async function fetchComments() {
         }
 
     } catch (error) {
-        console.log(`Произошла ошибка: ${error}`)
-        await bot.telegram.sendMessage(
-            LOG_CHANNEL_ID,
-            `\n<code>${error}</code>`,
-            { parse_mode: 'HTML' }
-        );
+        console.log(`${url} Произошла ошибка: ${error}`)
+        // await bot.telegram.sendMessage(
+        //     LOG_CHANNEL_ID,
+        //     `\n<code>${error}</code>`,
+        //     { parse_mode: 'HTML' }
+        // );
         return null
     }
 }

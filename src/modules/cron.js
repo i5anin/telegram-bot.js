@@ -4,15 +4,15 @@ const { notifyAllUsers } = require('#src/modules/notify')  // Уведомлен
 const { morningNotification } = require('#src/modules/oplata') // Добавлени
 
 function initCronJobs() {
-    // Уведомлять каждые 2 минуты
+    // Уведомлять каждые 5 минуты
     cron.schedule('*/5 * * * *', async () => {
-        console.log('Running a task every 2 minutes')
+        console.log('Running a task every 5 minutes')
         await notifyAllUsers()
     })
 
     // Уведомлять каждые 15 мин
-    cron.schedule('*/15 * * * *', async () => {
-        console.log('Running a task every 15 minutes');
+    cron.schedule('*/6 * * * *', async () => {
+        console.log('Running a task every 6 minutes');
         await morningNotification()
     })
 }
