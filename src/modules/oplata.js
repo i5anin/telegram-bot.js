@@ -7,12 +7,15 @@ async function morningNotification() {
     try {
         const response = await axios.get(`${OPLATA_API}/get_all.php?key=${SECRET_KEY}`)
         if (response.data && response.data.payments && response.data.payments.length > 0) {
-            const payments = response.data.payments
+            let payments = response.data.payments
+
+            // Сортируем платежи по дате в порядке убывания
+            const sortedPayments = payments.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             // Разбиваем массив платежей на подмассивы размером BATCH_SIZE
             let batches = []
-            for (let i = 0; i < payments.length; i += BATCH_SIZE) {
-                batches.push(payments.slice(i, i + BATCH_SIZE))
+            for (let i = 0; i < sortedPayments.length; i += BATCH_SIZE) {
+                batches.push(sortedPayments.slice(i, i + BATCH_SIZE))
             }
 
             const ADMIN_IDS = [

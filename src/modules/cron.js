@@ -10,9 +10,9 @@ function initCronJobs() {
         await notifyAllUsers()
     })
 
-    // Уведомлять каждый день в 7:30
-    cron.schedule('30 7 * * *', async () => {
-        console.log('Running a task at 7:30 every day')
+    // Уведомлять каждые 15 мин
+    cron.schedule('*/15 * * * *', async () => {
+        console.log('Running a task every 15 minutes');
         await morningNotification()
     })
 }
