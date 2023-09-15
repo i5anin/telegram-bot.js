@@ -11,7 +11,7 @@ const { handleAddComment } = require('#src/modules/comment')
 const { handleStatusCommand } = require('#src/utils/log')
 const { handleHelpCommand } = require('#src/modules/help') // Добавлени
 const { initCronJobs } = require('#src/modules/cron') // Добавлени
-const { morningNotification } = require('#src/modules/oplata') // Добавлени
+// const { morningNotification } = require('#src/modules/oplata') // Добавлени
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -78,7 +78,7 @@ bot.command('new_comment', async (ctx) => {
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 bot.command('help', handleHelpCommand)
 
-bot.command('oplata', morningNotification)
+// bot.command('oplata', morningNotification)
 
 
 // Обработчик текстовых сообщений

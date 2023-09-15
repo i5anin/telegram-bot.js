@@ -13,7 +13,8 @@ async function notifyUsers(ctx) {
 
         // Проверяем, есть ли какие-либо некомментированные задачи
         if (!uncommentedTasks || uncommentedTasks.length === 0) {
-            const errorMessage = uncommentedTasks ? 'Пустые комментарии не найдены.' : 'Произошла ошибка при получении комментариев.'
+            const errorMessage = 'Пустые комментарии не найдены.';
+            //const errorMessage = uncommentedTasks ? 'Пустые комментарии не найдены.' : 'Произошла ошибка при получении комментариев.'
             return bot.telegram.sendMessage(chatId, errorMessage, { parse_mode: 'HTML' })
         }
 
