@@ -18,7 +18,7 @@ async function morningNotification() {
             const ADMIN_IDS = [
                 GRAND_ADMIN,
                 LOG_CHANNEL_ID,
-                //'1107003647',
+                '1107003647',
             ]
 
             for (let batch of batches) {
