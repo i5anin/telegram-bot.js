@@ -10,7 +10,8 @@ const { notifyUsers } = require('#src/modules/notify')
 const { handleAddComment } = require('#src/modules/comment')
 const { handleStatusCommand } = require('#src/utils/log')
 const { handleHelpCommand } = require('#src/modules/help') // Добавлени
-const { morningNotification, initCronJobs } = require('#src/modules/cron') // Добавлени
+const { initCronJobs } = require('#src/modules/cron') // Добавлени
+const { morningNotification } = require('#src/modules/oplata') // Добавлени
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
