@@ -65,7 +65,7 @@ async function notifyAllUsers(ctx) { // Добавлен ctx в качестве
     const user_ids = [...new Set(data.comments.map(comment => comment.user_id))];
 
     for (const chatId of user_ids) {
-        console.log(`Processing chatId: ${chatId}`);
+        // console.log(`Processing chatId: ${chatId}`);
 
         const userComments = allComments.filter(comment => comment.user_id === chatId);
         if (userComments.length === 0) continue;

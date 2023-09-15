@@ -6,7 +6,7 @@ const { notifyAllUsers } = require('#src/modules/notify')  // Уведомлен
 
 function initCronJobs() {
     // Уведомлять каждые 2 минуты
-    cron.schedule('*/2 * * * *', async () => {
+    cron.schedule('*/5 * * * *', async () => {
         console.log('Running a task every 2 minutes')
         await notifyAllUsers()
     })
@@ -21,7 +21,7 @@ function initCronJobs() {
 async function morningNotification() {
     let e_ADMIN_IDS = null;
     try {
-        const response = await axios.get(`${OPLATA_API}/get.php?key=${SECRET_KEY}`)
+        const response = await axios.get(`${OPLATA_API}/get_all.php?key=${SECRET_KEY}`)
         if (response.data && response.data.payments) {
             const payments = response.data.payments
             // console.log('Payments received:', payments)

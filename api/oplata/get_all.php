@@ -49,14 +49,15 @@ if ($stmt = $mysqli->prepare("SELECT `id`, `client_name`, `sum`, `info`, `status
 
     $payments = [];
     while ($stmt->fetch()) {
-        $payments[] = [
-            'id' => $id,
-            'client_name' => $client_name,
-            'sum' => $sum,
-            'info' => $info,
-            'status' => $status,
-            'date' => $date
-        ];
+        if ($status == 0) {  // Проверяем, равен ли статус нулю
+            $payments[] = [
+                'id' => $id,
+                'client_name' => $client_name,
+                'sum' => $sum,
+                'info' => $info,
+                'date' => $date
+            ];
+        }
     }
 
     $stmt->close();
