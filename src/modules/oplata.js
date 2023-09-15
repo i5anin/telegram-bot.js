@@ -5,7 +5,7 @@ async function oplataNotification() {
     const BATCH_SIZE = 10
 
     try {
-        const response = await axios.get(`${OPLATA_API}/get_all.php?key=${SECRET_KEY}`)
+        const response = await axios.get(`${WEB_API}/oplata/get_all.php?key=${SECRET_KEY}`)
         if (response.data && response.data.payments && response.data.payments.length > 0) {
             let payments = response.data.payments
 
@@ -50,7 +50,7 @@ async function oplataNotification() {
 
                 // Если сообщения успешно отправлены, обновляем статус на сервере
                 if (sentIds.length > 0) {
-                    await axios.get(`${OPLATA_API}/update.php?key=${SECRET_KEY}&sent_ids=${sentIds.join(',')}`)
+                    await axios.get(`${WEB_API}/oplata/update.php?key=${SECRET_KEY}&sent_ids=${sentIds.join(',')}`)
                 }
             }
         } else {

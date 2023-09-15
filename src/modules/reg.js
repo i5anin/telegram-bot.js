@@ -7,7 +7,7 @@ const { handleTextCommand } = require('#src/modules/text')  // Обработк�
 
 // Функция для проверки, зарегистрирован ли пользователь на сервере
 async function checkRegistration(chatId) {
-    const url = `${USER_API}/get.php?id=${chatId}`
+    const url = `${WEB_API}/users/get.php?id=${chatId}`
     try {
         const response = await axios.get(url)
         return response.data.exists === true  // Возвращаем результат сразу

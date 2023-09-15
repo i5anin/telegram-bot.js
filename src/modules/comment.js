@@ -3,7 +3,7 @@ const axios = require('axios')
 
 //fetchComments
 async function fetchComments() {
-    const url = COMMENT_API + '/get_all.php?key=' + SECRET_KEY
+    const url = WEB_API + '/comment/get_all.php?key=' + SECRET_KEY
     try {
         const response = await fetch(url)
 
@@ -43,7 +43,7 @@ async function handleAddComment(ctx) {
     if (ctx.session.isAwaitComment) {
         // const userComment = ctx.message.text;
 
-        const url = `${COMMENT_API}/update.php`;
+        const url = `${WEB_API}/comment/update.php`;
         const params = {
             id_task: ctx.session.id_task,
             comment: ctx.message.text,

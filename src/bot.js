@@ -42,9 +42,7 @@ function resetFlags(ctx) {
 
 
 // Глобальные переменные
-global.USER_API = 'https://bot.pf-forum.ru/api/users'
-global.COMMENT_API = 'https://bot.pf-forum.ru/api/comment'
-global.OPLATA_API = 'https://bot.pf-forum.ru/api/oplata'
+global.WEB_API = 'https://bot.pf-forum.ru/api'
 global.GRAND_ADMIN = process.env.GRAND_ADMIN
 global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
 global.SECRET_KEY = process.env.SECRET_KEY
@@ -80,8 +78,8 @@ bot.command('new_comment_all', async (ctx) => {
     // Здесь загрузка всех сессий из вашего хранилища
     const allSessions = localSession.DB;  // Этот код нужно адаптировать
 
-    console.log('Type of allSessions:', typeof allSessions);
-    console.log('allSessions:', allSessions);
+    // console.log('Type of allSessions:', typeof allSessions);
+    // console.log('allSessions:', allSessions);
 
     if (allSessions && Array.isArray(allSessions.sessions)) {
         // Обновление флага для каждой сессии

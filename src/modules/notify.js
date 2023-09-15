@@ -65,7 +65,7 @@ async function notifyAllUsers(ctx) { // Добавлен ctx в качестве
     const allComments = await fetchComments();
 
     // Получаем данные всех пользователей
-    const data = await fetchData(`${COMMENT_API}/get_all.php?key=${SECRET_KEY}`);
+    const data = await fetchData(`${WEB_API}/comment/get_all.php?key=${SECRET_KEY}`);
 
     // Извлекаем идентификаторы чатов из всех комментариев и удаляем дубликаты
     const user_ids = [...new Set(data.comments.map(comment => comment.user_id))];
@@ -132,10 +132,6 @@ async function notifyAllUsers(ctx) { // Добавлен ctx в качестве
 //     ctx.session.isAwaitComment = false;
 //     ctx.session.userInitiated = false;
 // }
-
-
-
-
 
 // Экспортируем функции
 module.exports = { notifyUsers, notifyAllUsers }

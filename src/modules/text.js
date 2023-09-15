@@ -6,8 +6,6 @@ const { sendToLog } = require('#src/utils/admin') // Добавление лог
 
 async function handleTextCommand(ctx) {
     await sendToLog(ctx) // функция sendToLog
-    // Константы
-    const USER_API = 'https://bot.pf-forum.ru/api/users'
 
     // Деструктуризация полей из сообщения
     const { text, chat, from } = ctx.message
@@ -29,7 +27,7 @@ async function handleTextCommand(ctx) {
 
         // Запрос на добавление пользователя
         const dataAddUser = await fetchData(
-            `${USER_API}/add.php`,
+            `${WEB_API}/users/add.php`,
             {
                 id: userId,
                 fio: cleanedText,
