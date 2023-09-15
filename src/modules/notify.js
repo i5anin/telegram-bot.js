@@ -60,25 +60,36 @@ function sleep(ms) {
 }
 
 // Функция для уведомления всех пользователей
-async function notifyAllUsers(ctx) { // Добавлен ctx в качестве аргумента
+async function notifyAllUsers(ctx) { // Добавлен ctx в качестве аргумента для доступа к сессии и другим методам контекста
+
+    // Получаем все комментарии
     const allComments = await fetchComments();
+
+    // Получаем данные всех пользователей
     const data = await fetchData(`${COMMENT_API}/get_all.php?key=${SECRET_KEY}`);
+
+    // Извлекаем идентификаторы чатов из всех комментариев и удаляем дубликаты
     const user_ids = [...new Set(data.comments.map(comment => comment.user_id))];
 
+    // Проходим по каждому идентификатору чата
     for (const chatId of user_ids) {
-        // console.log(`Processing chatId: ${chatId}`);
 
+        // Фильтруем комментарии для данного пользователя
         const userComments = allComments.filter(comment => comment.user_id === chatId);
+
+        // Если у пользователя нет комментариев, пропустить итерацию
         if (userComments.length === 0) continue;
 
+        // Извлекаем данные из первого комментария
         const { id_task, kolvo_brak, det_name, date } = userComments[0];
 
-        // Проверяем, отправлялось ли сообщение ранее
+        // Проверяем, отправлялось ли сообщение этому пользователю ранее по этой задаче
         if (ctx.session.sentMessages && ctx.session.sentMessages.includes(id_task)) {
             console.log(`Message for id_task ${id_task} already sent to chatId: ${chatId}`);
             continue; // Пропустить, если сообщение уже отправлялось
         }
 
+        // Формируем текст сообщения
         const message = `Вам нужно прокомментировать следующую задачу:`
             + `<code>(1/${userComments.length})</code>\n\n`
             + `Название и обозначение:\n`
@@ -88,32 +99,30 @@ async function notifyAllUsers(ctx) { // Добавлен ctx в качестве
             + `ID: <code>${id_task}</code>\n`
             + `<code>Cron</code>`;
 
+        // Пытаемся отправить сообщение
         try {
             await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' });
             console.log(`Message sent to chatId: ${chatId}`);
 
-            // Запоминаем, что сообщение отправлено
+            // Запоминаем, что сообщение отправлено этому пользователю по данной задаче
             if (!ctx.session.sentMessages) {
                 ctx.session.sentMessages = [];
             }
             ctx.session.sentMessages.push(id_task);
 
             await sleep(5000); // Задержка на 5 секунд
-        } catch (error) {
+        } catch (error) { // Если возникает ошибка при отправке
             console.error(`Failed to send message to chatId: ${chatId}`, error);
             try {
+                // Отправляем уведомление в канал логирования
                 await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение на chatId: ${chatId}\nError: ${error}`, { parse_mode: 'HTML' });
             } catch (logError) {
-                await bot.telegram.sendMessage(
-                    LOG_CHANNEL_ID,
-                    `\n<code>${error}</code>`,
-                    { parse_mode: 'HTML' }
-                );
                 console.error(`Failed to send log message: ${logError}`);
             }
         }
     }
 }
+
 
 
 

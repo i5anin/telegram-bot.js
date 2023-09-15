@@ -11,7 +11,7 @@ const { handleAddComment } = require('#src/modules/comment')
 const { handleStatusCommand } = require('#src/utils/log')
 const { handleHelpCommand } = require('#src/modules/help') // Добавлени
 const { initCronJobs } = require('#src/modules/cron') // Добавлени
-// const { morningNotification } = require('#src/modules/oplata') // Добавлени
+// const {oplataNotification } = require('#src/modules/oplata') // Добавлени
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -77,8 +77,25 @@ bot.command('new_comment', async (ctx) => {
 })
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 bot.command('help', handleHelpCommand)
-
-// bot.command('oplata', morningNotification)
+bot.command('oplata', oplataNotification)
+bot.command('msg', async (ctx) => {
+    // Проверяем, является ли отправитель грант-админом
+    if (ctx.from.id.toString() === GRAND_ADMIN) {
+        // Разбиваем текст сообщения на части, чтобы извлечь ID и само сообщение
+        const parts = ctx.message.text.split(' ')
+        if (parts.length < 3) return ctx.reply('Недостаточно аргументов. Используйте /msg [id] [Сообщение]')
+        const userId = parts[1]
+        const message = parts.slice(2).join(' ')
+        // Отправляем сообщение
+        try {
+            await bot.telegram.sendMessage(userId, message)
+            ctx.reply('Сообщение успешно отправлено.')
+        } catch (error) {
+            ctx.reply(`Ошибка при отправке сообщения: ${error}`)
+        }
+    }
+    // Если пользователь не является грант-админом, ничего не делаем
+})
 
 
 // Обработчик текстовых сообщений

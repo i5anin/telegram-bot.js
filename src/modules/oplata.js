@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-async function morningNotification() {
+async function oplataNotification() {
     let e_ADMIN_IDS = null
     const BATCH_SIZE = 10
 
@@ -65,4 +65,4 @@ async function morningNotification() {
     }
 }
 
-module.exports = { morningNotification }
+module.exports = { oplataNotification }
