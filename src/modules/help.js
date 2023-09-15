@@ -1,5 +1,5 @@
 // Функция для обработки команды /help
-const { sendToLog } = require('#src/utils/log') // Добавление лога
+const { sendToLog } = require('#src/utils/admin') // Добавление лога
 
 function handleHelpCommand(ctx) {
     sendToLog(ctx)

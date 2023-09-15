@@ -6,12 +6,12 @@ const LocalSession = require('telegraf-session-local')
 // Импорт модулей
 const { handleTextCommand } = require('#src/modules/text')
 const { handleRegComment } = require('#src/modules/reg')
-const { notifyUsers } = require('#src/modules/notify')
+const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleAddComment } = require('#src/modules/comment')
-const { handleStatusCommand } = require('#src/utils/log')
+const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
 const { handleHelpCommand } = require('#src/modules/help') // Добавлени
 const { initCronJobs } = require('#src/modules/cron') // Добавлени
-// const {oplataNotification } = require('#src/modules/oplata') // Добавлени
+const { oplataNotification } = require('#src/modules/oplata') // Добавлени
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -75,27 +75,30 @@ bot.command('new_comment', async (ctx) => {
     resetFlags(ctx)
     await notifyUsers(ctx)
 })
+bot.command('new_comment_all', async (ctx) => {
+    resetFlags(ctx);
+    // Здесь загрузка всех сессий из вашего хранилища
+    const allSessions = localSession.DB;  // Этот код нужно адаптировать
+
+    console.log('Type of allSessions:', typeof allSessions);
+    console.log('allSessions:', allSessions);
+
+    if (allSessions && Array.isArray(allSessions.sessions)) {
+        // Обновление флага для каждой сессии
+        for (const session of allSessions.sessions) {
+            session.data.isAwaitComment = true;
+        }
+        // Сохранение изменений в хранилище (если это необходимо)
+        await notifyAllUsers(ctx);
+    } else {
+        console.error('Sessions are not available or not iterable.');
+    }
+});
+
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 bot.command('help', handleHelpCommand)
 bot.command('oplata', oplataNotification)
-bot.command('msg', async (ctx) => {
-    // Проверяем, является ли отправитель грант-админом
-    if (ctx.from.id.toString() === GRAND_ADMIN) {
-        // Разбиваем текст сообщения на части, чтобы извлечь ID и само сообщение
-        const parts = ctx.message.text.split(' ')
-        if (parts.length < 3) return ctx.reply('Недостаточно аргументов. Используйте /msg [id] [Сообщение]')
-        const userId = parts[1]
-        const message = parts.slice(2).join(' ')
-        // Отправляем сообщение
-        try {
-            await bot.telegram.sendMessage(userId, message)
-            ctx.reply('Сообщение успешно отправлено.')
-        } catch (error) {
-            ctx.reply(`Ошибка при отправке сообщения: ${error}`)
-        }
-    }
-    // Если пользователь не является грант-админом, ничего не делаем
-})
+bot.command('msg', async (ctx) => handleMsgCommand())
 
 
 // Обработчик текстовых сообщений

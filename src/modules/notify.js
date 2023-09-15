@@ -1,7 +1,7 @@
 // Импортируем необходимые функции
 const fetchData = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
-const { sendToLog } = require('#src/utils/log')
+const { sendToLog } = require('#src/utils/admin')
 
 // Функция для уведомления одного пользователя о некомментированных задачах
 async function notifyUsers(ctx) {
@@ -53,7 +53,6 @@ async function notifyUsers(ctx) {
     ctx.session.isAwaitComment = true
 }
 
-// Функция для уведомления всех пользователей
 // Вспомогательная функция для создания задержки
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -110,6 +109,9 @@ async function notifyAllUsers(ctx) { // Добавлен ctx в качестве
             }
             ctx.session.sentMessages.push(id_task);
 
+            // Сбрасываем флаги сессии и устанавливаем ожидание комментария только для тех, кому было отправлено сообщение
+            // ctx.session[chatId] = { isAwaitingComment: true };
+
             await sleep(5000); // Задержка на 5 секунд
         } catch (error) { // Если возникает ошибка при отправке
             console.error(`Failed to send message to chatId: ${chatId}`, error);
@@ -122,6 +124,15 @@ async function notifyAllUsers(ctx) { // Добавлен ctx в качестве
         }
     }
 }
+
+
+// Функция для сброса флагов сессии
+// function resetFlags(ctx) {
+//     ctx.session.isAwaitFio = false;
+//     ctx.session.isAwaitComment = false;
+//     ctx.session.userInitiated = false;
+// }
+
 
 
 
