@@ -101,37 +101,38 @@ bot.command('msg', async (ctx) => handleMsgCommand(ctx))
 
 const getExternalUsers = async () => {
     try {
-        const response = await axios.get('https://bot.pf-forum.ru/api/users/get_all_fio.php');
-        return response.data.users_data;
+        const response = await axios.get('https://bot.pf-forum.ru/api/users/get_all_fio.php')
+        return response.data.users_data
     } catch (error) {
-        console.error('Ошибка при получении данных с внешнего API:', error);
-        return [];
+        console.error('Ошибка при получении данных с внешнего API:', error)
+        return []
     }
-};
+}
 
 async function sendMessage(ctx, chatId, messageText) {
     if (!messageText || messageText.trim() === '') {
-        console.warn('Cannot send empty message');
-        return;
+        console.warn('Cannot send empty message')
+        return
     }
 
     try {
-        await ctx.telegram.sendMessage(chatId, messageText);
+        await ctx.telegram.sendMessage(chatId, messageText)
     } catch (error) {
-        console.error(`Error sending message to chat_id: ${chatId}`, error);
+        console.error(`Error sending message to chat_id: ${chatId}`, error)
     }
 }
+
 async function generateReport(ctx, chatId) {
-    const externalUsers = await getExternalUsers();
-    let reportMessage = `Отчет для группы ${chatId}\n\n`;
-    let counter = 0;
-    let inGroupCounter = 0;
-    let absentUsersReport = '';
+    const externalUsers = await getExternalUsers()
+    let reportMessage = `Отчет для группы ${chatId}\n\n`
+    let counter = 0
+    let inGroupCounter = 0
+    let absentUsersReport = ''
 
     for (const user of externalUsers) {
-        counter++;
+        counter++
         try {
-            const telegramUser = await ctx.telegram.getChatMember(chatId, user.user_id);
+            const telegramUser = await ctx.telegram.getChatMember(chatId, user.user_id)
 
             const userInfo = `${counter}. username: @${telegramUser.user.username}\n` +
                 `id: ${telegramUser.user.id}\n` +
@@ -140,39 +141,39 @@ async function generateReport(ctx, chatId) {
                 `bot: ${telegramUser.user.is_bot}\n` +
                 `lang: ${telegramUser.user.language_code}\n` +
                 `fio: ${user.fio}\n` +
-                `---\n`;
+                `---\n`
 
-            reportMessage += userInfo;
-            inGroupCounter++;
+            reportMessage += userInfo
+            inGroupCounter++
         } catch (error) {
-            absentUsersReport += `id ${user.user_id} ${user.fio} - отсутствует\n-----------------\n`;
+            absentUsersReport += `id ${user.user_id} ${user.fio} - отсутствует\n-----------------\n`
         }
     }
 
-    reportMessage += `\nВсего пользователей проверено: ${counter}\n`;
-    reportMessage += `Всего пользователей из внешнего списка в чате: ${inGroupCounter}\n`;
+    reportMessage += `\nВсего пользователей проверено: ${counter}\n`
+    reportMessage += `Всего пользователей из внешнего списка в чате: ${inGroupCounter}\n`
 
     if (absentUsersReport) {
-        reportMessage += `\nОтчет об отсутствующих пользователях:\n${absentUsersReport}`;
+        reportMessage += `\nОтчет об отсутствующих пользователях:\n${absentUsersReport}`
     }
 
-    await sendMessage(ctx, LOG_CHANNEL_ID, reportMessage);
+    await sendMessage(ctx, LOG_CHANNEL_ID, reportMessage)
 }
 
 bot.command('get_group_info', async (ctx) => {
     if (ctx.from.id.toString() !== GRAND_ADMIN) {
-        return ctx.reply('Только GRAND_ADMIN может использовать данную команду.');
+        return ctx.reply('Только GRAND_ADMIN может использовать данную команду.')
     }
 
-    const input = ctx.message.text.split(' ');
+    const input = ctx.message.text.split(' ')
 
     if (input.length !== 2) {
-        return ctx.reply('Использование: /get_group_info [chat_id]');
+        return ctx.reply('Использование: /get_group_info [chat_id]')
     }
 
-    const chatId = input[1];
-    await generateReport(ctx, chatId);
-});
+    const chatId = input[1]
+    await generateReport(ctx, chatId)
+})
 
 
 // Обработчик текстовых сообщений
