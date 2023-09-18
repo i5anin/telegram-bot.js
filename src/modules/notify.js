@@ -103,6 +103,8 @@ async function notifyAllUsers(ctx) {
             await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' });
             console.log(`Сообщение отправлено на chatId: ${chatId}`);
 
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Сообщение отправлено на chatId: <code>${chatId}</code>`, { parse_mode: 'HTML' });
+
             // Запоминаем, что сообщение отправлено этому пользователю по данной задаче
             // if (!ctx.session.sentMessages) {
             //     ctx.session.sentMessages = [];
@@ -112,7 +114,7 @@ async function notifyAllUsers(ctx) {
             // Сбрасываем флаги сессии и устанавливаем ожидание комментария только для тех, кому было отправлено сообщение
             // ctx.session[chatId] = { isAwaitingComment: true };
 
-            await sleep(5000); // Задержка на 5 секунд
+            await sleep(2000); // Задержка на 5 секунд
         } catch (error) { // Если возникает ошибка при отправке
             console.error(`Failed to send message to chatId: ${chatId}`, error);
             // Отправляем уведомление в канал логирования
