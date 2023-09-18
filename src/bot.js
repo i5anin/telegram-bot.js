@@ -119,53 +119,50 @@ async function isMemberOfGroup(telegram, chatId, userId) {
 }
 
 bot.command('get_group_info', async (ctx) => {
-    if (ctx.from.id.toString() !== GRAND_ADMIN) {
-        return ctx.reply('Только GRAND_ADMIN может использовать данную команду.')
-    }
-
-    const input = ctx.message.text.split(' ')
-
-    if (input.length !== 2) {
-        return ctx.reply('Использование: /get_group_info [chat_id]')
-    }
-
-    const chatId = input[1] // Теперь используется
-    const externalUsers = await getExternalUsers()
-
     try {
-        let outputMessage = ''
-        let counter = 0
-        let inGroupCounter = 0 // Счетчик пользователей из внешнего списка в группе
-
-        for (const user of externalUsers) {
-            counter++
-            const userInfo = `${counter}. username: N/A\nid: ${user.user_id}\nfirstname: ${user.fio.split(' ')[0]}\nlastname: ${user.fio.split(' ')[1]}\nbot: N/A\nlang: N/A\n---\n`
-            outputMessage += userInfo
-
-            // Логика для проверки, является ли этот пользователь участником группы в Telegram
-            if (await isMemberOfGroup(ctx.telegram, chatId, user.user_id)) {
-                outputMessage += `Этот участник есть в вашем внешнем списке.\n---\n`
-                inGroupCounter++
-            }
-
-            if (counter % 10 === 0) {
-                await ctx.telegram.sendMessage(LOG_CHANNEL_ID, outputMessage)
-                outputMessage = ''
-            }
+        // Проверяем, является ли отправитель GRAND_ADMIN
+        if (ctx.from.id.toString() !== GRAND_ADMIN) {
+            return ctx.reply('Только GRAND_ADMIN может использовать данную команду.');
         }
 
-        outputMessage += `Всего пользователей в чате: ${counter}\n`
-        outputMessage += `Всего пользователей из внешнего списка в чате: ${inGroupCounter}\n`
-
-        if (outputMessage) {
-            await ctx.telegram.sendMessage(LOG_CHANNEL_ID, outputMessage)
+        // Получаем аргументы команды (если есть)
+        const input = ctx.message.text.split(' ');
+        if (input.length !== 2) {
+            return ctx.reply('Использование: /get_group_info [chat_id]');
         }
 
-    } catch (e) {
-        console.error(e)
-        await ctx.reply('Ошибка при получении данных о группе.')
+        const chatId = input[1];
+
+        // Получаем информацию о чате
+        const chatInfo = await ctx.telegram.getChat(chatId);
+
+        if (!chatInfo) {
+            return ctx.reply('Чат не найден.');
+        }
+
+        // Получаем информацию о участниках чата (этот метод может не работать для больших групп)
+        // Замените этот код на ваш способ получения информации о пользователях
+        const chatMembers = await ctx.telegram.getChatMembersCount(chatId);
+
+        if (!chatMembers) {
+            return ctx.reply('Не удается получить информацию о участниках чата.');
+        }
+
+        // Здесь можно добавить логику проверки на внешние базы данных или что-то в этом роде
+
+        // Выводим информацию
+        let infoText = `Информация о группе ${chatInfo.title}:\n`;
+        infoText += `ID группы: ${chatInfo.id}\n`;
+        infoText += `Количество участников: ${chatMembers}\n`;
+        // Добавьте сюда другую необходимую информацию
+
+        ctx.reply(infoText);
+    } catch (error) {
+        console.error('Ошибка при получении данных о группе:', error);
+        ctx.reply('Ошибка при получении данных о группе.');
     }
-})
+});
+
 
 
 // Обработчик текстовых сообщений
