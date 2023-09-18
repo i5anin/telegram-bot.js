@@ -123,14 +123,13 @@ async function sendMessage(ctx, chatId, messageText) {
 }
 
 async function generateReport(ctx, chatId) {
-
     const chatInfo = await ctx.telegram.getChat(chatId)
     const externalUsers = await getExternalUsers()
-    let reportMessage = `Отчет для группы ${chatInfo.title} (ID: ${chatId})\n\n`
+    let reportMessage = `Отчет для группы <code>${chatInfo.title}</code> (ID: ${chatId})\n\n`
+    let absentUsersReport = ''
 
     let counter = 0
     let inGroupCounter = 0
-    let absentUsersReport = ''
 
     for (const user of externalUsers) {
         counter++
@@ -156,13 +155,14 @@ async function generateReport(ctx, chatId) {
     reportMessage += `\nВсего пользователей проверено: ${counter}\n`
     reportMessage += `Всего пользователей из внешнего списка в чате: ${inGroupCounter}\n`
 
-    if (absentUsersReport) {
-        reportMessage += `\nОтчет об отсутствующих пользователях:\n${absentUsersReport}`
-    }
-    await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportMessage, { parse_mode: 'HTML' });
+    await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportMessage, { parse_mode: 'HTML' })
 
-    // await sendMessage(ctx, LOG_CHANNEL_ID, reportMessage)
+    // Отправка отчета об отсутствующих пользователях в отдельном сообщении
+    if (absentUsersReport) {
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет об отсутствующих пользователях:\n${absentUsersReport}`, { parse_mode: 'HTML' })
+    }
 }
+
 
 bot.command('get_group_info', async (ctx) => {
     if (ctx.from.id.toString() !== GRAND_ADMIN) {
