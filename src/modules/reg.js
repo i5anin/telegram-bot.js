@@ -4,20 +4,18 @@ const ruLang = require('#src/utils/ru_lang')  // Локализация сооб
 const { sendToLog } = require('#src/utils/admin') // Добавление лога
 const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
 
-
 // Функция для проверки, зарегистрирован ли пользователь на сервере
 async function checkRegistration(chatId) {
     const url = `${WEB_API}/users/get.php?id=${chatId}`
     try {
         const response = await axios.get(url)
-        return response.data.exists === true  // Возвращаем результат сразу
+        return {
+            exists: response.data.exists === true,
+            fio: response.data.fio,
+        }
     } catch (error) {
-        await bot.telegram.sendMessage(
-            LOG_CHANNEL_ID,
-            `\n<code>${error}</code>`,
-            { parse_mode: 'HTML' }
-        );
-        return false
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `\n<code>${error}</code>`, { parse_mode: 'HTML' })
+        return { exists: false, fio: null }
     }
 }
 
@@ -26,13 +24,19 @@ async function handleRegComment(ctx) {
     const chatId = ctx.message.chat.id
     const { chat } = ctx.message
 
-        await sendToLog(ctx)
+    await sendToLog(ctx)
 
-    const isRegistered = await checkRegistration(chatId)
+    const registrationData = await checkRegistration(chatId)
+    const isRegistered = registrationData.exists
+    const fio = registrationData.fio
 
-    // Определяем, какой текст и статус должны быть установлены
-    const textToReply = isRegistered ? ruLang.alreadyRegistered : ruLang.notRegistered
-    ctx.session.isAwaitFio = !isRegistered;
+    let textToReply
+    if (isRegistered && fio) {
+        textToReply = `<code>${fio}</code> <b>Вы уже зарегистрированы!</b>`
+    } else {
+        textToReply = ruLang.notRegistered
+    }
+    ctx.session.isAwaitFio = !isRegistered
 
     // Отправляем сообщение
     ctx.reply(textToReply, { parse_mode: 'HTML' })

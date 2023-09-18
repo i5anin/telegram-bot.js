@@ -11,31 +11,35 @@ function check_user_id_exists($user_id)
     $mysqli = mysqli_connect($server, $user, $pass, $db);
     mysqli_set_charset($mysqli, 'utf8mb4');
 
-    $stmt = mysqli_prepare($mysqli, "SELECT COUNT(*) FROM `users` WHERE `user_id` = ?");
+    $stmt = mysqli_prepare($mysqli, "SELECT COUNT(*), `fio` FROM `users` WHERE `user_id` = ?");
     mysqli_stmt_bind_param($stmt, 'i', $user_id);
 
     if (!mysqli_stmt_execute($stmt)) {
         return ['error' => 'Ошибка: ' . mysqli_stmt_error($stmt)];
     }
 
-    mysqli_stmt_bind_result($stmt, $count);
+    mysqli_stmt_bind_result($stmt, $count, $fio);
     mysqli_stmt_fetch($stmt);
 
     mysqli_stmt_close($stmt);
     mysqli_close($mysqli);
 
-    return $count > 0;
+    if ($count > 0) {
+        return ['exists' => true, 'fio' => $fio];
+    } else {
+        return ['exists' => false];
+    }
 }
 
 // Если GET-параметр id установлен, проверяем его наличие в базе данных
 if (isset($_GET['id'])) {
     $user_id = intval($_GET['id']);
-    $exists = check_user_id_exists($user_id);
+    $result = check_user_id_exists($user_id);
 
-    if (isset($exists['error'])) {
-        echo json_encode(['error' => $exists['error']]);
+    if (isset($result['error'])) {
+        echo json_encode(['error' => $result['error']]);
     } else {
-        echo json_encode(['exists' => $exists]);
+        echo json_encode($result);
     }
 } else {
     echo json_encode(['error' => 'ID не предоставлен']);

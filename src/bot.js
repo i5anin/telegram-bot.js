@@ -4,7 +4,7 @@ const { Telegraf } = require('telegraf')
 const LocalSession = require('telegraf-session-local')
 
 // Импорт модулей
-const axios = require('axios');
+const axios = require('axios')
 const { handleTextCommand } = require('#src/modules/text')
 const { handleRegComment } = require('#src/modules/reg')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
@@ -120,52 +120,52 @@ async function isMemberOfGroup(telegram, chatId, userId) {
 
 bot.command('get_group_info', async (ctx) => {
     if (ctx.from.id.toString() !== GRAND_ADMIN) {
-        return ctx.reply('Только GRAND_ADMIN может использовать данную команду.');
+        return ctx.reply('Только GRAND_ADMIN может использовать данную команду.')
     }
 
-    const input = ctx.message.text.split(' ');
+    const input = ctx.message.text.split(' ')
 
     if (input.length !== 2) {
-        return ctx.reply('Использование: /get_group_info [chat_id]');
+        return ctx.reply('Использование: /get_group_info [chat_id]')
     }
 
-    const chatId = input[1]; // Теперь используется
-    const externalUsers = await getExternalUsers();
+    const chatId = input[1] // Теперь используется
+    const externalUsers = await getExternalUsers()
 
     try {
-        let outputMessage = '';
-        let counter = 0;
-        let inGroupCounter = 0; // Счетчик пользователей из внешнего списка в группе
+        let outputMessage = ''
+        let counter = 0
+        let inGroupCounter = 0 // Счетчик пользователей из внешнего списка в группе
 
         for (const user of externalUsers) {
-            counter++;
-            const userInfo = `${counter}. username: N/A\nid: ${user.user_id}\nfirstname: ${user.fio.split(' ')[0]}\nlastname: ${user.fio.split(' ')[1]}\nbot: N/A\nlang: N/A\n---\n`;
-            outputMessage += userInfo;
+            counter++
+            const userInfo = `${counter}. username: N/A\nid: ${user.user_id}\nfirstname: ${user.fio.split(' ')[0]}\nlastname: ${user.fio.split(' ')[1]}\nbot: N/A\nlang: N/A\n---\n`
+            outputMessage += userInfo
 
             // Логика для проверки, является ли этот пользователь участником группы в Telegram
             if (await isMemberOfGroup(ctx.telegram, chatId, user.user_id)) {
-                outputMessage += `Этот участник есть в вашем внешнем списке.\n---\n`;
-                inGroupCounter++;
+                outputMessage += `Этот участник есть в вашем внешнем списке.\n---\n`
+                inGroupCounter++
             }
 
             if (counter % 10 === 0) {
-                await ctx.telegram.sendMessage(LOG_CHANNEL_ID, outputMessage);
-                outputMessage = '';
+                await ctx.telegram.sendMessage(LOG_CHANNEL_ID, outputMessage)
+                outputMessage = ''
             }
         }
 
-        outputMessage += `Всего пользователей в чате: ${counter}\n`;
-        outputMessage += `Всего пользователей из внешнего списка в чате: ${inGroupCounter}\n`;
+        outputMessage += `Всего пользователей в чате: ${counter}\n`
+        outputMessage += `Всего пользователей из внешнего списка в чате: ${inGroupCounter}\n`
 
         if (outputMessage) {
-            await ctx.telegram.sendMessage(LOG_CHANNEL_ID, outputMessage);
+            await ctx.telegram.sendMessage(LOG_CHANNEL_ID, outputMessage)
         }
 
     } catch (e) {
-        console.error(e);
-        await ctx.reply('Ошибка при получении данных о группе.');
+        console.error(e)
+        await ctx.reply('Ошибка при получении данных о группе.')
     }
-});
+})
 
 
 // Обработчик текстовых сообщений
