@@ -123,8 +123,11 @@ async function sendMessage(ctx, chatId, messageText) {
 }
 
 async function generateReport(ctx, chatId) {
+
+    const chatInfo = await ctx.telegram.getChat(chatId)
     const externalUsers = await getExternalUsers()
-    let reportMessage = `Отчет для группы ${chatId}\n\n`
+    let reportMessage = `Отчет для группы ${chatInfo.title} (ID: ${chatId})\n\n`
+
     let counter = 0
     let inGroupCounter = 0
     let absentUsersReport = ''
@@ -134,19 +137,19 @@ async function generateReport(ctx, chatId) {
         try {
             const telegramUser = await ctx.telegram.getChatMember(chatId, user.user_id)
 
-            const userInfo = `${counter}. username: @${telegramUser.user.username}\n` +
-                `id: ${telegramUser.user.id}\n` +
-                `firstname: ${telegramUser.user.first_name}\n` +
-                `lastname: ${telegramUser.user.last_name || ''}\n` +
-                `bot: ${telegramUser.user.is_bot}\n` +
-                `lang: ${telegramUser.user.language_code}\n` +
-                `fio: ${user.fio}\n` +
+            const userInfo = `${counter}. username: ${'@' + telegramUser.user.username || ''}\n` +
+                `id: <code>${telegramUser.user.id}</code>\n` +
+                `firstname: <code>${telegramUser.user.first_name}</code>\n` +
+                `lastname: <code>${telegramUser.user.last_name || ''}</code>\n` +
+                `bot: <code>${telegramUser.user.is_bot}</code>\n` +
+                `lang: <code>${telegramUser.user.language_code || ''}</code>\n` +
+                `fio: <code>${user.fio}</code>\n` +
                 `---\n`
 
             reportMessage += userInfo
             inGroupCounter++
         } catch (error) {
-            absentUsersReport += `id ${user.user_id} ${user.fio} - отсутствует\n-----------------\n`
+            absentUsersReport += `id <code>${user.user_id}</code> <code>${user.fio}</code> - отсутствует\n-----------------\n`
         }
     }
 
@@ -156,8 +159,9 @@ async function generateReport(ctx, chatId) {
     if (absentUsersReport) {
         reportMessage += `\nОтчет об отсутствующих пользователях:\n${absentUsersReport}`
     }
+    await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportMessage, { parse_mode: 'HTML' });
 
-    await sendMessage(ctx, LOG_CHANNEL_ID, reportMessage)
+    // await sendMessage(ctx, LOG_CHANNEL_ID, reportMessage)
 }
 
 bot.command('get_group_info', async (ctx) => {
