@@ -30,8 +30,8 @@ async function notifyUsers(ctx) {
             + `<code>(1/${userActualComments.length})</code>\n\n`
             + `Название и обозначение:\n<code>${det_name}</code>\n`
             + `Брак: <code>${kolvo_brak}</code>\n`
-            + `Дата: <code>${date}</code>\n`
-            + `ID: <code>${id_task}</code>`
+            + `Дата: <code>${date}</code>\n\n`
+            + `task_ID: <code>${id_task}</code>`
         // Отправляем сообщение
         ctx.session.userComments = userActualComments[0]
         ctx.session.id_task = id_task
@@ -59,7 +59,8 @@ function sleep(ms) {
 }
 
 // Функция для уведомления всех пользователей
-async function notifyAllUsers(ctx) { // Добавлен ctx в качестве аргумента для доступа к сессии и другим методам контекста
+async function notifyAllUsers(ctx) {
+    // Добавлен ctx в качестве аргумента для доступа к сессии и другим методам контекста
 
     // Получаем все комментарии
     const allComments = await fetchComments();
@@ -83,10 +84,10 @@ async function notifyAllUsers(ctx) { // Добавлен ctx в качестве
         const { id_task, kolvo_brak, det_name, date } = userComments[0];
 
         // Проверяем, отправлялось ли сообщение этому пользователю ранее по этой задаче
-        if (ctx.session.sentMessages && ctx.session.sentMessages.includes(id_task)) {
-            console.log(`Message for id_task ${id_task} already sent to chatId: ${chatId}`);
-            continue; // Пропустить, если сообщение уже отправлялось
-        }
+        // if (ctx.session.sentMessages && ctx.session.sentMessages.includes(id_task)) {
+        //     console.log(`Сообщение для id_task ${id_task} уже отправлено на chatId: ${chatId}`);
+        //     continue; // Пропустить, если сообщение уже отправлялось
+        // }
 
         // Формируем текст сообщения
         const message = `Вам нужно прокомментировать следующую задачу:`
@@ -94,20 +95,19 @@ async function notifyAllUsers(ctx) { // Добавлен ctx в качестве
             + `Название и обозначение:\n`
             + `<code>${det_name}</code>\n`
             + `Брак: <code>${kolvo_brak}</code>\n`
-            + `Дата: <code>${date}</code>\n`
-            + `ID: <code>${id_task}</code>\n`
-            + `<code>Cron</code>`;
+            + `Дата: <code>${date}</code>\n\n`
+            + `<code>Cron</code> task_ID: <code>${id_task}</code>\n`;
 
         // Пытаемся отправить сообщение
         try {
             await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' });
-            console.log(`Message sent to chatId: ${chatId}`);
+            console.log(`Сообщение отправлено на chatId: ${chatId}`);
 
             // Запоминаем, что сообщение отправлено этому пользователю по данной задаче
-            if (!ctx.session.sentMessages) {
-                ctx.session.sentMessages = [];
-            }
-            ctx.session.sentMessages.push(id_task);
+            // if (!ctx.session.sentMessages) {
+            //     ctx.session.sentMessages = [];
+            // }
+            // ctx.session.sentMessages.push(id_task);
 
             // Сбрасываем флаги сессии и устанавливаем ожидание комментария только для тех, кому было отправлено сообщение
             // ctx.session[chatId] = { isAwaitingComment: true };
@@ -115,12 +115,8 @@ async function notifyAllUsers(ctx) { // Добавлен ctx в качестве
             await sleep(5000); // Задержка на 5 секунд
         } catch (error) { // Если возникает ошибка при отправке
             console.error(`Failed to send message to chatId: ${chatId}`, error);
-            try {
-                // Отправляем уведомление в канал логирования
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение на chatId: ${chatId}\nError: ${error}`, { parse_mode: 'HTML' });
-            } catch (logError) {
-                console.error(`Failed to send log message: ${logError}`);
-            }
+            // Отправляем уведомление в канал логирования
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение на chatId: ${chatId}\nError: ${error}`, { parse_mode: 'HTML' });
         }
     }
 }

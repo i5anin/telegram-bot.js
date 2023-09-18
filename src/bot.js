@@ -57,7 +57,7 @@ global.stateCounter = {
 
 // Случайный номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 100) + 1
-console.log('!!! Номер запущенного экземпляра : ' + instanceNumber)
+console.log('! Номер запущенного экземпляра : ' + instanceNumber)
 
 // Обработчики команд
 bot.command(['start', 'reg'], async (ctx) => {
@@ -101,14 +101,15 @@ bot.command('msg', async (ctx) => handleMsgCommand(ctx))
 
 // Обработчик текстовых сообщений
 bot.on('text', async (ctx) => {
+
     await handleTextCommand(ctx)
-    await handleAddComment(ctx)
+    // await handleAddComment(ctx)
 })
 
 // Запуск бота
 bot.launch()
     .catch((err) => {
-        console.error('Error while launching the bot:', err)
+        console.error('Fatal Error! Error while launching the bot:', err)
     })
 
 // Инициализация cron-заданий

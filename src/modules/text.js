@@ -10,10 +10,12 @@ async function handleTextCommand(ctx) {
     // Деструктуризация полей из сообщения
     const { text, chat, from } = ctx.message
 
-    // Ранний выход для улучшения читаемости
-    if (!ctx.session.isAwaitFio && !ctx.session.isAwaitComment) return
+    console.log(ctx.message.reply_to_message)
 
-    // Обработка ожидания ФИО
+    // Ранний выход для улучшения читаемости
+    if (!ctx.session.isAwaitFio && !ctx.session.isAwaitComment && !ctx.message.reply_to_message) return
+
+    // --------- Обработка ожидания ФИО ---------
     if (ctx.session.isAwaitFio) {
         console.log('ctx.session.isAwaitFio=', ctx.session.isAwaitFio)
         if (!/^[А-Яа-яёЁëË]+\s[А-Яа-яёЁëË]\. ?[А-Яа-яёЁëË]\.$/.test(text)) { //налог с диакритическим знаком "ë"
@@ -51,10 +53,10 @@ async function handleTextCommand(ctx) {
     }
 
     console.log('ctx.session.isAwaitComment = ', ctx.session.isAwaitComment)
-    // Обработка ожидания комментария
+    // --------- Обработка ожидания комментария ---------
     if (ctx.session.isAwaitComment) {
         await handleAddComment(ctx)
-        console.log('Обработка ожидания комментария')
+        console.log('Обработка ожидания комментария handleAddComment')
     }
 }
 

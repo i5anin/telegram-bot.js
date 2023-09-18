@@ -5,14 +5,14 @@ const { oplataNotification } = require('#src/modules/oplata') // Добавле�
 
 function initCronJobs() {
     // Уведомлять о сообщениях каждые 5 мин
-    cron.schedule('*/5 * * * *', async () => {
-        console.log('Running a task every 5 minutes')
-        await notifyAllUsers()
+    cron.schedule('*/5 * * * *', async (ctx) => {
+        console.log('Оповищение. Running a task every 5 minutes')
+        await notifyAllUsers(ctx)
     })
 
     // Уведомлять об оплате каждые 15 мин
     cron.schedule('*/6 * * * *', async () => {
-        console.log('Running a task every 6 minutes');
+        // console.log('Оплата. Running a task every 6 minutes');
         await oplataNotification()
     })
 }

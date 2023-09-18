@@ -1,6 +1,6 @@
 // messages.js
 module.exports = {
-    alreadyRegistered: 'Вы уже зарегистрированы!',
+    alreadyRegistered: '<b>Вы уже зарегистрированы!</b>',
     notRegistered:
         'Не зарегистрированы. \nВведите данные в формате:\n<code>Иванов И.И.</code>',
     registrationSuccess: 'Регистрация прошла успешно!',
