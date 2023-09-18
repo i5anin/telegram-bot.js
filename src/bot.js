@@ -74,9 +74,9 @@ bot.command('new_comment', async (ctx) => {
     await notifyUsers(ctx)
 })
 bot.command('new_comment_all', async (ctx) => {
-    resetFlags(ctx);
+    resetFlags(ctx)
     // Здесь загрузка всех сессий из вашего хранилища
-    const allSessions = localSession.DB;  // Этот код нужно адаптировать
+    const allSessions = localSession.DB  // Этот код нужно адаптировать
 
     // console.log('Type of allSessions:', typeof allSessions);
     // console.log('allSessions:', allSessions);
@@ -84,19 +84,86 @@ bot.command('new_comment_all', async (ctx) => {
     if (allSessions && Array.isArray(allSessions.sessions)) {
         // Обновление флага для каждой сессии
         for (const session of allSessions.sessions) {
-            session.data.isAwaitComment = true;
+            session.data.isAwaitComment = true
         }
         // Сохранение изменений в хранилище (если это необходимо)
-        await notifyAllUsers(ctx);
+        await notifyAllUsers(ctx)
     } else {
-        console.error('Sessions are not available or not iterable.');
+        console.error('Sessions are not available or not iterable.')
     }
-});
+})
 
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 bot.command('help', handleHelpCommand)
 bot.command('oplata', oplataNotification)
 bot.command('msg', async (ctx) => handleMsgCommand(ctx))
+
+async function getExternalUsers() {
+    try {
+        const response = await axios.get('https://xxx.xx-forum.ru/api/users/get_all_fio.php')
+        return response.data.users_data
+    } catch (error) {
+        console.error(`Error fetching external users: ${error}`)
+        return []
+    }
+}
+
+async function isMemberOfGroup(telegram, chatId, userId) {
+    try {
+        const member = await telegram.getChatMember(chatId, userId)
+        return member && member.status !== 'left' && member.status !== 'kicked'
+    } catch (error) {
+        return false
+    }
+}
+
+bot.command('get_group_info', async (ctx) => {
+    if (ctx.from.id.toString() !== GRAND_ADMIN) {
+        return ctx.reply('Только GRAND_ADMIN может использовать данную команду.')
+    }
+
+    const input = ctx.message.text.split(' ')
+
+    if (input.length !== 2) {
+        return ctx.reply('Использование: /get_group_info [chat_id]')
+    }
+
+    const externalUsers = await getExternalUsers()
+
+    try {
+        let outputMessage = ''
+        let counter = 0
+        let inGroupCounter = 0 // Счетчик пользователей из внешнего списка в группе
+
+        for (const user of externalUsers) {
+            counter++
+            const userInfo = `${counter}. username: N/A\nid: ${user.user_id}\nfirstname: ${user.fio.split(' ')[0]}\nlastname: ${user.fio.split(' ')[1]}\nbot: N/A\nlang: N/A\n---\n`
+            outputMessage += userInfo
+
+            // TODO: Здесь логика для проверки, является ли этот пользователь участником группы в Telegram
+            //if (/* logic to check if this user is a member of the Telegram group */) {
+            //    outputMessage += `Этот участник есть в вашем внешнем списке.\n---\n`;
+            //   inGroupCounter++;
+            //}
+
+            if (counter % 10 === 0) {
+                await ctx.telegram.sendMessage(LOG_CHANNEL_ID, outputMessage)
+                outputMessage = ''
+            }
+        }
+
+        outputMessage += `Всего пользователей в чате: ${counter}\n`
+        outputMessage += `Всего пользователей из внешнего списка в чате: ${inGroupCounter}\n`
+
+        if (outputMessage) {
+            await ctx.telegram.sendMessage(LOG_CHANNEL_ID, outputMessage)
+        }
+
+    } catch (e) {
+        console.error(e)
+        await ctx.reply('Ошибка при получении данных о группе.')
+    }
+})
 
 
 // Обработчик текстовых сообщений
