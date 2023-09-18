@@ -70,7 +70,7 @@ bot.command(['start', 'reg'], async (ctx) => {
     }
 })
 
-bot.command('new_comment', async (ctx) => {
+bot.command('check_comments', async (ctx) => {
     resetFlags(ctx)
     await notifyUsers(ctx)
 })
