@@ -52,9 +52,8 @@ async function handleTextCommand(ctx) {
         ctx.session.isAwaitFio = false
     }
 
-    console.log('ctx.session.isAwaitComment = ', ctx.session.isAwaitComment)
     // --------- Обработка ожидания комментария ---------
-    if (ctx.session.isAwaitComment) {
+    if (ctx.message.reply_to_message) {
         await handleAddComment(ctx)
         console.log('Обработка ожидания комментария handleAddComment')
     }

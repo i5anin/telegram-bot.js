@@ -54,7 +54,7 @@ async function oplataNotification() {
                 }
             }
         } else {
-            console.log('- Оплата не найдена, пропуск уведомления.')
+            // console.log('- Оплата не найдена, пропуск уведомления.')
         }
     } catch (error) {
         await bot.telegram.sendMessage(
