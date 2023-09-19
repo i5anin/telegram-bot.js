@@ -4,7 +4,6 @@ header('Content-Type: application/json');
 
 $dbConfig = require 'sql_config.php';
 
-// Проверка наличия всех необходимых параметров
 if (!isset($_GET["id_task"]) || !isset($_GET["comments_op"]) || !isset($_GET["access_key"])) {
     http_response_code(400);
     echo json_encode(['status' => 'Error', 'message' => 'Missing parameters.']);
@@ -13,15 +12,13 @@ if (!isset($_GET["id_task"]) || !isset($_GET["comments_op"]) || !isset($_GET["ac
 
 $id_task = $_GET["id_task"];
 $comment = $_GET["comments_op"];
-$key = $_GET["access_key"];  // Изменено с "key" на "access_key"
+$key = $_GET["access_key"];
 
-// Проверка ключа доступа
 if ($key !== $dbConfig['key']) {
     http_response_code(403);
     echo json_encode(['status' => 'Error', 'message' => 'Invalid access key.']);
     exit;
 }
-
 
 function update_sk_comment($id, $comment, $dbConfig)
 {
@@ -33,22 +30,32 @@ function update_sk_comment($id, $comment, $dbConfig)
     $mysqli = mysqli_connect($dbConfig['server'], $dbConfig['user'], $dbConfig['pass'], $dbConfig['db']);
     mysqli_set_charset($mysqli, 'utf8mb4');
 
-    // Проверяем, существует ли такая запись
-    $check_stmt = mysqli_prepare($mysqli, "SELECT * FROM `sk_comment` WHERE `id_task` = ?");
+    if (!$mysqli) {
+        die('Ошибка подключения к базе данных: ' . mysqli_connect_error());
+    }
+
+    $check_stmt = mysqli_prepare($mysqli, "SELECT * FROM `sk_comments` WHERE `id_task` = ?");
+    if ($check_stmt === false) {
+        die('Ошибка подготовки SQL-запроса: ' . mysqli_error($mysqli));
+    }
+
     mysqli_stmt_bind_param($check_stmt, "i", $id);
     mysqli_stmt_execute($check_stmt);
     $result = mysqli_stmt_get_result($check_stmt);
 
-    if (mysqli_num_rows($result) == 0) {
-        return false;  // Если запись не найдена, возвращаем false
+    if (mysqli_num_rows($result) === 0) {
+        return false;
     }
 
     $stmt = mysqli_prepare($mysqli, "UPDATE `sk_comments` SET `comments_op` = ?, `completed` = 1 WHERE `id_task` = ?");
+    if ($stmt === false) {
+        die('Ошибка подготовки SQL-запроса: ' . mysqli_error($mysqli));
+    }
+
     mysqli_stmt_bind_param($stmt, "si", $comment, $id);
 
     if (!mysqli_stmt_execute($stmt)) {
-        echo "Ошибка: " . mysqli_stmt_error($stmt);
-        return false;
+        die('Ошибка выполнения SQL-запроса: ' . mysqli_stmt_error($stmt));
     }
 
     mysqli_stmt_close($stmt);
