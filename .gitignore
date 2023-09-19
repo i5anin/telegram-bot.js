@@ -107,3 +107,4 @@ state.db
 .idea
 
 session_db.json
+*.csv

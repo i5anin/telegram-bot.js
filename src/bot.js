@@ -80,9 +80,6 @@ bot.command('new_comment_all', async (ctx) => {
     // Здесь загрузка всех сессий из вашего хранилища
     const allSessions = localSession.DB  // Этот код нужно адаптировать
 
-    // console.log('Type of allSessions:', typeof allSessions);
-    // console.log('allSessions:', allSessions);
-
     if (allSessions && Array.isArray(allSessions.sessions)) {
         // Обновление флага для каждой сессии
         for (const session of allSessions.sessions) {
@@ -134,10 +131,9 @@ async function generateReport(ctx, chatId) {
     const externalUsers = await getExternalUsers()
 
     // Отправляем сообщение в лог-канал
-    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет для группы <code>${chatInfo.title}</code> (ID: <code>${chatId}</code>) Количество пользователей: <code>${chatMembersCount}</code>`, { parse_mode: 'HTML' })
+    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет для группы <code>${chatInfo.title}</code>\nID: <code>${chatId}</code>\nКоличество пользователей: <code>${chatMembersCount}</code>`, { parse_mode: 'HTML' })
 
     let absentCounter = 0
-    let absentUsersBatch = []
 
     // Обходим всех внешних пользователей
     for (const user of externalUsers) {
@@ -146,51 +142,26 @@ async function generateReport(ctx, chatId) {
             const telegramUser = await ctx.telegram.getChatMember(chatId, user.user_id)
             const status = telegramUser.status  // Здесь хранится статус пользователя
 
-            const username = telegramUser.user.username ? '@' + telegramUser.user.username : '<code>N/A</code>'
+            const username = telegramUser.user.username ? '@' + telegramUser.user.username : 'N/A'
 
             // Добавляем информацию в CSV отчет
             const userInfoCsv = `${telegramUser.user.username || 'N/A'};${telegramUser.user.id};${telegramUser.user.first_name};${telegramUser.user.last_name || 'N/A'};${user.fio};${status}`
             csvReport.push(userInfoCsv)
 
-            // Добавляем информацию в текстовый отчет
-            // const userInfo = `${inGroupCounter}. username: ${username}\n` +
-            //     `id: <code>${telegramUser.user.id}</code>\n` +
-            //     `firstname: <code>${telegramUser.user.first_name}</code>\n` +
-            //     `lastname: <code>${telegramUser.user.last_name || 'N/A'}</code>\n` +
-            //     `fio: <code>${user.fio}</code>\n---\n`;
-
-            // reportBatch.push(userInfo);
 
         } catch (error) {
             // Пользователь отсутствует в чате
             absentCounter++
-            absentUsersBatch.push(`${absentCounter}. id: <code>${user.user_id}</code> fio: <code>${user.fio}</code> - отсутствует`)
 
             // Добавляем информацию об отсутствующих пользователях в CSV отчет
             const userInfoCsv = `N/A;${user.user_id};N/A;N/A;${user.fio};left`  // Статус 'left'
             csvReport.push(userInfoCsv)
         }
 
-        // Отправляем отчеты по 10 записей
-        // if (reportBatch.length === 10) {
-        //     await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportBatch.join(''), { parse_mode: 'HTML' });
-        //     reportBatch = [];
-        // }
-        //
-        // if (absentUsersBatch.length === 10) {
-        //     await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет об отсутствующих пользователях:\n` + absentUsersBatch.join('\n-----------------\n'), { parse_mode: 'HTML' });
-        //     absentUsersBatch = [];
-        // }
+
     }
 
-    // Отправляем оставшиеся записи
-    // if (reportBatch.length > 0) {
-    //     await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportBatch.join(''), { parse_mode: 'HTML' });
-    // }
-    //
-    // if (absentUsersBatch.length > 0) {
-    //     await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет об отсутствующих пользователях:\n` + absentUsersBatch.join('\n-----------------\n'), { parse_mode: 'HTML' });
-    // }
+
 
     // Сохраняем CSV отчеты
     fs.writeFileSync(`${chatInfo.title}_report.csv`, csvReport.join('\n'))
@@ -217,7 +188,6 @@ bot.command('get_group_info', async (ctx) => {
 bot.on('text', async (ctx) => {
 
     await handleTextCommand(ctx)
-    // await handleAddComment(ctx)
 })
 
 // Запуск бота
@@ -225,6 +195,56 @@ bot.launch()
     .catch((err) => {
         console.error('Fatal Error! Error while launching the bot:', err)
     })
+
+// Отслеживаем событие добавления нового пользователя в чат
+bot.on('new_chat_members', async (ctx) => { // работает
+    console.log("new_chat_members")
+    const chatId = ctx.chat.id;
+    const chatTitle = ctx.chat.title || 'Неназванный чат';
+    const addedUsers = ctx.message.new_chat_members;
+
+    for (const user of addedUsers) {
+        const username = user.username || 'N/A';
+        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+        const userId = user.id;
+
+        const message = `Добавили в группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`;
+        ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
+    }
+});
+
+// Отслеживаем событие добавления бота в новый чат
+bot.on('new_chat_member', async (ctx) => {
+    console.log("new_chat_member")
+    const chatId = ctx.chat.id;
+    const chatTitle = ctx.chat.title || 'Неназванный чат';
+    const newMember = ctx.message.new_chat_member;
+
+    // Проверяем, является ли новый участник ботом
+    if (newMember && newMember.username === 'Имя пользователя вашего бота') {
+
+        const message = `Бот добавлен в группу <code>${chatTitle}</code>\nID: <code>${chatId}</code>`;
+        ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
+    }
+});
+
+
+// Отслеживаем событие удаления пользователя из чата
+bot.on('left_chat_member', async (ctx) => {
+    const chatId = ctx.chat.id;
+    const chatTitle = ctx.chat.title || 'Неназванный чат';
+    const leftMember = ctx.message.left_chat_member;
+
+    // Информация о пользователе
+    const username = leftMember.username || 'N/A';
+    const fullName = `${leftMember.first_name || ''} ${leftMember.last_name || ''}`.trim();
+    const userId = leftMember.id;
+
+    const message = `Пользователь покинул группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`;
+
+    ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
+});
+
 
 // Инициализация cron-заданий
 initCronJobs()

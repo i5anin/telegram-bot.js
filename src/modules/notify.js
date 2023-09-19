@@ -109,9 +109,9 @@ async function notifyAllUsers(ctx) {
         // Пытаемся отправить сообщение
         try {
             await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' });
-            console.log(`Сообщение отправлено на chatId: ${chatId}`);
+            console.log(`Cron Сообщение отправлено на chatId: ${chatId}`);
 
-            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Сообщение отправлено на chatId: <code>${chatId}</code>`, { parse_mode: 'HTML' });
+            // await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Сообщение отправлено на chatId: <code>${chatId}</code>`, { parse_mode: 'HTML' });
 
             // Запоминаем, что сообщение отправлено этому пользователю по данной задаче
             // if (!ctx.session.sentMessages) {
