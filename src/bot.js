@@ -88,9 +88,9 @@ bot.command('new_comment_all', async (ctx) => {
 
     if (allSessions && Array.isArray(allSessions.sessions)) {
         // Обновление флага для каждой сессии
-        for (const session of allSessions.sessions) {
-            session.data.isAwaitComment = true
-        }
+        // for (const session of allSessions.sessions) {
+        //     session.data.isAwaitComment = true
+        // }
         // Сохранение изменений в хранилище (если это необходимо)
         await notifyAllUsers(ctx)
     } else {
@@ -163,11 +163,7 @@ async function generateReport(ctx, chatId) {
             const userInfoCsv = `N/A;${user.user_id};N/A;N/A;${user.fio};left`  // Статус 'left'
             csvReport.push(userInfoCsv)
         }
-
-
     }
-
-
     // Сохраняем CSV отчеты
     fs.writeFileSync(`${chatInfo.title}_report.csv`, csvReport.join('\n'))
 }
@@ -204,7 +200,6 @@ bot.launch()
 // Отслеживаем событие добавления нового пользователя в чат
 bot.on('new_chat_members', async (ctx) => { // работает
     console.log('new_chat_members')
-    const chatId = ctx.chat.id
     const chatTitle = ctx.chat.title || 'Неназванный чат'
     const addedUsers = ctx.message.new_chat_members
 
@@ -214,13 +209,12 @@ bot.on('new_chat_members', async (ctx) => { // работает
         const userId = user.id
 
         const message = `${emoji.ok} Добавили в группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`
-        ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
+        await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
     }
 })
 
 // Отслеживаем событие удаления пользователя из чата
 bot.on('left_chat_member', async (ctx) => {
-    const chatId = ctx.chat.id
     const chatTitle = ctx.chat.title || 'Неназванный чат'
     const leftMember = ctx.message.left_chat_member
 
@@ -231,7 +225,7 @@ bot.on('left_chat_member', async (ctx) => {
 
     const message = `${emoji.x} Пользователь покинул группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`
 
-    ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
+    await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
 })
 
 
