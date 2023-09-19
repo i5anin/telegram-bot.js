@@ -5,14 +5,14 @@ header('Content-Type: application/json');
 $dbConfig = require 'sql_config.php';
 
 // Проверка наличия всех необходимых параметров
-if (!isset($_GET["id_task"]) || !isset($_GET["comment"]) || !isset($_GET["access_key"]) || !isset($dbConfig['key'])) {
+if (!isset($_GET["id_task"]) || !isset($_GET["comments_op"]) || !isset($_GET["access_key"])) {
     http_response_code(400);
-    echo json_encode(['status' => 'Error', 'message' => 'Missing parameters or SECRET_KEY.']);
+    echo json_encode(['status' => 'Error', 'message' => 'Missing parameters.']);
     exit;
 }
 
 $id_task = $_GET["id_task"];
-$comment = $_GET["comment"];
+$comment = $_GET["comments_op"];
 $key = $_GET["access_key"];  // Изменено с "key" на "access_key"
 
 // Проверка ключа доступа
@@ -43,7 +43,7 @@ function update_sk_comment($id, $comment, $dbConfig)
         return false;  // Если запись не найдена, возвращаем false
     }
 
-    $stmt = mysqli_prepare($mysqli, "UPDATE `sk_comment` SET `comment` = ?, `completed` = 1 WHERE `id_task` = ?");
+    $stmt = mysqli_prepare($mysqli, "UPDATE `sk_comments` SET `comments_op` = ?, `completed` = 1 WHERE `id_task` = ?");
     mysqli_stmt_bind_param($stmt, "si", $comment, $id);
 
     if (!mysqli_stmt_execute($stmt)) {
