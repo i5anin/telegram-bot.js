@@ -13,10 +13,10 @@ if ($mysqli->connect_error) {
 $mysqli->set_charset('utf8mb4');
 
 if (isset($_GET['user_id']) && is_numeric($_GET['user_id'])) {
-    if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`,`type` FROM `sk_comment` WHERE `user_id` = ? AND `completed` = 0")) {
+    if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`,`type`, `kolvo_brak`, `comments_otk`, `comments_op` FROM `sk_comments` WHERE `user_id` = ? AND `completed` = 0")) {
         $stmt->bind_param("i", $_GET['user_id']);
         $stmt->execute();
-        $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type);
+        $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type, $kolvo_brak, $comments_otk, $comments_op); // Добавлено
 
         $comments = [];
         while ($stmt->fetch()) {
@@ -26,7 +26,10 @@ if (isset($_GET['user_id']) && is_numeric($_GET['user_id'])) {
                 'date' => $date,
                 'specs_nom_id' => $specs_nom_id,
                 'det_name' => $det_name,
-                'type' => $type
+                'type' => $type,
+                'kolvo_brak' => $kolvo_brak,  // добавлено
+                'comments_otk' => $comments_otk,  // добавлено
+                'comments_op' => $comments_op  // добавлено
             ];
         }
         $stmt->close();
@@ -44,4 +47,3 @@ if (isset($_GET['user_id']) && is_numeric($_GET['user_id'])) {
 }
 
 $mysqli->close();
-?>
