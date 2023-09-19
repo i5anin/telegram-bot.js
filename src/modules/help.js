@@ -1,9 +1,13 @@
-// Функция для обработки команды /help
-const { sendToLog } = require('#src/utils/admin') // Добавление лога
+const fs = require('fs');
+async function handleHelpCommand(ctx) {
+    // sendToLog(ctx);
 
-function handleHelpCommand(ctx) {
-    sendToLog(ctx)
-    ctx.reply(`Доступные команды:
+    // Отправка фото из файла
+    const photo = fs.createReadStream('./img/img.jpg');
+    await ctx.replyWithPhoto({ source: photo });
+
+    // Отправка текста
+    await ctx.reply(`Доступные команды:
     
 1. /reg - Регистрация пользователя
 Шаблон: <code>Иванов И.И.</code>
@@ -13,7 +17,7 @@ function handleHelpCommand(ctx) {
 2. /new_comment - Получить новые комментарии
 · прокомментировать задачу через <u>ответить</u>
 
-В случае ошибки напишите разработчику @i5anin Сергей.`, { parse_mode: 'HTML' })
+В случае ошибки напишите разработчику @i5anin Сергей.`, { parse_mode: 'HTML' });
 }
 
-module.exports = { handleHelpCommand }
+module.exports = { handleHelpCommand };
