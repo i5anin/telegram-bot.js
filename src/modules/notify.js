@@ -58,6 +58,8 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+let sentTaskIds = [];
+
 // Функция для уведомления всех пользователей
 async function notifyAllUsers(ctx) {
     // Добавлен ctx в качестве аргумента для доступа к сессии и другим методам контекста
@@ -82,6 +84,12 @@ async function notifyAllUsers(ctx) {
 
         // Извлекаем данные из первого комментария
         const { id_task, kolvo_brak, det_name, date } = userComments[0];
+
+        // Проверяем, отправлялось ли сообщение этому пользователю ранее по этой задаче
+        if (sentTaskIds.includes(id_task)) {
+            console.log(`Сообщение для id_task ${id_task} уже отправлено на chatId: ${chatId}`);
+            continue;
+        }
 
         // Проверяем, отправлялось ли сообщение этому пользователю ранее по этой задаче
         // if (ctx.session.sentMessages && ctx.session.sentMessages.includes(id_task)) {
@@ -120,6 +128,7 @@ async function notifyAllUsers(ctx) {
             // Отправляем уведомление в канал логирования
             await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение на chatId: ${chatId}\nError: ${error}`, { parse_mode: 'HTML' });
         }
+        sentTaskIds.push(id_task);
     }
 }
 

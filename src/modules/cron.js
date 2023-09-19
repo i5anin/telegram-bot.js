@@ -5,8 +5,8 @@ const { oplataNotification } = require('#src/modules/oplata') // Добавле�
 
 function initCronJobs() {
     // Уведомлять о сообщениях каждые 60 мин
-    cron.schedule('*/60 * * * *', async (ctx) => {
-        console.log('Оповищение. Running a task every 60 minutes')
+    cron.schedule('0 7-20 * * *', async (ctx) => {
+        console.log('Оповещение. Running a task every hour from 7 to 20')
         await notifyAllUsers(ctx)
     })
 
