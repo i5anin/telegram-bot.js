@@ -83,19 +83,7 @@ bot.command('new_comment', async (ctx) => {
 })
 bot.command('new_comment_all', async (ctx) => {
     resetFlags(ctx)
-    // Здесь загрузка всех сессий из вашего хранилища
-    const allSessions = localSession.DB  // Этот код нужно адаптировать
-
-    if (allSessions && Array.isArray(allSessions.sessions)) {
-        // Обновление флага для каждой сессии
-        // for (const session of allSessions.sessions) {
-        //     session.data.isAwaitComment = true
-        // }
-        // Сохранение изменений в хранилище (если это необходимо)
-        await notifyAllUsers(ctx)
-    } else {
-        console.error('Sessions are not available or not iterable.')
-    }
+    await notifyAllUsers(ctx)
 })
 
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
