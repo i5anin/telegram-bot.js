@@ -43,7 +43,7 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`, `type`, `kolvo_brak` FROM `sk_comment` WHERE `completed` = 0")) {
+if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`, `type`, `kolvo_brak`,'comments_otk' FROM `sk_comment` WHERE `completed` = 0")) {
     $stmt->execute();
     $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type, $kolvo_brak); // добавлено kolvo_brak
 
@@ -56,14 +56,16 @@ if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id
             'specs_nom_id' => $specs_nom_id,
             'det_name' => $det_name,
             'type' => $type,
-            'kolvo_brak' => $kolvo_brak // добавлено kolvo_brak
+            'kolvo_brak' => $kolvo_brak, // добавлено kolvo_brak
+            'comments_otk'  => $comments_otk, // показать
+            'comments_op'  => $comments_op  // изменить
         ];
     }
 
     $stmt->close();
 
     if (!empty($comments)) {
-        echo json_encode(['comments' => $comments]);
+        echo json_encode(['comments_op' => $comments]);
     } else {
         echo json_encode(['error' => 'Comments not found']);
     }
