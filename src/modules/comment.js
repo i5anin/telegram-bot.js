@@ -23,7 +23,7 @@ async function handleAddComment(ctx) {
     }
 
     const chatId = ctx.message.chat.id
-    const botUsername = ctx.botInfo.username
+    // const botUsername = ctx.botInfo.username
 
     const taskText = ctx.message.reply_to_message.text || ''
 
@@ -52,9 +52,10 @@ async function handleAddComment(ctx) {
         }
 
         const url = `${WEB_API}/comment/update.php`
+        console.log(taskID + ' ' + ctx.message.text + ' ' + SECRET_KEY)
         const params = {
             id_task: taskID,
-            comment: ctx.message.text,
+            comments_op: ctx.message.text,
             access_key: SECRET_KEY,
         }
 
