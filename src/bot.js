@@ -195,8 +195,8 @@ async function generateReport(ctx, chatId) {
     }
 
     // Сохраняем CSV отчеты
-    fs.writeFileSync('csv/report.csv', csvReport.join('\n'));
-    fs.writeFileSync('csv/absent_users.csv', csvAbsentUsers.join('\n'));
+    fs.writeFileSync('report.csv', csvReport.join('\n'));
+    fs.writeFileSync('absent_users.csv', csvAbsentUsers.join('\n'));
 }
 
 
