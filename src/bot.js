@@ -151,7 +151,7 @@ async function generateReport(ctx, chatId) {
             const username = telegramUser.user.username ? '@' + telegramUser.user.username : '<code>N/A</code>';
 
             // Добавляем информацию в CSV отчет
-            const userInfoCsv = `${username},${telegramUser.user.id},${telegramUser.user.first_name},${telegramUser.user.last_name || 'N/A'},${user.fio}`;
+            const userInfoCsv = `${username};${telegramUser.user.id};${telegramUser.user.first_name};${telegramUser.user.last_name || 'N/A'};${user.fio}`;
             csvReport.push(userInfoCsv); // Комментарий: Добавлено для CSV
 
             // Добавляем информацию в текстовый отчет
