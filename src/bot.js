@@ -125,42 +125,53 @@ async function sendMessage(ctx, chatId, messageText) {
 async function generateReport(ctx, chatId) {
     const chatInfo = await ctx.telegram.getChat(chatId)
     const externalUsers = await getExternalUsers()
-    let reportMessage = `Отчет для группы <code>${chatInfo.title}</code> (ID: <code>${chatId}</code>)\n\n`
-    let absentUsersReport = ''
+
+    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет для группы <code>${chatInfo.title}</code> (ID: ${chatId})`, { parse_mode: 'HTML' })
 
     let counter = 0
     let inGroupCounter = 0
+    let absentCounter = 0
+    let reportBatch = []
+    let absentUsersBatch = []
 
     for (const user of externalUsers) {
         counter++
         try {
             const telegramUser = await ctx.telegram.getChatMember(chatId, user.user_id)
+            inGroupCounter++
 
-            const userInfo = `${counter}. username: ${'@' + telegramUser.user.username || ''}\n` +
+            const userInfo = `${inGroupCounter}. username: ${'@' + telegramUser.user.username || ''}\n` +
                 `id: <code>${telegramUser.user.id}</code>\n` +
                 `firstname: <code>${telegramUser.user.first_name}</code>\n` +
                 `lastname: <code>${telegramUser.user.last_name || ''}</code>\n` +
-                `bot: <code>${telegramUser.user.is_bot}</code>\n` +
-                `lang: <code>${telegramUser.user.language_code || ''}</code>\n` +
-                `fio: <code>${user.fio}</code>\n` +
                 `---\n`
 
-            reportMessage += userInfo
-            inGroupCounter++
+            reportBatch.push(userInfo)
         } catch (error) {
-            absentUsersReport += `id <code>${user.user_id}</code> <code>${user.fio}</code> - отсутствует\n-----------------\n`
+            absentCounter++
+            absentUsersBatch.push(`${absentCounter}. id <code>${user.user_id}</code> <code>${user.fio}</code> - отсутствует`)
+        }
+
+        // Send every 10 present users
+        if (reportBatch.length === 10) {
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportBatch.join(''), { parse_mode: 'HTML' })
+            reportBatch = []
+        }
+
+        // Send every 10 absent users
+        if (absentUsersBatch.length === 10) {
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет об отсутствующих пользователях:\n` + absentUsersBatch.join('\n-----------------\n'), { parse_mode: 'HTML' })
+            absentUsersBatch = []
         }
     }
 
-    reportMessage += `\nВсего пользователей проверено: ${counter}\n`
-    reportMessage += `Всего пользователей из внешнего списка в чате: ${inGroupCounter}\n`
-
-    await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportMessage, { parse_mode: 'HTML' })
-
-    // Отправка отчета об отсутствующих пользователях в отдельном сообщении
-    // if (absentUsersReport) {
-    //     await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет об отсутствующих пользователях:\n${absentUsersReport}`, { parse_mode: 'HTML' })
-    // }
+    // Send remaining users if any
+    if (reportBatch.length > 0) {
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportBatch.join(''), { parse_mode: 'HTML' })
+    }
+    if (absentUsersBatch.length > 0) {
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет об отсутствующих пользователях:\n` + absentUsersBatch.join('\n-----------------\n'), { parse_mode: 'HTML' })
+    }
 }
 
 
