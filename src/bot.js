@@ -1,5 +1,6 @@
 // Загрузка переменных среды из .env файла
 require('dotenv').config()
+const fs = require('fs');
 const { Telegraf } = require('telegraf')
 const LocalSession = require('telegraf-session-local')
 
@@ -122,56 +123,80 @@ async function sendMessage(ctx, chatId, messageText) {
     }
 }
 
+
 async function generateReport(ctx, chatId) {
-    const chatInfo = await ctx.telegram.getChat(chatId)
-    const externalUsers = await getExternalUsers()
+    // Локальные переменные для CSV отчета
+    const csvReport = ['username;id;firstname;lastname;fio'];
+    const csvAbsentUsers = ['id;fio'];
 
-    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет для группы <code>${chatInfo.title}</code> (ID: ${chatId})`, { parse_mode: 'HTML' })
+    // Получаем информацию о чате и внешних пользователях
+    const chatInfo = await ctx.telegram.getChat(chatId);
+    const externalUsers = await getExternalUsers();
 
-    let counter = 0
-    let inGroupCounter = 0
-    let absentCounter = 0
-    let reportBatch = []
-    let absentUsersBatch = []
+    // Отправляем сообщение в лог-канал
+    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет для группы <code>${chatInfo.title}</code> (ID: ${chatId})`, { parse_mode: 'HTML' });
 
+    let inGroupCounter = 0;
+    let absentCounter = 0;
+    let reportBatch = [];
+    let absentUsersBatch = [];
+
+    // Обходим всех внешних пользователей
     for (const user of externalUsers) {
-        counter++
         try {
-            const telegramUser = await ctx.telegram.getChatMember(chatId, user.user_id)
-            inGroupCounter++
+            // Пытаемся получить информацию о пользователе в телеграме
+            const telegramUser = await ctx.telegram.getChatMember(chatId, user.user_id);
+            inGroupCounter++;
 
-            const userInfo = `${inGroupCounter}. username: ${'@' + telegramUser.user.username || ''}\n` +
+            const username = telegramUser.user.username ? '@' + telegramUser.user.username : '<code>N/A</code>';
+
+            // Добавляем информацию в CSV отчет
+            const userInfoCsv = `${username},${telegramUser.user.id},${telegramUser.user.first_name},${telegramUser.user.last_name || 'N/A'},${user.fio}`;
+            csvReport.push(userInfoCsv); // Комментарий: Добавлено для CSV
+
+            // Добавляем информацию в текстовый отчет
+            const userInfo = `${inGroupCounter}. username: ${username}\n` +
                 `id: <code>${telegramUser.user.id}</code>\n` +
                 `firstname: <code>${telegramUser.user.first_name}</code>\n` +
-                `lastname: <code>${telegramUser.user.last_name || ''}</code>\n` +
-                `---\n`
+                `lastname: <code>${telegramUser.user.last_name || 'N/A'}</code>\n` +
+                `fio: <code>${user.fio}</code>\n---\n`;
 
-            reportBatch.push(userInfo)
+            reportBatch.push(userInfo);
+
         } catch (error) {
-            absentCounter++
-            absentUsersBatch.push(`${absentCounter}. id <code>${user.user_id}</code> <code>${user.fio}</code> - отсутствует`)
+            // Пользователь отсутствует в чате
+            absentCounter++;
+            absentUsersBatch.push(`${absentCounter}. id: <code>${user.user_id}</code> fio: <code>${user.fio}</code> - отсутствует`);
+
+            // Добавляем информацию об отсутствующих пользователях в CSV отчет
+            const absentInfo = `${user.user_id},${user.fio}`;
+            csvAbsentUsers.push(absentInfo); // Комментарий: Добавлено для CSV отчета об отсутствующих пользователях
         }
 
-        // Send every 10 present users
+        // Отправляем отчеты по 10 записей
         if (reportBatch.length === 10) {
-            await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportBatch.join(''), { parse_mode: 'HTML' })
-            reportBatch = []
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportBatch.join(''), { parse_mode: 'HTML' });
+            reportBatch = [];
         }
 
-        // Send every 10 absent users
         if (absentUsersBatch.length === 10) {
-            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет об отсутствующих пользователях:\n` + absentUsersBatch.join('\n-----------------\n'), { parse_mode: 'HTML' })
-            absentUsersBatch = []
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет об отсутствующих пользователях:\n` + absentUsersBatch.join('\n-----------------\n'), { parse_mode: 'HTML' });
+            absentUsersBatch = [];
         }
     }
 
-    // Send remaining users if any
+    // Отправляем оставшиеся записи
     if (reportBatch.length > 0) {
-        await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportBatch.join(''), { parse_mode: 'HTML' })
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID, reportBatch.join(''), { parse_mode: 'HTML' });
     }
+
     if (absentUsersBatch.length > 0) {
-        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет об отсутствующих пользователях:\n` + absentUsersBatch.join('\n-----------------\n'), { parse_mode: 'HTML' })
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Отчет об отсутствующих пользователях:\n` + absentUsersBatch.join('\n-----------------\n'), { parse_mode: 'HTML' });
     }
+
+    // Сохраняем CSV отчеты
+    fs.writeFileSync('csv/report.csv', csvReport.join('\n'));
+    fs.writeFileSync('csv/absent_users.csv', csvAbsentUsers.join('\n'));
 }
 
 
