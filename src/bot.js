@@ -49,6 +49,12 @@ global.GRAND_ADMIN = process.env.GRAND_ADMIN
 global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
 global.SECRET_KEY = process.env.SECRET_KEY
 global.DIR_OPLATA = process.env.DIR_OPLATA
+global.emoji = {
+    x: "&#10060;", //❌
+    warning: "&#x26A0;", //⚠️
+    ok:"&#9989;", //✅
+    error: "&#10071;", //❗
+}
 global.bot = bot
 global.stateCounter = {
     my: 0,
@@ -162,7 +168,6 @@ async function generateReport(ctx, chatId) {
     }
 
 
-
     // Сохраняем CSV отчеты
     fs.writeFileSync(`${chatInfo.title}_report.csv`, csvReport.join('\n'))
 }
@@ -198,52 +203,36 @@ bot.launch()
 
 // Отслеживаем событие добавления нового пользователя в чат
 bot.on('new_chat_members', async (ctx) => { // работает
-    console.log("new_chat_members")
-    const chatId = ctx.chat.id;
-    const chatTitle = ctx.chat.title || 'Неназванный чат';
-    const addedUsers = ctx.message.new_chat_members;
+    console.log('new_chat_members')
+    const chatId = ctx.chat.id
+    const chatTitle = ctx.chat.title || 'Неназванный чат'
+    const addedUsers = ctx.message.new_chat_members
 
     for (const user of addedUsers) {
-        const username = user.username || 'N/A';
-        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-        const userId = user.id;
+        const username = user.username || 'N/A'
+        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim()
+        const userId = user.id
 
-        const message = `Добавили в группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`;
-        ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
+        const message = `${emoji.ok} Добавили в группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`
+        ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
     }
-});
-
-// Отслеживаем событие добавления бота в новый чат
-bot.on('new_chat_member', async (ctx) => {
-    console.log("new_chat_member")
-    const chatId = ctx.chat.id;
-    const chatTitle = ctx.chat.title || 'Неназванный чат';
-    const newMember = ctx.message.new_chat_member;
-
-    // Проверяем, является ли новый участник ботом
-    if (newMember && newMember.username === 'Имя пользователя вашего бота') {
-
-        const message = `Бот добавлен в группу <code>${chatTitle}</code>\nID: <code>${chatId}</code>`;
-        ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
-    }
-});
-
+})
 
 // Отслеживаем событие удаления пользователя из чата
 bot.on('left_chat_member', async (ctx) => {
-    const chatId = ctx.chat.id;
-    const chatTitle = ctx.chat.title || 'Неназванный чат';
-    const leftMember = ctx.message.left_chat_member;
+    const chatId = ctx.chat.id
+    const chatTitle = ctx.chat.title || 'Неназванный чат'
+    const leftMember = ctx.message.left_chat_member
 
     // Информация о пользователе
-    const username = leftMember.username || 'N/A';
-    const fullName = `${leftMember.first_name || ''} ${leftMember.last_name || ''}`.trim();
-    const userId = leftMember.id;
+    const username = leftMember.username || 'N/A'
+    const fullName = `${leftMember.first_name || ''} ${leftMember.last_name || ''}`.trim()
+    const userId = leftMember.id
 
-    const message = `Пользователь покинул группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`;
+    const message = `${emoji.x} Пользователь покинул группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`
 
-    ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
-});
+    ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
+})
 
 
 // Инициализация cron-заданий
