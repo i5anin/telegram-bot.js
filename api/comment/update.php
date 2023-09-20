@@ -4,19 +4,33 @@ header('Content-Type: application/json');
 
 $dbConfig = require 'sql_config.php';
 
-if (!isset($_GET["id_task"]) || !isset($_GET["comments_op"]) || !isset($_GET["access_key"])) {
-    http_response_code(400);
-    echo json_encode(['status' => 'Error', 'message' => 'Missing parameters.']);
-    exit;
-}
-
-$id_task = $_GET["id_task"];
-$comment = $_GET["comments_op"];
-$key = $_GET["access_key"];
+$key = $_GET["access_key"] ?? null;
 
 if ($key !== $dbConfig['key']) {
     http_response_code(403);
     echo json_encode(['status' => 'Error', 'message' => 'Invalid access key.']);
+    exit;
+}
+
+if (isset($_GET["send"])) {
+    // Здесь ваша логика для параметра send
+    echo json_encode(['status' => 'OK', 'message' => 'Send operation completed.']);
+    http_response_code(200);
+    exit;
+} elseif (isset($_GET["id_task"]) && isset($_GET["comments_op"])) {
+    $id_task = $_GET["id_task"];
+    $comment = $_GET["comments_op"];
+
+    if (update_sk_comment($id_task, $comment, $dbConfig)) {
+        echo json_encode(['status' => 'OK', 'message' => 'Data successfully updated.']);
+        http_response_code(200);
+    } else {
+        http_response_code(400);
+        echo json_encode(['status' => 'Error', 'message' => 'Failed to update data.']);
+    }
+} else {
+    http_response_code(400);
+    echo json_encode(['status' => 'Error', 'message' => 'Missing parameters.']);
     exit;
 }
 
@@ -47,7 +61,7 @@ function update_sk_comment($id, $comment, $dbConfig)
         return false;
     }
 
-    $stmt = mysqli_prepare($mysqli, "UPDATE `sk_comments` SET `comments_op` = ?, `completed` = 1 WHERE `id_task` = ?");
+    $stmt = mysqli_prepare($mysqli, "UPDATE `sk_comments` SET `comments_op` = ?, `answered` = 1 WHERE `id_task` = ?");
     if ($stmt === false) {
         die('Ошибка подготовки SQL-запроса: ' . mysqli_error($mysqli));
     }
@@ -60,15 +74,6 @@ function update_sk_comment($id, $comment, $dbConfig)
 
     mysqli_stmt_close($stmt);
     mysqli_close($mysqli);
+
     return true;
-}
-
-$res = update_sk_comment($id_task, $comment, $dbConfig);
-
-if ($res) {
-    echo json_encode(['status' => 'OK', 'message' => 'Data successfully updated.']);
-    http_response_code(200);
-} else {
-    http_response_code(400);
-    echo json_encode(['status' => 'Error', 'message' => 'Failed to update data.']);
 }
