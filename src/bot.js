@@ -49,6 +49,7 @@ global.GRAND_ADMIN = process.env.GRAND_ADMIN
 global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
 global.SECRET_KEY = process.env.SECRET_KEY
 global.DIR_OPLATA = process.env.DIR_OPLATA
+global.OPLATA_GROUP = process.env.OPLATA_GROUP
 global.emoji = {
     x: '&#10060;', //❌
     warning: '&#x26A0;', //⚠️
@@ -64,7 +65,7 @@ global.stateCounter = {
 
 
 // Случайный номер экземпляра
-const instanceNumber = Math.floor(Math.random() * 100) + 1
+const instanceNumber = Math.floor(Math.random() * 9000) + 1000;
 console.log('! Номер запущенного экземпляра : ' + instanceNumber)
 
 // Обработчики команд

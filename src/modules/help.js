@@ -1,14 +1,11 @@
 const fs = require('fs');
+const { message } = require('telegraf/filters')
+
 async function handleHelpCommand(ctx) {
-    // https://imgbb.su/image/0bD7OR
-    // sendToLog(ctx);
-
-    // Отправка фото из файла
-    const photo = fs.createReadStream('src/img/answer.jpg');
-    await ctx.replyWithPhoto({ source: photo });
-
-    // Отправка текста
-    await ctx.reply(`Доступные команды:
+    // Отправка фото из файла с подписью (caption)
+    const photo = fs.createReadStream('src/media/answer.jpg');
+    const video = fs.createReadStream('src/media/answer.mp4');
+    const messageJpg = `Доступные команды:
     
 1. /reg - Регистрация пользователя
 Шаблон: <code>Иванов И.И.</code>
@@ -17,8 +14,16 @@ async function handleHelpCommand(ctx) {
 
 2. /new_comment - Получить новые комментарии
 · прокомментировать задачу через <u>ответить</u>
+· телефон: <u>ответить</u> - долгое нажатие на нужном сообщении
+· пк: правой кнопкой мыши <u>ответить</u>
 
-В случае ошибки напишите разработчику @i5anin Сергей.`, { parse_mode: 'HTML' });
+В случае ошибки напишите разработчику @i5anin Сергей.`
+    await ctx.replyWithPhoto({ source: photo }, {
+        caption: messageJpg,
+        parse_mode: 'HTML' // Опционально, если вы хотите использовать HTML-разметку в подписи
+    });
+    // Отправка видео
+    await ctx.replyWithVideo({ source: video });
 }
 
 module.exports = { handleHelpCommand };

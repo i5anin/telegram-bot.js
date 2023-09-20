@@ -26,11 +26,11 @@ async function notifyUsers(ctx) {
 
         // Формируем сообщение для пользователя
         const { id_task, kolvo_brak, det_name, date } = userActualComments[0]
-        const message = `Пожалуйста, прокомментируйте следующую операцию:`
+        const message = `<b>Пожалуйста, прокомментируйте следующую операцию:</b>`
             + `<code>(1/${userActualComments.length})</code>\n\n`
-            + `Название и обозначение:\n<code>${det_name}</code>\n`
-            + `Брак: <code>${kolvo_brak}</code>\n`
-            + `Дата: <code>${date}</code>\n\n`
+            + `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n`
+            + `<b>Брак:</b> <code>${kolvo_brak}</code>\n`
+            + `<b>Дата:</b> <code>${date}</code>\n\n`
             + `task_ID: <code>${id_task}</code>`
         // Отправляем сообщение
         ctx.session.userComments = userActualComments[0]
@@ -98,29 +98,18 @@ async function notifyAllUsers(ctx) {
         // }
 
         // Формируем текст сообщения
-        const message = `Вам нужно прокомментировать следующую задачу:`
+        const message = `<b>Вам нужно прокомментировать следующую задачу:</b>`
             + `<code>(1/${userComments.length})</code>\n\n`
-            + `Название и обозначение:\n`
+            + `<b>Название и обозначение:</b>\n`
             + `<code>${det_name}</code>\n`
-            + `Брак: <code>${kolvo_brak}</code>\n`
-            + `Дата: <code>${date}</code>\n\n`
+            + `<b>Брак:</b> <code>${kolvo_brak}</code>\n`
+            + `<b>Дата:</b> <code>${date}</code>\n\n`
             + `<code>Cron</code> task_ID: <code>${id_task}</code>\n`;
 
         // Пытаемся отправить сообщение
         try {
             await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' });
             console.log(`Cron Сообщение отправлено на chatId: ${chatId}`);
-
-            // await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Сообщение отправлено на chatId: <code>${chatId}</code>`, { parse_mode: 'HTML' });
-
-            // Запоминаем, что сообщение отправлено этому пользователю по данной задаче
-            // if (!ctx.session.sentMessages) {
-            //     ctx.session.sentMessages = [];
-            // }
-            // ctx.session.sentMessages.push(id_task);
-
-            // Сбрасываем флаги сессии и устанавливаем ожидание комментария только для тех, кому было отправлено сообщение
-            // ctx.session[chatId] = { isAwaitingComment: true };
 
             await sleep(2000); // Задержка на 5 секунд
         } catch (error) { // Если возникает ошибка при отправке
@@ -131,14 +120,6 @@ async function notifyAllUsers(ctx) {
         sentTaskIds.push(id_task);
     }
 }
-
-
-// Функция для сброса флагов сессии
-// function resetFlags(ctx) {
-//     ctx.session.isAwaitFio = false;
-//     ctx.session.isAwaitComment = false;
-//     ctx.session.userInitiated = false;
-// }
 
 // Экспортируем функции
 module.exports = { notifyUsers, notifyAllUsers }
