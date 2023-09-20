@@ -43,7 +43,7 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`, `type`, `kolvo_brak`, `comments_otk`, `comments_op`, 'sent' FROM `sk_comments` WHERE `answered` = 0")) {
+if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`, `type`, `kolvo_brak`, `comments_otk`, `comments_op`, `sent` FROM `sk_comments` WHERE `answered` = 0")) {
     $stmt->execute();
     $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type, $kolvo_brak, $comments_otk, $comments_op, $sent);
 

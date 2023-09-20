@@ -117,9 +117,16 @@ async function notifyAllUsers(ctx) {
         // Если у пользователя нет комментариев, пропустить итерацию
         if (userComments.length === 0) continue
 
-        // Извлекаем данные из первого комментария
-        const { id_task, kolvo_brak, det_name, date } = userComments[0]
+        // Формируем сообщение для пользователя
+        const { id_task, kolvo_brak, det_name, date, specs_nom_id, type } = userActualComments[0]
 
+        const typeMapping = {
+            'ПО': 'Пооперационный контроль окончательный',
+            'ПН': 'Пооперационный контроль неокончательный',
+            'УО': 'Контроль перед упаковкой окончательный',
+            'УН': 'Контроль перед упаковкой неокончательный',
+        }
+        const typeString = typeMapping[type] || 'Неизвестный тип'
         // Проверяем, отправлялось ли сообщение этому пользователю ранее по этой задаче
         if (sentTaskIds.includes(id_task)) {
             console.log(`Сообщение для id_task ${id_task} уже отправлено на chatId: ${chatId}`)
@@ -129,11 +136,13 @@ async function notifyAllUsers(ctx) {
         // Формируем текст сообщения
         const message = `<b>Пожалуйста, прокомментируйте следующую операцию:</b>`
             + `<code>(1/${userComments.length})</code>\n\n`
-            + `<b>Название и обозначение:</b>\n`
-            + `<code>${det_name}</code>\n`
+            + `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n`
             + `<b>Брак:</b> <code>${kolvo_brak}</code>\n`
+            + `<b>Контроль:</b> <code>${typeString}</code>\n`
+            + `<b>Партия:</b> <code>${specs_nom_id}</code>\n`
             + `<b>Дата:</b> <code>${date}</code>\n\n`
             + `<code>Cron</code> task_ID: <code>${id_task}</code>\n`
+            + `<i>необходимо прокомментировать через "ответить" на это сообщение</i>`
 
         // Пытаемся отправить сообщение
         try {
