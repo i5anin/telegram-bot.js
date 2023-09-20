@@ -57,6 +57,21 @@ async function notifyUsers(ctx) {
         // console.log('ctx.session.id_task = ', ctx.session.id_task)
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
 
+        // Выполняем HTTP-запрос для обновления статуса задачи
+        const updateUrl = `${WEB_API}/comment/update.php?id_task=${id_task}&sent=1&access_key=${SECRET_KEY}`
+        console.log('updateUrl = ', updateUrl)
+        try {
+            const response = await fetch(updateUrl) // или await axios.get(updateUrl);
+            if (response.ok) {
+                console.log('Task status updated successfully')
+            } else {
+                console.log('Failed to update task status:', response.status)
+            }
+        } catch (error) {
+            console.log('Error while updating task status:', error)
+        }
+
+
         // Увеличиваем счетчик сообщений
         stateCounter.message++
 
@@ -118,7 +133,7 @@ async function notifyAllUsers(ctx) {
         // }
 
         // Формируем текст сообщения
-        const message = `<b>Вам нужно прокомментировать следующую задачу:</b>`
+        const message = `<b>Пожалуйста, прокомментируйте следующую операцию:</b>`
             + `<code>(1/${userComments.length})</code>\n\n`
             + `<b>Название и обозначение:</b>\n`
             + `<code>${det_name}</code>\n`
