@@ -39,6 +39,7 @@ function resetFlags(ctx) {
     ctx.session.isAwaitFio = false
     ctx.session.isAwaitComment = false
     ctx.session.userInitiated = false
+    ctx.session.isUserInitiated = false
 }
 
 
@@ -74,9 +75,10 @@ bot.command(['start', 'reg'], async (ctx) => {
 })
 
 bot.command('new_comment', async (ctx) => {
-    resetFlags(ctx)
-    await notifyUsers(ctx)
-})
+    resetFlags(ctx);
+    ctx.session.isUserInitiated = true;  // Устанавливаем флаг в сессии
+    await notifyUsers(ctx);
+});
 bot.command('new_comment_all', async (ctx) => {
     resetFlags(ctx)
     await notifyAllUsers(ctx)

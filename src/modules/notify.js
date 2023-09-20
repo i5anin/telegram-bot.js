@@ -39,6 +39,7 @@ function formatMessage(comment, total) {
     };
     const { id_task, kolvo_brak, det_name, date, specs_nom_id, type } = comment;
     const typeString = typeMapping[type] || 'Неизвестный тип';
+
     return `<b>Пожалуйста, прокомментируйте следующую операцию:</b><code>(1/${total})</code>\n\n` +
         `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
         `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
@@ -51,7 +52,6 @@ function formatMessage(comment, total) {
 // Первая функция
 
 async function notifyAllUsers(ctx) {
-    await sendToLog(ctx)
     const allComments = await fetchComments();
     const data = await fetchData(`${WEB_API}/comment/get_all.php?key=${SECRET_KEY}`);
     const user_ids = [...new Set(data.comments.map(comment => comment.user_id))];
@@ -69,19 +69,31 @@ async function notifyAllUsers(ctx) {
 // Вторая функция
 
 async function notifyUsers(ctx) {
-    await sendToLog(ctx)
     const chatId = ctx.message.chat.id;
-    const uncommentedTasks = await fetchComments(chatId);
-    if (!uncommentedTasks || uncommentedTasks.length === 0) {
-        return sendMessage(chatId, 'Пустые комментарии не найдены.');
+    const isUserInitiated = ctx.session.isUserInitiated || false; // Получаем флаг из сессии
+    try {
+        // Получаем список некомментированных задач для данного пользователя
+        const uncommentedTasks = await fetchComments(chatId);
+        if (!uncommentedTasks || uncommentedTasks.length === 0) {
+            if (isUserInitiated) {
+                ctx.session.isUserInitiated = false; // Сбрасываем флаг
+                return sendMessage(chatId, 'Пустые комментарии не найдены.');
+            }
+            return;
+        }
+
+        const userActualComments = uncommentedTasks.filter(({ user_id }) => user_id === chatId);
+        if (userActualComments.length === 0) return;
+
+        const message = formatMessage(userActualComments[0], userActualComments.length);
+        sendMessage(chatId, message);
+
+        await updateTaskStatus(userActualComments[0].id_task);
+        ctx.session.isUserInitiated = false; // Сбрасываем флаг
+    } catch (error) {
+        console.log('Error in notifyUsers:', error);
+        await sendMessage(LOG_CHANNEL_ID, `<code>${error}</code>`);
     }
-
-    const userActualComments = uncommentedTasks.filter(({ user_id }) => user_id === chatId);
-    if (userActualComments.length === 0) return;
-
-    const message = formatMessage(userActualComments[0], userActualComments.length);
-    sendMessage(chatId, message);
-    updateTaskStatus(userActualComments[0].id_task);
 }
 
 
