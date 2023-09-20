@@ -200,16 +200,27 @@ bot.on('left_chat_member', async (ctx) => {
     await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
 })
 
-// Отслеживаем новые сообщения на канале
-bot.on('channel_post', (ctx) => {
-    console.log('Новое сообщение на канале: ', ctx.update.channel_post);
-});
-
-// Отслеживаем редактированные сообщения на канале
-bot.on('edited_channel_post', (ctx) => {
-    console.log('Редактированное сообщение на канале: ', ctx.update.edited_channel_post);
-});
-
+// // Отслеживаем новые сообщения на канале
+// bot.on('channel_post', async (ctx) => {
+//     const channelTitle = ctx.chat.title || 'Неназванный канал';
+//     const messageId = ctx.message.message_id;
+//     const text = ctx.message.text || 'N/A';
+//     const date = new Date(ctx.message.date * 1000); // Дата сообщения
+//
+//     const message = `📢 Новое сообщение на канале <code>${channelTitle}</code>\nMessage ID: <code>${messageId}</code>\nТекст: <code>${text}</code>\nДата: <code>${date.toISOString()}</code>`;
+//     await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
+// });
+//
+// // Отслеживаем редактированные сообщения на канале
+// bot.on('edited_channel_post', async (ctx) => {
+//     const channelTitle = ctx.chat.title || 'Неназванный канал';
+//     const messageId = ctx.message.message_id;
+//     const editedText = ctx.message.text || 'N/A';
+//     const editDate = new Date(ctx.message.edit_date * 1000); // Дата редактирования
+//
+//     const message = `📝 Редактированное сообщение на канале <code>${channelTitle}</code>\nMessage ID: <code>${messageId}</code>\nОтредактированный текст: <code>${editedText}</code>\nДата редактирования: <code>${editDate.toISOString()}</code>`;
+//     await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
+// });
 
 
 // Инициализация cron-заданий

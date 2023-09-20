@@ -2,7 +2,7 @@
 const axios = require('axios')
 const ruLang = require('#src/utils/ru_lang')  // Локализация сообщений
 const { sendToLog } = require('#src/utils/admin') // Добавление лога
-const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
+// const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
 
 // Функция для проверки, зарегистрирован ли пользователь на сервере
 async function checkRegistration(chatId) {

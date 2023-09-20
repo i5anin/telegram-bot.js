@@ -4,9 +4,9 @@ const { notifyAllUsers } = require('#src/modules/notify')  // Уведомлен
 const { oplataNotification } = require('#src/modules/oplata') // Добавлени
 
 function initCronJobs() {
-    // Уведомлять о сообщениях каждые 60 мин
-    cron.schedule('0 7-20 * * *', async (ctx) => {
-        console.log('Оповещение. Running a task every hour from 7 to 20')
+    // Уведомлять о сообщениях каждые 15 мин
+    cron.schedule('*/15 * * * *', async (ctx) => {
+        console.log('Оплата. Running a task every 15 minutes');
         await notifyAllUsers(ctx)
     })
 

@@ -1,7 +1,9 @@
 const fs = require('fs');
-const { message } = require('telegraf/filters')
+// const { message } = require('telegraf/filters')
+const { sendToLog } = require('#src/utils/admin')
 
 async function handleHelpCommand(ctx) {
+    await sendToLog(ctx)
     // Отправка фото из файла с подписью (caption)
     const photo = fs.createReadStream('src/media/answer.jpg');
     const video = fs.createReadStream('src/media/answer.mp4');
