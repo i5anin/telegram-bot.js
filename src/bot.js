@@ -50,10 +50,10 @@ global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
 global.SECRET_KEY = process.env.SECRET_KEY
 global.DIR_OPLATA = process.env.DIR_OPLATA
 global.emoji = {
-    x: "&#10060;", //❌
-    warning: "&#x26A0;", //⚠️
-    ok:"&#9989;", //✅
-    error: "&#10071;", //❗
+    x: '&#10060;', //❌
+    warning: '&#x26A0;', //⚠️
+    ok: '&#9989;', //✅
+    error: '&#10071;', //❗
 }
 global.bot = bot
 global.stateCounter = {
@@ -93,7 +93,7 @@ bot.command('msg', async (ctx) => handleMsgCommand(ctx))
 
 const getExternalUsers = async () => {
     try {
-        const response = await axios.get('https://bot.pf-forum.ru/api/users/get_all_fio.php')
+        const response = await axios.get(WEB_API + '/users/get_all_fio.php')
         return response.data.users_data
     } catch (error) {
         console.error('Ошибка при получении данных с внешнего API:', error)

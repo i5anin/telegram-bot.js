@@ -1,9 +1,10 @@
 const fs = require('fs');
 async function handleHelpCommand(ctx) {
+    // https://imgbb.su/image/0bD7OR
     // sendToLog(ctx);
 
     // Отправка фото из файла
-    const photo = fs.createReadStream('./img/img.jpg');
+    const photo = fs.createReadStream('src/img/answer.jpg');
     await ctx.replyWithPhoto({ source: photo });
 
     // Отправка текста
