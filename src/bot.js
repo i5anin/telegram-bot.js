@@ -6,14 +6,13 @@ const LocalSession = require('telegraf-session-local')
 
 // Импорт модулей
 const axios = require('axios')
-const { handleTextCommand } = require('#src/modules/text')
+const { initCronJobs } = require('#src/modules/cron')
 const { handleRegComment } = require('#src/modules/reg')
+const { handleTextCommand } = require('#src/modules/text')
+const { handleHelpCommand } = require('#src/modules/help')
+const { oplataNotification } = require('#src/modules/oplata') 
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
-const { handleAddComment } = require('#src/modules/comment')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
-const { handleHelpCommand } = require('#src/modules/help') // Добавлени
-const { initCronJobs } = require('#src/modules/cron') // Добавлени
-const { oplataNotification } = require('#src/modules/oplata') // Добавлени
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -65,7 +64,7 @@ global.stateCounter = {
 
 
 // Случайный номер экземпляра
-const instanceNumber = Math.floor(Math.random() * 9000) + 1000;
+const instanceNumber = Math.floor(Math.random() * 9000) + 1000
 console.log('! Номер запущенного экземпляра : ' + instanceNumber)
 
 // Обработчики команд

@@ -35,7 +35,7 @@ async function notifyUsers(ctx) {
         // Отправляем сообщение
         ctx.session.userComments = userActualComments[0]
         ctx.session.id_task = id_task
-        console.log('ctx.session.id_task = ', ctx.session.id_task)
+        // console.log('ctx.session.id_task = ', ctx.session.id_task)
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
 
         // Увеличиваем счетчик сообщений
