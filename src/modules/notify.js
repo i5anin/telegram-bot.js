@@ -59,7 +59,6 @@ async function notifyUsers(ctx) {
 
         // Выполняем HTTP-запрос для обновления статуса задачи
         const updateUrl = `${WEB_API}/comment/update.php?id_task=${id_task}&sent=1&access_key=${SECRET_KEY}`
-        console.log('updateUrl = ', updateUrl)
         try {
             const response = await fetch(updateUrl) // или await axios.get(updateUrl);
             if (response.ok) {
@@ -111,8 +110,8 @@ async function notifyAllUsers(ctx) {
     // Проходим по каждому идентификатору чата
     for (const chatId of user_ids) {
 
-        // Фильтруем комментарии для данного пользователя
-        const userComments = allComments.filter(comment => comment.user_id === chatId)
+        // Находим первый комментарий для данного пользователя, где sent === 0
+        const userComment = allComments.find(comment => comment.user_id === chatId && comment.sent === 0);
 
         // Если у пользователя нет комментариев, пропустить итерацию
         if (userComments.length === 0) continue
@@ -150,6 +149,19 @@ async function notifyAllUsers(ctx) {
             console.log(`Cron Сообщение отправлено на chatId: ${chatId}`)
 
             await sleep(2000) // Задержка на 5 секунд
+
+            const updateUrl = `${WEB_API}/comment/update.php?id_task=${id_task}&sent=1&access_key=${SECRET_KEY}`
+            try {
+                const response = await fetch(updateUrl) // или await axios.get(updateUrl);
+                if (response.ok) {
+                    console.log('Task status updated successfully')
+                } else {
+                    console.log('Failed to update task status:', response.status)
+                }
+            } catch (error) {
+                console.log('Error while updating task status:', error)
+            }
+
         } catch (error) { // Если возникает ошибка при отправке
             console.error(`Failed to send message to chatId: ${chatId}`, error)
             // Отправляем уведомление в канал логирования
