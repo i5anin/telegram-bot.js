@@ -126,12 +126,6 @@ async function notifyAllUsers(ctx) {
             continue
         }
 
-        // Проверяем, отправлялось ли сообщение этому пользователю ранее по этой задаче
-        // if (ctx.session.sentMessages && ctx.session.sentMessages.includes(id_task)) {
-        //     console.log(`Сообщение для id_task ${id_task} уже отправлено на chatId: ${chatId}`);
-        //     continue; // Пропустить, если сообщение уже отправлялось
-        // }
-
         // Формируем текст сообщения
         const message = `<b>Пожалуйста, прокомментируйте следующую операцию:</b>`
             + `<code>(1/${userComments.length})</code>\n\n`
