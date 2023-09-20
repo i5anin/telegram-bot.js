@@ -11,7 +11,7 @@ async function oplataNotification() {
             let payments = response.data.payments
 
             // Сортируем платежи по дате в порядке убывания
-            const sortedPayments = payments.sort((a, b) => new Date(b.date) - new Date(a.date));
+            const sortedPayments = payments.sort((a, b) => new Date(b.date) - new Date(a.date))
 
             // Разбиваем массив платежей на подмассивы размером BATCH_SIZE
             let batches = []
@@ -19,14 +19,11 @@ async function oplataNotification() {
                 batches.push(sortedPayments.slice(i, i + BATCH_SIZE))
             }
 
-            const ADMIN_IDS = [
-                LOG_CHANNEL_ID,
-                DIR_OPLATA,
-            ]
+            const ADMIN_IDS = [OPLATA_GROUP, DIR_OPLATA]
 
             for (let batch of batches) {
                 // Формируем сообщение для администратора
-                let message = 'Отчет по оплате:\n'
+                let message = 'Отчет по оплате:\n--------------------'
                 let sentIds = []
 
                 batch.forEach((payment) => {
@@ -34,10 +31,10 @@ async function oplataNotification() {
                     const [year, month, day] = payment.date.split('-')
                     const formattedDate = `${day}.${month}.${year}`
 
-                    message += `Дата: <code>${formattedDate}</code>\n`
-                    message += `Имя клиента: <code>${payment.client_name}</code>\n`
-                    message += `Сумма: <code>${formattedSum} руб</code>\n`
-                    message += `Информация: <code>${payment.info}</code>\n`
+                    message += `<b>Дата:</b> <code>${formattedDate}</code>\n`
+                    message += `<b>Имя клиента:</b> <code>${payment.client_name}</code>\n`
+                    message += `<b>Сумма:</b> <code>${formattedSum} руб</code>\n`
+                    message += `<b>Информация:</b> <code>${payment.info}</code>\n`
                     message += '--------------------\n'
 
                     sentIds.push(payment.id)

@@ -10,7 +10,7 @@ const { initCronJobs } = require('#src/modules/cron')
 const { handleRegComment } = require('#src/modules/reg')
 const { handleTextCommand } = require('#src/modules/text')
 const { handleHelpCommand } = require('#src/modules/help')
-const { oplataNotification } = require('#src/modules/oplata') 
+const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
 
@@ -51,9 +51,9 @@ global.DIR_OPLATA = process.env.DIR_OPLATA
 global.OPLATA_GROUP = process.env.OPLATA_GROUP
 global.emoji = {
     x: '&#10060;', //❌
-    warning: '&#x26A0;', //⚠️
     ok: '&#9989;', //✅
     error: '&#10071;', //❗
+    warning: '&#x26A0;', //⚠️
 }
 global.bot = bot
 global.stateCounter = {
@@ -69,12 +69,8 @@ console.log('! Номер запущенного экземпляра : ' + inst
 
 // Обработчики команд
 bot.command(['start', 'reg'], async (ctx) => {
-    try {
-        resetFlags(ctx)
-        await handleRegComment(ctx, ctx.session.isAwaitFio = true)
-    } catch (error) {
-        console.error('Error in handleRegComment:', error)
-    }
+    resetFlags(ctx)
+    await handleRegComment(ctx, ctx.session.isAwaitFio = true)
 })
 
 bot.command('new_comment', async (ctx) => {
@@ -86,10 +82,12 @@ bot.command('new_comment_all', async (ctx) => {
     await notifyAllUsers(ctx)
 })
 
-bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 bot.command('help', handleHelpCommand)
+
 bot.command('oplata', oplataNotification)
+
 bot.command('msg', async (ctx) => handleMsgCommand(ctx))
+bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
 
 const getExternalUsers = async () => {
     try {
@@ -100,20 +98,6 @@ const getExternalUsers = async () => {
         return []
     }
 }
-
-async function sendMessage(ctx, chatId, messageText) {
-    if (!messageText || messageText.trim() === '') {
-        console.warn('Cannot send empty message')
-        return
-    }
-
-    try {
-        await ctx.telegram.sendMessage(chatId, messageText)
-    } catch (error) {
-        console.error(`Error sending message to chat_id: ${chatId}`, error)
-    }
-}
-
 
 async function generateReport(ctx, chatId) {
     // Локальные переменные для CSV отчета
@@ -215,6 +199,17 @@ bot.on('left_chat_member', async (ctx) => {
 
     await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
 })
+
+// Отслеживаем новые сообщения на канале
+bot.on('channel_post', (ctx) => {
+    console.log('Новое сообщение на канале: ', ctx.update.channel_post);
+});
+
+// Отслеживаем редактированные сообщения на канале
+bot.on('edited_channel_post', (ctx) => {
+    console.log('Редактированное сообщение на канале: ', ctx.update.edited_channel_post);
+});
+
 
 
 // Инициализация cron-заданий
