@@ -43,9 +43,9 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`, `type`, `kolvo_brak`, `comments_otk`, `comments_op` FROM `sk_comments` WHERE `sent` = 0")) {
+if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`, `type`, `kolvo_brak`, `comments_otk`, `comments_op`, 'sent' FROM `sk_comments` WHERE `answered` = 0")) {
     $stmt->execute();
-    $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type, $kolvo_brak, $comments_otk, $comments_op);
+    $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type, $kolvo_brak, $comments_otk, $comments_op, $sent);
 
     $comments = [];
     while ($stmt->fetch()) {
@@ -57,8 +57,9 @@ if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id
             'det_name' => $det_name,
             'type' => $type,
             'kolvo_brak' => $kolvo_brak,
-            'comments_otk' => $comments_otk,  // добавлено
-            'comments_op' => $comments_op  // добавлено
+            'comments_otk' => $comments_otk,
+            'comments_op' => $comments_op,
+            'sent' => $sent,
         ];
     }
 
