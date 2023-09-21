@@ -1,6 +1,5 @@
 ```mermaid
 graph TD
-graph TD
     bot --> cron
     bot --> reg
     bot --> text
