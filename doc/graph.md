@@ -1,5 +1,6 @@
 ```mermaid
 graph TD
+graph TD
     bot --> cron
     bot --> reg
     bot --> text
@@ -8,18 +9,21 @@ graph TD
     bot --> notify
     bot --> admin
 
-    cron --> initCronJobs[initCronJobs]
+    cron --> notify[notifyAllUsers]
+    cron --> oplata[oplataNotification]
 
-    reg --> handleRegComment[handleRegComment]
+    reg --> admin[sendToLog]
 
-    text --> handleTextCommand[handleTextCommand]
+    text --> helpers[fetchData]
+    text --> notify[notifyUsers]
+    text --> comment[handleAddComment]
+    text --> admin[sendToLog]
 
-    help --> handleHelpCommand[handleHelpCommand]
+    help --> admin[sendToLog]
 
-    oplata --> oplataNotification[oplataNotification]
-
-    notify --> notifyUsers[notifyUsers]
-    notify --> notifyAllUsers[notifyAllUsers]
+    notify --> helpers[fetchData]
+    notify --> comment[fetchComments]
+    notify --> admin[sendToLog]
 
     admin --> handleStatusCommand[handleStatusCommand]
     admin --> handleMsgCommand[handleMsgCommand]
