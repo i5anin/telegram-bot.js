@@ -14,7 +14,7 @@ async function checkRegistration(chatId) {
             fio: response.data.fio,
         }
     } catch (error) {
-        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `\n<code>${error}</code>`, { parse_mode: 'HTML' })
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `reg <code>${error}</code>`, { parse_mode: 'HTML' })
         return { exists: false, fio: null }
     }
 }

@@ -77,7 +77,7 @@ async function handleAddComment(ctx) {
                 `Ошибка при добавлении комментария:\n${error}`,
                 { parse_mode: 'HTML' },
             )
-            console.log('Axios Error:', error, error.response && error.response.data)
+            console.log('Comment Axios Error:', error, error.response && error.response.data)
         }
     } else {
         console.log('Invalid task_ID format or missing detName in the reply message!')

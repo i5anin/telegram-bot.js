@@ -10,9 +10,9 @@ const { sendToLog } = require('#src/utils/log')
 async function sendMessage(chatId, message) {
     try {
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
-        console.log(`Message sent to chatId: ${chatId}`)
+        console.log(`Notify Message sent to chatId: ${chatId}`)
     } catch (error) {
-        console.error(`Failed to send message to chatId: ${chatId}`, error)
+        console.error(`Notify Failed to send message to chatId: ${chatId}`, error)
     }
 }
 
@@ -21,12 +21,12 @@ async function updateTaskStatus(id_task) {
     try {
         const response = await fetch(updateUrl)
         if (response.ok) {
-            console.log('Task status updated successfully')
+            console.log('Notify Task status updated successfully')
         } else {
-            console.log('Failed to update task status:', response.status)
+            console.log('Notify Failed to update task status:', response.status)
         }
     } catch (error) {
-        console.log('Error while updating task status:', error)
+        console.log('Notify Error while updating task status:', error)
     }
 }
 
@@ -55,7 +55,7 @@ function formatMessage(comment, total) {
 
 async function notifyAllUsers() {
     const allComments = await fetchComments()
-    const data = await fetchData(`${WEB_API} / comment / get_all.php ? key =${SECRET_KEY}`)
+    const data = await fetchData(`${WEB_API}/comment/get_all.php?key=${SECRET_KEY}`)
     const user_ids = [...new Set(data.comments.map(comment => comment.user_id))]
 
     for (const chatId of user_ids) {
@@ -94,8 +94,8 @@ async function notifyUsers(ctx) {
         await updateTaskStatus(userActualComments[0].id_task)
         ctx.session.isUserInitiated = false // Сбрасываем флаг
     } catch (error) {
-        console.log('Error in notifyUsers:', error)
-        await sendMessage(LOG_CHANNEL_ID, ` < code >${error} < /code>`)
+        console.log('Notify Error in notifyUsers:', error)
+        await sendMessage(LOG_CHANNEL_ID, `Notify <code>${error} </code>`)
     }
 }
 
