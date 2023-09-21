@@ -1,7 +1,7 @@
 // Импортируем необходимые функции
 const fetchData = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
-const { sendToLog } = require('#src/utils/admin')
+const { sendToLog } = require('#src/utils/log')
 
 
 // Функция для уведомления одного пользователя о некомментированных задачах

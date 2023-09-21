@@ -23,7 +23,7 @@ async function oplataNotification() {
 
             for (let batch of batches) {
                 // Формируем сообщение для администратора
-                let message = 'Отчет по оплате:\n--------------------'
+                let message = 'Отчет по оплате:\n--------------------\n'
                 let sentIds = []
 
                 batch.forEach((payment) => {
