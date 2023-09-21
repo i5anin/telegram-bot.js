@@ -80,16 +80,16 @@ const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDate
 const updateBotURL = `${WEB_API}/bot/update.php?key=${SECRET_KEY}&date=${encodeURIComponent(formattedDateTime)}&random_key=${instanceNumber}`;
 
 // URL для начальной регистрации бота
-const startBotURL = `${WEB_API}/bot/start.php?key=${SECRET_KEY}`;
+// const startBotURL = `${WEB_API}/bot/start.php?key=${SECRET_KEY}`;
 
 // Отправка данных при запуске бота
-axios.get(startBotURL)
-    .then(response => {
-        console.log('Bot start data registered successfully:', response.data);
-    })
-    .catch(error => {
-        console.error('Error registering bot start data:', error);
-    });
+// axios.get(startBotURL)
+//     .then(response => {
+//         console.log('Bot start data registered successfully:', response.data);
+//     })
+//     .catch(error => {
+//         console.error('Error registering bot start data:', error);
+//     });
 
 
 console.log(`! Номер запущенного экземпляра : ${instanceNumber} Время запуска [${currentDateTime}]`)
