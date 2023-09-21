@@ -51,10 +51,8 @@ global.SECRET_KEY = process.env.SECRET_KEY
 global.DIR_OPLATA = process.env.DIR_OPLATA
 global.OPLATA_GROUP = process.env.OPLATA_GROUP
 global.emoji = {
-    x: '&#10060;', //❌
-    ok: '&#9989;', //✅
-    error: '&#10071;', //❗
-    warning: '&#x26A0;', //⚠️
+    x: '&#10060;', ok: '&#9989;',  //❌ //✅
+    error: '&#10071;', warning: '&#x26A0;', //❗ //⚠️
 }
 global.bot = bot
 global.stateCounter = {
