@@ -1,51 +1,26 @@
 ```mermaid
 graph TD
-    bot --> cronNode
-    bot --> regNode
-    bot --> textNode
-    bot --> helpNode
-    bot --> oplataNode
-    bot --> notifyNode
-    bot --> adminNode
+    bot --> cron
+    bot --> reg
+    bot --> text
+    bot --> help
+    bot --> oplata
+    bot --> notify
+    bot --> admin
 
-    subgraph botDeps["bot dependencies"]
-        bot --> initCronJobs[initCronJobs]
-        bot --> handleRegComment[handleRegComment]
-        bot --> handleTextCommand[handleTextCommand]
-        bot --> handleHelpCommand[handleHelpCommand]
-        bot --> oplataNotification[oplataNotification]
-        bot --> notifyUsers[notifyUsers]
-        bot --> notifyAllUsers[notifyAllUsers]
-        bot --> handleStatusCommand[handleStatusCommand]
-        bot --> handleMsgCommand[handleMsgCommand]
-    end
+    cron --> initCronJobs[initCronJobs]
 
-    subgraph cronDeps["cron dependencies"]
-        cronNode --> cronModule["#src/modules/cron"]
-    end
+    reg --> handleRegComment[handleRegComment]
 
-    subgraph regDeps["reg dependencies"]
-        regNode --> regModule["#src/modules/reg"]
-    end
+    text --> handleTextCommand[handleTextCommand]
 
-    subgraph textDeps["text dependencies"]
-        textNode --> textModule["#src/modules/text"]
-    end
+    help --> handleHelpCommand[handleHelpCommand]
 
-    subgraph helpDeps["help dependencies"]
-        helpNode --> helpModule["#src/modules/help"]
-    end
+    oplata --> oplataNotification[oplataNotification]
 
-    subgraph oplataDeps["oplata dependencies"]
-        oplataNode --> oplataModule["#src/modules/oplata"]
-    end
+    notify --> notifyUsers[notifyUsers]
+    notify --> notifyAllUsers[notifyAllUsers]
 
-    subgraph notifyDeps["notify dependencies"]
-        notifyNode --> notifyModule["#src/modules/notify"]
-    end
-
-    subgraph adminDeps["admin dependencies"]
-        adminNode --> adminUtil["#src/utils/admin"]
-    end
-
+    admin --> handleStatusCommand[handleStatusCommand]
+    admin --> handleMsgCommand[handleMsgCommand]
 ```
