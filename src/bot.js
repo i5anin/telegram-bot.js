@@ -52,6 +52,7 @@ global.SECRET_KEY = process.env.SECRET_KEY
 global.DIR_OPLATA = process.env.DIR_OPLATA
 global.OPLATA_GROUP = process.env.OPLATA_GROUP
 global.OPLATA_REPORT_ACTIVE = process.env.OPLATA_REPORT_ACTIVE //OPLATA_REPORT_ACTIVE = true;
+global.MODE = process.env.NODE_ENV || 'development'  // Если NODE_ENV не определен, по умолчанию используется 'development'
 global.emoji = {
     x: '&#10060;', ok: '&#9989;',  //❌ //✅
     error: '&#10071;', warning: '&#x26A0;', //❗ //⚠️
@@ -72,29 +73,27 @@ global.stateCounter = {
 
 // Случайный номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 9000) + 1000
-
 const currentDateTime = new Date()
-const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDateTime.getMonth() + 1).padStart(2, '0')}-${String(currentDateTime.getDate()).padStart(2, '0')} ${String(currentDateTime.getHours()).padStart(2, '0')}:${String(currentDateTime.getMinutes()).padStart(2, '0')}:${String(currentDateTime.getSeconds()).padStart(2, '0')}`
 
+if (global.MODE === 'build') {
+    const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDateTime.getMonth() + 1).padStart(2, '0')}-${String(currentDateTime.getDate()).padStart(2, '0')} ${String(currentDateTime.getHours()).padStart(2, '0')}:${String(currentDateTime.getMinutes()).padStart(2, '0')}:${String(currentDateTime.getSeconds()).padStart(2, '0')}`
 // URL для регулярного обновления данных о боте
-const updateBotURL = `${WEB_API}/bot/update.php?key=${SECRET_KEY}&date=${encodeURIComponent(formattedDateTime)}&random_key=${instanceNumber}`;
-
-// URL для начальной регистрации бота
-// const startBotURL = `${WEB_API}/bot/start.php?key=${SECRET_KEY}`;
+    const updateBotURL = `${WEB_API}/bot/update.php?key=${SECRET_KEY}&date=${encodeURIComponent(formattedDateTime)}&random_key=${instanceNumber}`
 
 // Отправка данных при запуске бота
-// axios.get(startBotURL)
-//     .then(response => {
-//         console.log('Bot start data registered successfully:', response.data);
-//     })
-//     .catch(error => {
-//         console.error('Error registering bot start data:', error);
-//     });
-
+    axios.get(updateBotURL)
+        .then(response => {
+            console.log('Данные о запуске бота успешно зарегистрированы:', response.data)
+        })
+        .catch(error => {
+            console.error('Ошибка регистрации стартовых данных бота:', error)
+        })
+}
 
 console.log(`! Номер запущенного экземпляра : ${instanceNumber} Время запуска [${currentDateTime}]`)
 console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
-bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
+console.log('MODE =', MODE)
+// bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
 
 // Обработчики команд
 bot.command(['start', 'reg'], async (ctx) => {
@@ -128,4 +127,4 @@ bot.on('left_chat_member', logLeftChatMember)
 bot.launch().catch((err) => console.error('Fatal Error! Error while launching the bot:', err))
 
 // Инициализация cron-заданий
-initCronJobs()
+initCronJobs(currentDateTime, instanceNumber)

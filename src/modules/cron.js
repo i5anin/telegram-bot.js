@@ -4,10 +4,10 @@ const cron = require('node-cron')
 const { notifyAllUsers } = require('#src/modules/notify')  // Уведомления пользователя
 const { oplataNotification } = require('#src/modules/oplata') // Добавлени
 
-function initCronJobs() {
+function initCronJobs(currentDateTime, instanceNumber) {
     // Уведомлять о сообщениях каждые 15 мин
     cron.schedule('*/15 * * * *', async (ctx) => {
-        console.log('notifyAllUsers Running a task every 15 minutes');
+        console.log('notifyAllUsers Running a task every 15 minutes')
         await notifyAllUsers(ctx)
     })
 
@@ -17,32 +17,35 @@ function initCronJobs() {
         await oplataNotification()
     })
 
-    const checkAndUpdateBotData = `${WEB_API}/bot/start.php?key=${SECRET_KEY}`;
-    cron.schedule('*/10 * * * *', () => {  // Каждые 10 минут
-        axios.get(checkAndUpdateBotData)
-            .then(response => {
-                if (response.data && response.data.latest_entry) {
-                    const latestEntry = response.data.latest_entry;
+    if (global.MODE === 'build') {
+        // Проверка экземпляра
+        cron.schedule('*/10 * * * * *', async () => {
+            console.log(' Проверка экземпляра. 30 сек')
+            const checkAndUpdateBotData = `${WEB_API}/bot/check.php?key=${SECRET_KEY}`
 
-                    // Проверка date и random_key
-                    if (latestEntry.date !== formattedDateTime || latestEntry.random_key !== instanceNumber) {
-                        // Отправка сообщения в LOG_CHANNEL_ID
-                        bot.telegram.sendMessage(LOG_CHANNEL_ID, `Mismatch detected!\nExpected date: ${formattedDateTime}\nReceived date: ${latestEntry.date}\nExpected random_key: ${instanceNumber}\nReceived random_key: ${latestEntry.random_key}`, { parse_mode: 'HTML' })
+            axios.get(checkAndUpdateBotData)
+                .then(response => {
+                    console.log('Данные о актуальном экземляре:', response.data.latest_entry)
 
-                        // Завершение работы бота
-                        bot.stop('Mismatch detected! Stopping the bot.');
-                    } else {
-                        console.log('Bot data is consistent:', response.data);
+                    // Получаем текущую дату и время
+                    const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDateTime.getMonth() + 1).padStart(2, '0')}-${String(currentDateTime.getDate()).padStart(2, '0')} ${String(currentDateTime.getHours()).padStart(2, '0')}:${String(currentDateTime.getMinutes()).padStart(2, '0')}:${String(currentDateTime.getSeconds()).padStart(2, '0')}`
+                    console.log(formattedDateTime, instanceNumber)
+                    // Случайный номер экземпляра
+
+                    // Проверяем соответствие
+                    if (formattedDateTime !== response.data.latest_entry.date || instanceNumber !== response.data.latest_entry.random_key) {
+                        console.error('Несоответствие данных! Останавливаем бота.')
+                        // Сначала останавливаем бота
+                        bot.stop()
+                        // Затем завершаем весь процесс
+                        process.exit()
                     }
-
-                } else {
-                    console.error('Unexpected data format from server:', response.data);
-                }
-            })
-            .catch(error => {
-                console.error('Error checking bot data:', error);
-            });
-    });
+                })
+                .catch(error => {
+                    console.error('Ошибка данных о актуальном экземляре:', error)
+                })
+        })
+    }
 }
 
 module.exports = { initCronJobs }
