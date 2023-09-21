@@ -1,16 +1,18 @@
 module.exports = {
   apps: [
     {
-      name: 'my-bot', // Уникальное имя для бота
+      name: 'bot-app',
       script: 'bot.js',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
       env: {
-        NODE_ENV: 'build',
-        // NODE_ENV: 'development',
+        NODE_ENV: 'development'
       },
-      env_development: {
-        NODE_ENV: 'build',
-        // NODE_ENV: 'development',
-      },
-    },
-  ],
+      env_production: {
+        NODE_ENV: 'production'
+      }
+    }
+  ]
 };
