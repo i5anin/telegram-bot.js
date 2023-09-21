@@ -63,7 +63,7 @@ async function notifyAllUsers() {
         if (!userComment) continue
 
         const message = formatMessage(userComment, allComments.length)
-        await sendMessage(chatId, message)
+        await sendMessage(chatId, message+"\n<code>Cron</code>")
         await updateTaskStatus(userComment.id_task)
     }
 }
