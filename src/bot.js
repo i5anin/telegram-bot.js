@@ -50,6 +50,7 @@ global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
 global.SECRET_KEY = process.env.SECRET_KEY
 global.DIR_OPLATA = process.env.DIR_OPLATA
 global.OPLATA_GROUP = process.env.OPLATA_GROUP
+global.OPLATA_REPORT_ACTIVE = process.env.OPLATA_REPORT_ACTIVE //OPLATA_REPORT_ACTIVE = true;
 global.emoji = {
     x: '&#10060;', ok: '&#9989;',  //❌ //✅
     error: '&#10071;', warning: '&#x26A0;', //❗ //⚠️
@@ -64,7 +65,10 @@ global.stateCounter = {
 
 // Случайный номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 9000) + 1000
-console.log('! Номер запущенного экземпляра : ' + instanceNumber)
+const currentDateTime = new Date().toLocaleString()
+console.log(`! Номер запущенного экземпляра : ${instanceNumber} Время запуска [${currentDateTime}]`)
+console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
+bot.telegram.sendMessage(LOG_CHANNEL_ID, `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
 
 // Обработчики команд
 bot.command(['start', 'reg'], async (ctx) => {
@@ -84,7 +88,7 @@ bot.command('new_comment_all', async (ctx) => {
 bot.command('help', handleHelpCommand)
 bot.command('oplata', oplataNotification)
 bot.command('msg', async (ctx) => handleMsgCommand(ctx))
-bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber))
+bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber, currentDateTime))
 bot.command('get_group_info', handleGetGroupInfoCommand)
 
 

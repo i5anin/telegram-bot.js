@@ -2,6 +2,8 @@ const axios = require('axios')
 
 async function oplataNotification() {
 
+    if (!OPLATA_REPORT_ACTIVE) return
+
     let e_ADMIN_IDS = null
     const BATCH_SIZE = 10
 

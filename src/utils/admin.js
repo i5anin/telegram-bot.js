@@ -19,8 +19,8 @@ async function handleMsgCommand(ctx) {
 }
 
 // Функция для обработки команды /status
-async function handleStatusCommand(ctx, instanceNumber) {
-    await ctx.reply(`Текущий номер экземпляра: ${instanceNumber}`)
+async function handleStatusCommand(ctx, instanceNumber, currentDateTime) {
+    await ctx.reply(`Номер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`,{ parse_mode: 'HTML' })
 }
 
 module.exports = { handleStatusCommand, handleMsgCommand }
