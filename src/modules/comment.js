@@ -44,10 +44,11 @@ async function handleAddComment(ctx) {
             return
         }
 
-        const comment = comments.find(c => c.id_task == taskID && c.user_id == chatId)
+        const comment = comments.find(c => c.id_task === Number(taskID) && c.user_id === chatId)
 
         if (!comment) {
             await bot.telegram.sendMessage(chatId, 'Ошибка! задача уже прокомментирована')
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Ошибка! задача уже прокомментирована\ntaskID: <code>${taskID}</code>\nchatId: <code>${chatId}</code>`,{ parse_mode: 'HTML' })
             console.log('Не найдено ни одного подходящего комментария') //Не найдено ни одного подходящего комментария на который
             return
         }
