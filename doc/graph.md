@@ -1,14 +1,14 @@
 ```mermaid
 graph TD
-bot --> cron
-bot --> reg
-bot --> text
-bot --> help
-bot --> oplata
-bot --> notify
-bot --> admin
+    bot --> cronNode
+    bot --> regNode
+    bot --> textNode
+    bot --> helpNode
+    bot --> oplataNode
+    bot --> notifyNode
+    bot --> adminNode
 
-    subgraph bot[bot dependencies]
+    subgraph botDeps["bot dependencies"]
         bot --> initCronJobs[initCronJobs]
         bot --> handleRegComment[handleRegComment]
         bot --> handleTextCommand[handleTextCommand]
@@ -20,31 +20,32 @@ bot --> admin
         bot --> handleMsgCommand[handleMsgCommand]
     end
 
-    subgraph cron[cron dependencies]
-        cron --> cronModule["#src/modules/cron"]
+    subgraph cronDeps["cron dependencies"]
+        cronNode --> cronModule["#src/modules/cron"]
     end
 
-    subgraph reg[reg dependencies]
-        reg --> regModule["#src/modules/reg"]
+    subgraph regDeps["reg dependencies"]
+        regNode --> regModule["#src/modules/reg"]
     end
 
-    subgraph text[text dependencies]
-        text --> textModule["#src/modules/text"]
+    subgraph textDeps["text dependencies"]
+        textNode --> textModule["#src/modules/text"]
     end
 
-    subgraph help[help dependencies]
-        help --> helpModule["#src/modules/help"]
+    subgraph helpDeps["help dependencies"]
+        helpNode --> helpModule["#src/modules/help"]
     end
 
-    subgraph oplata[oplata dependencies]
-        oplata --> oplataModule["#src/modules/oplata"]
+    subgraph oplataDeps["oplata dependencies"]
+        oplataNode --> oplataModule["#src/modules/oplata"]
     end
 
-    subgraph notify[notify dependencies]
-        notify --> notifyModule["#src/modules/notify"]
+    subgraph notifyDeps["notify dependencies"]
+        notifyNode --> notifyModule["#src/modules/notify"]
     end
 
-    subgraph admin[admin dependencies]
-        admin --> adminUtil["#src/utils/admin"]
+    subgraph adminDeps["admin dependencies"]
+        adminNode --> adminUtil["#src/utils/admin"]
     end
+
 ```
