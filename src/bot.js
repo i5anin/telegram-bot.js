@@ -54,6 +54,7 @@ global.OPLATA_REPORT_ACTIVE = process.env.OPLATA_REPORT_ACTIVE //OPLATA_REPORT_A
 global.emoji = {
     x: '&#10060;', ok: '&#9989;',  //❌ //✅
     error: '&#10071;', warning: '&#x26A0;', //❗ //⚠️
+    bot: '&#129302;',
 }
 global.bot = bot
 global.stateCounter = {
@@ -68,7 +69,7 @@ const instanceNumber = Math.floor(Math.random() * 9000) + 1000
 const currentDateTime = new Date().toLocaleString()
 console.log(`! Номер запущенного экземпляра : ${instanceNumber} Время запуска [${currentDateTime}]`)
 console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
-bot.telegram.sendMessage(LOG_CHANNEL_ID, `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
+bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
 
 // Обработчики команд
 bot.command(['start', 'reg'], async (ctx) => {
