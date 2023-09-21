@@ -2,6 +2,7 @@
 require('dotenv').config()
 const { Telegraf } = require('telegraf')
 const LocalSession = require('telegraf-session-local')
+const axios = require('axios')
 
 // Импорт модулей
 const { initCronJobs } = require('#src/modules/cron')
@@ -63,10 +64,34 @@ global.stateCounter = {
     cronMessage: 0,
 }
 
+// const currentDateTime = new Date().toLocaleString() преобразовать в 2023-09-22 2000:00:00
+// тип datetime
+
+// url=`${WEB_API}/start.php?key=${SECRET_KEY}&date=2023-09-22%2000:00:00&random_key=${instanceNumber}`
+
 
 // Случайный номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 9000) + 1000
-const currentDateTime = new Date().toLocaleString()
+
+const currentDateTime = new Date()
+const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDateTime.getMonth() + 1).padStart(2, '0')}-${String(currentDateTime.getDate()).padStart(2, '0')} ${String(currentDateTime.getHours()).padStart(2, '0')}:${String(currentDateTime.getMinutes()).padStart(2, '0')}:${String(currentDateTime.getSeconds()).padStart(2, '0')}`
+
+// URL для регулярного обновления данных о боте
+const updateBotURL = `${WEB_API}/bot/update.php?key=${SECRET_KEY}&date=${encodeURIComponent(formattedDateTime)}&random_key=${instanceNumber}`;
+
+// URL для начальной регистрации бота
+const startBotURL = `${WEB_API}/bot/start.php?key=${SECRET_KEY}`;
+
+// Отправка данных при запуске бота
+axios.get(startBotURL)
+    .then(response => {
+        console.log('Bot start data registered successfully:', response.data);
+    })
+    .catch(error => {
+        console.error('Error registering bot start data:', error);
+    });
+
+
 console.log(`! Номер запущенного экземпляра : ${instanceNumber} Время запуска [${currentDateTime}]`)
 console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
 bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
