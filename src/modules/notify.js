@@ -69,6 +69,7 @@ async function notifyAllUsers(ctx) {
 // Вторая функция
 
 async function notifyUsers(ctx) {
+    await sendToLog(ctx)
     const chatId = ctx.message.chat.id;
     const isUserInitiated = ctx.session.isUserInitiated || false; // Получаем флаг из сессии
     try {
