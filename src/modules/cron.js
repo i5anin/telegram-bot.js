@@ -19,7 +19,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
 
     if (MODE === 'build') {
         // Проверка экземпляра
-        cron.schedule('*/10 * * * *', async () => {
+        cron.schedule('*/3 * * * *', async () => {
             // console.log(' Проверка экземпляра. 30 сек')
             const checkAndUpdateBotData = `${WEB_API}/bot/check.php?key=${SECRET_KEY}`
 
