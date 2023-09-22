@@ -2,11 +2,8 @@ const ruLang = require('#src/utils/ru_lang')
 const fetchData = require('#src/utils/helpers')
 const { notifyUsers } = require('#src/modules/notify')
 const { handleAddComment } = require('#src/modules/comment')
-const { sendToLog } = require('#src/utils/log') // Добавление лога
 
 async function handleTextCommand(ctx) {
-    await sendToLog(ctx)
-
     // Деструктуризация полей из сообщения
     const { text, chat, from } = ctx.message
 

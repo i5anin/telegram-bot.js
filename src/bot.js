@@ -60,16 +60,19 @@ global.emoji = {
 }
 global.bot = bot
 global.stateCounter = {
-    my: 0,
-    message: 0,
-    cronMessage: 0,
+    bot_update: 0,
+    bot_check: 0,
+
+    user_get_all: 0,
+    user_get_all_fio: 0,
+    user_add: 0,  // user_update: 0,
+
+    comment_get_all: 0,
+    comment_update: 0,
+
+    oplata_get_all: 0,
+    oplata_update: 0,
 }
-
-// const currentDateTime = new Date().toLocaleString() преобразовать в 2023-09-22 2000:00:00
-// тип datetime
-
-// url=`${WEB_API}/start.php?key=${SECRET_KEY}&date=2023-09-22%2000:00:00&random_key=${instanceNumber}`
-
 
 // Случайный номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 9000) + 1000
@@ -93,6 +96,7 @@ if (MODE === 'build') {
 console.log(`! Номер запущенного экземпляра : ${instanceNumber} Время запуска [${currentDateTime}]`)
 console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
 console.log('MODE =', MODE)
+
 if (MODE === 'build') bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
 
 // Обработчики команд
@@ -136,9 +140,62 @@ bot.command('get_group_info', async (ctx) => {
     await handleGetGroupInfoCommand(ctx)
 })
 
+async function whoCommand(ctx) {
+    let userId
+    let username
+    let firstName
+    let lastName
+
+    // Проверка, является ли сообщение ответом на другое сообщение
+    if (ctx.message.reply_to_message) {
+        userId = ctx.message.reply_to_message.from.id
+        username = ctx.message.reply_to_message.from.username
+        firstName = ctx.message.reply_to_message.from.first_name
+        lastName = ctx.message.reply_to_message.from.last_name
+    } else {
+        // Парсим входящее сообщение, чтобы получить аргументы команды
+        const input = ctx.message.text.split(' ')
+        userId = input[1] ? parseInt(input[1]) : ctx.from.id
+        username = ctx.from.username
+        firstName = ctx.from.first_name
+        lastName = ctx.from.last_name
+    }
+
+    try {
+        // Получение данных о пользователях с внешнего API
+        const response = await axios.get(`${WEB_API}/users/get_all_fio.php`)
+
+        // Проверка наличия пользователя в полученных данных
+        const usersData = response.data.users_data
+        const user = usersData.find(u => u.user_id === userId)
+
+        if (user) {
+            // Если пользователь найден, отправляем информацию о нем
+            const fullName = `${firstName || ''} ${lastName || ''}`.trim()
+            await ctx.reply(`Пользователь с ID <code>${userId}</code> TG: <code>${username || ''}</code> (<code>${fullName}</code>) зарегистрирован как <code>${user.fio}</code>`, { parse_mode: 'HTML' })
+        } else {
+            // Если пользователь не найден, отправляем сообщение об ошибке
+            await ctx.reply(`Пользователь с ID <code>${userId}</code> не зарегистрирован в системе`, { parse_mode: 'HTML' })
+        }
+    } catch (error) {
+        console.error('Ошибка при получении данных с внешнего API:', error)
+        await ctx.reply('Произошла ошибка при выполнении команды')
+    }
+}
+
+bot.command('who', async (ctx) => {
+    // if (ctx.chat.type !== 'private') return
+    await whoCommand(ctx)
+})
+
 
 // Обработчик текстовых сообщений
-bot.on('text', handleTextCommand)
+bot.on('text', async (ctx) => {
+    await sendToLog(ctx)
+    if (ctx.chat.type !== 'private') return
+    await handleTextCommand(ctx)
+})
+
 bot.on('new_chat_members', logNewChatMembers)
 bot.on('left_chat_member', logLeftChatMember)
 
