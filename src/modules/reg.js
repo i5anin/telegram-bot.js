@@ -24,8 +24,6 @@ async function handleRegComment(ctx) {
     const chatId = ctx.message.chat.id
     const { chat } = ctx.message
 
-    await sendToLog(ctx)
-
     const registrationData = await checkRegistration(chatId)
     const isRegistered = registrationData.exists
     const fio = registrationData.fio

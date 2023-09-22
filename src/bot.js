@@ -12,7 +12,7 @@ const { handleHelpCommand } = require('#src/modules/help')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
-const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
+const { logNewChatMembers, logLeftChatMember, sendToLog } = require('#src/utils/log')
 const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 
 // Конфигурационные переменные
@@ -97,21 +97,25 @@ if (MODE === 'build') bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `За
 
 // Обработчики команд
 bot.command(['start', 'reg'], async (ctx) => {
+    await sendToLog(ctx)
     if (ctx.chat.type !== 'private') return
     resetFlags(ctx)
     await handleRegComment(ctx, ctx.session.isAwaitFio = true)
 })
 bot.command('new_comment', async (ctx) => {
+    await sendToLog(ctx)
     if (ctx.chat.type !== 'private') return
     resetFlags(ctx)
     await notifyUsers(ctx, ctx.session.isUserInitiated = true)
 })
 bot.command('new_comment_all', async (ctx) => {
+    await sendToLog(ctx)
     if (ctx.chat.type !== 'private') return
     resetFlags(ctx)
     await notifyAllUsers(ctx)
 })
 bot.command('help', async (ctx) => {
+    await sendToLog(ctx)
     if (ctx.chat.type !== 'private') return
     await handleHelpCommand(ctx)
 })
