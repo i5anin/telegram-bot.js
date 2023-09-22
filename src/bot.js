@@ -124,7 +124,11 @@ bot.on('new_chat_members', logNewChatMembers)
 bot.on('left_chat_member', logLeftChatMember)
 
 // Запуск бота
-bot.launch().catch((err) => console.error('Fatal Error! Error while launching the bot:', err))
+bot.launch().catch((err) => {
+    console.error('Fatal Error! Error while launching the bot:', err);
+    // Перезапуск бота или другие действия по восстановлению
+    setTimeout(() => bot.launch(), 30000); // Попробовать перезапустить через 30 секунд
+});
 
 // Инициализация cron-заданий
 initCronJobs(currentDateTime, instanceNumber)
