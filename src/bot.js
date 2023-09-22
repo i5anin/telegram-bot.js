@@ -140,20 +140,66 @@ bot.command('get_group_info', async (ctx) => {
     await handleGetGroupInfoCommand(ctx)
 })
 
+bot.command('who', async (ctx) => {
+    // if (ctx.chat.type !== 'private') return
+    await whoCommand(ctx)
+})
+
+bot.on('message', async (ctx) => {
+    // Проверка на пересланное сообщение
+    if (ctx.message.forward_from) {
+        const userId = ctx.message.forward_from.id;
+        const username = ctx.message.forward_from.username;
+        const firstName = ctx.message.forward_from.first_name;
+        const lastName = ctx.message.forward_from.last_name;
+
+        try {
+            // Запрос к внешнему API для получения данных о пользователе
+            const response = await axios.get(`${WEB_API}/users/get_all_fio.php`);
+            const usersData = response.data.users_data;
+            const user = usersData.find(u => u.user_id === userId);
+
+            if (user) {
+                // Если пользователь найден в данных внешнего API, отправляем информацию о нем
+                const fullName = `${firstName || ''} ${lastName || ''}`.trim();
+                await ctx.reply(`Пользователь\nID <code>${userId}</code>\nTG: <code>${username || ''}</code> (<code>${fullName}</code>)\nfio: <code>${user.fio}</code>`, { parse_mode: 'HTML' });
+            } else {
+                // Если пользователь не найден, отправляем сообщение об ошибке
+                await ctx.reply(`Пользователь\nID <code>${userId}</code>\nне зарегистрирован в системе`, { parse_mode: 'HTML' });
+            }
+        } catch (error) {
+            console.error('Ошибка при получении данных с внешнего API:', error);
+            await ctx.reply('Произошла ошибка при выполнении команды');
+        }
+    }
+});
+
+
+
 async function whoCommand(ctx) {
     let userId
     let username
     let firstName
     let lastName
 
-    // Проверка, является ли сообщение ответом на другое сообщение
-    if (ctx.message.reply_to_message) {
+
+    if (ctx.message.forward_from) {
+        console.log(ctx.message.forward_from)
+        // Сообщение переслано
+        userId = ctx.message.forward_from.id
+        username = ctx.message.forward_from.username
+        firstName = ctx.message.forward_from.first_name
+        lastName = ctx.message.forward_from.last_name
+    } else if (ctx.message.reply_to_message) {
+        // Ответ на сообщение
+        console.log(ctx.message.reply_to_message)
         userId = ctx.message.reply_to_message.from.id
         username = ctx.message.reply_to_message.from.username
         firstName = ctx.message.reply_to_message.from.first_name
         lastName = ctx.message.reply_to_message.from.last_name
     } else {
-        // Парсим входящее сообщение, чтобы получить аргументы команды
+        // Прямое сообщение
+        console.log(input[1] ? parseInt(input[1]) : ctx.from.id)
         const input = ctx.message.text.split(' ')
         userId = input[1] ? parseInt(input[1]) : ctx.from.id
         username = ctx.from.username
@@ -172,10 +218,10 @@ async function whoCommand(ctx) {
         if (user) {
             // Если пользователь найден, отправляем информацию о нем
             const fullName = `${firstName || ''} ${lastName || ''}`.trim()
-            await ctx.reply(`Пользователь с ID <code>${userId}</code> TG: <code>${username || ''}</code> (<code>${fullName}</code>) зарегистрирован как <code>${user.fio}</code>`, { parse_mode: 'HTML' })
+            await ctx.reply(`Пользователь\nID: <code>${userId}</code>\nTG: <code>${username || ''}</code> (<code>${fullName}</code>)\nfio: <code>${user.fio}</code>`, { parse_mode: 'HTML' })
         } else {
             // Если пользователь не найден, отправляем сообщение об ошибке
-            await ctx.reply(`Пользователь с ID <code>${userId}</code> не зарегистрирован в системе`, { parse_mode: 'HTML' })
+            await ctx.reply(`Пользователь\nID: <code>${userId}</code>\nне зарегистрирован в системе`, { parse_mode: 'HTML' })
         }
     } catch (error) {
         console.error('Ошибка при получении данных с внешнего API:', error)
@@ -183,10 +229,7 @@ async function whoCommand(ctx) {
     }
 }
 
-bot.command('who', async (ctx) => {
-    // if (ctx.chat.type !== 'private') return
-    await whoCommand(ctx)
-})
+
 
 
 // Обработчик текстовых сообщений
