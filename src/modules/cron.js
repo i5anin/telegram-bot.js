@@ -6,7 +6,7 @@ const { oplataNotification } = require('#src/modules/oplata') // Добавле�
 
 function initCronJobs(currentDateTime, instanceNumber) {
     // Уведомлять о сообщениях каждые 15 мин
-    cron.schedule('*/15 9-20 * * *', async () => {
+    cron.schedule('*/15 8-23 * * *', async () => {
         console.log('notifyAllUsers Running a task every 15 minutes')
         await notifyAllUsers(ctx)
     })
@@ -17,7 +17,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
         await oplataNotification()
     })
 
-    if (global.MODE === 'build') {
+    if (MODE === 'build') {
         // Проверка экземпляра
         cron.schedule('*/10 * * * * *', async () => {
             // console.log(' Проверка экземпляра. 30 сек')

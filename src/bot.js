@@ -75,7 +75,7 @@ global.stateCounter = {
 const instanceNumber = Math.floor(Math.random() * 9000) + 1000
 const currentDateTime = new Date()
 
-if (global.MODE === 'build') {
+if (MODE === 'build') {
     const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDateTime.getMonth() + 1).padStart(2, '0')}-${String(currentDateTime.getDate()).padStart(2, '0')} ${String(currentDateTime.getHours()).padStart(2, '0')}:${String(currentDateTime.getMinutes()).padStart(2, '0')}:${String(currentDateTime.getSeconds()).padStart(2, '0')}`
 // URL для регулярного обновления данных о боте
     const updateBotURL = `${WEB_API}/bot/update.php?key=${SECRET_KEY}&date=${encodeURIComponent(formattedDateTime)}&random_key=${instanceNumber}`
@@ -93,7 +93,7 @@ if (global.MODE === 'build') {
 console.log(`! Номер запущенного экземпляра : ${instanceNumber} Время запуска [${currentDateTime}]`)
 console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
 console.log('MODE =', MODE)
-// bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
+if (MODE === "build") bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
 
 // Обработчики команд
 bot.command(['start', 'reg'], async (ctx) => {
