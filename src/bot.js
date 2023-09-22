@@ -93,57 +93,42 @@ if (MODE === 'build') {
 console.log(`! Номер запущенного экземпляра : ${instanceNumber} Время запуска [${currentDateTime}]`)
 console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
 console.log('MODE =', MODE)
-if (MODE === 'build') bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
+if (MODE === "build") bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
 
 // Обработчики команд
 bot.command(['start', 'reg'], async (ctx) => {
-    if (ctx.chat.type !== 'private') return
     resetFlags(ctx)
     await handleRegComment(ctx, ctx.session.isAwaitFio = true)
 })
+
 bot.command('new_comment', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
     resetFlags(ctx)
     await notifyUsers(ctx, ctx.session.isUserInitiated = true)
 })
 bot.command('new_comment_all', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
     resetFlags(ctx)
     await notifyAllUsers(ctx)
 })
-bot.command('help', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
-    await handleHelpCommand(ctx)
-})
-bot.command('oplata', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
-    await oplataNotification(ctx)
-})
-bot.command('msg', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
-    await handleMsgCommand(ctx)
-})
-bot.command('status', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
-    await handleStatusCommand(ctx, instanceNumber, currentDateTime)
-})
-bot.command('get_group_info', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
-    await handleGetGroupInfoCommand(ctx)
-})
+
+bot.command('help', handleHelpCommand)
+bot.command('oplata', oplataNotification)
+bot.command('msg', async (ctx) => handleMsgCommand(ctx))
+bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber, currentDateTime))
+bot.command('get_group_info', handleGetGroupInfoCommand)
 
 
 // Обработчик текстовых сообщений
 bot.on('text', handleTextCommand)
+
 bot.on('new_chat_members', logNewChatMembers)
 bot.on('left_chat_member', logLeftChatMember)
 
 // Запуск бота
 bot.launch().catch((err) => {
-    console.error('Fatal Error! Error while launching the bot:', err)
+    console.error('Fatal Error! Error while launching the bot:', err);
     // Перезапуск бота или другие действия по восстановлению
-    setTimeout(() => bot.launch(), 30000) // Попробовать перезапустить через 30 секунд
-})
+    setTimeout(() => bot.launch(), 30000); // Попробовать перезапустить через 30 секунд
+});
 
 // Инициализация cron-заданий
 initCronJobs(currentDateTime, instanceNumber)
