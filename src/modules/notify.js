@@ -10,7 +10,7 @@ const { sendToLog } = require('#src/utils/log')
 async function sendMessage(chatId, message) {
     try {
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
-        console.log(`Notify. Message sent to chatId: ${chatId}`)
+        // console.log(`Notify. Message sent to chatId: ${chatId}`)
     } catch (error) {
         console.error(`Notify. Failed to send message to chatId: ${chatId}`, error)
     }
