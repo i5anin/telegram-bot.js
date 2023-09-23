@@ -41,7 +41,7 @@ async function handleTextCommand(ctx) {
 
         await bot.telegram.sendMessage(
             LOG_CHANNEL_ID,
-            dataAddUser ? `⭐ Пользователь добавлен.${defMsg}` :
+            dataAddUser ? `${emoji.star}Пользователь добавлен.${defMsg}` :
                 `⚠️Ошибка регистрации${defMsg}`,
             { parse_mode: 'HTML' },
         )
