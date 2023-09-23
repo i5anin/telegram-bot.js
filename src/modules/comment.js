@@ -48,13 +48,13 @@ async function handleAddComment(ctx) {
 
         if (!comment) {
             await bot.telegram.sendMessage(chatId, 'Ошибка! задача уже прокомментирована')
-            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Ошибка! задача уже прокомментирована\ntaskID: <code>${taskID}</code>\nchatId: <code>${chatId}</code>`,{ parse_mode: 'HTML' })
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Ошибка! задача уже прокомментирована\ntaskID: <code>${taskID}</code>\nchatId: <code>${chatId}</code>`, { parse_mode: 'HTML' })
             console.log('Не найдено ни одного подходящего комментария') //Не найдено ни одного подходящего комментария на который
             return
         }
 
         const url = `${WEB_API}/comment/update.php`
-        console.log(taskID + ' ' + ctx.message.text + ' ' + SECRET_KEY)
+        console.log('taskID=ctx.message.text=SECRET_KEY' + taskID + ' ' + ctx.message.text + ' ' + SECRET_KEY)
         const params = {
             id_task: taskID,
             comments_op: ctx.message.text,

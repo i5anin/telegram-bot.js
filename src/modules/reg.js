@@ -2,6 +2,7 @@
 const axios = require('axios')
 const ruLang = require('#src/utils/ru_lang')  // Локализация сообщений
 const { sendToLog } = require('#src/utils/log') // Добавление лога
+const { resetFlags } = require('#src//utils/helpers')
 // const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
 
 // Функция для проверки, зарегистрирован ли пользователь на сервере
@@ -21,6 +22,9 @@ async function checkRegistration(chatId) {
 
 // Асинхронная функция для обработки команды регистрации
 async function handleRegComment(ctx) {
+    await sendToLog(ctx)
+    if (ctx.chat.type !== 'private') return
+    resetFlags(ctx)
     const chatId = ctx.message.chat.id
     const { chat } = ctx.message
 

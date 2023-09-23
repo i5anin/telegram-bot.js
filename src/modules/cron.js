@@ -29,7 +29,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
 
                     // Получаем текущую дату и время
                     const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDateTime.getMonth() + 1).padStart(2, '0')}-${String(currentDateTime.getDate()).padStart(2, '0')} ${String(currentDateTime.getHours()).padStart(2, '0')}:${String(currentDateTime.getMinutes()).padStart(2, '0')}:${String(currentDateTime.getSeconds()).padStart(2, '0')}`
-                    console.log(formattedDateTime, instanceNumber)
+                    console.log("formattedDateTime=",formattedDateTime,"instanceNumber=", instanceNumber)
                     // Случайный номер экземпляра
 
                     // Проверяем соответствие

@@ -14,6 +14,8 @@ const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
 const { logNewChatMembers, logLeftChatMember, sendToLog } = require('#src/utils/log')
 const { handleGetGroupInfoCommand } = require('#src/utils/csv')
+const { runBot } = require('#src/modules/run')
+const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -34,14 +36,6 @@ bot.use((ctx, next) => {
     }
     return next()
 })
-
-// Функция для сброса флагов сессии
-function resetFlags(ctx) {
-    ctx.session.isAwaitFio = false
-    ctx.session.isAwaitComment = false
-    ctx.session.userInitiated = false
-    ctx.session.isUserInitiated = false
-}
 
 
 // Глобальные переменные
@@ -78,166 +72,22 @@ global.stateCounter = {
 const instanceNumber = Math.floor(Math.random() * 9000) + 1000
 const currentDateTime = new Date()
 
-if (MODE === 'build') {
-    const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDateTime.getMonth() + 1).padStart(2, '0')}-${String(currentDateTime.getDate()).padStart(2, '0')} ${String(currentDateTime.getHours()).padStart(2, '0')}:${String(currentDateTime.getMinutes()).padStart(2, '0')}:${String(currentDateTime.getSeconds()).padStart(2, '0')}`
-// URL для регулярного обновления данных о боте
-    const updateBotURL = `${WEB_API}/bot/update.php?key=${SECRET_KEY}&date=${encodeURIComponent(formattedDateTime)}&random_key=${instanceNumber}`
-
-// Отправка данных при запуске бота
-    axios.get(updateBotURL)
-        .then(response => {
-            console.log('Данные о запуске бота успешно зарегистрированы:', response.data)
-        })
-        .catch(error => {
-            console.error('Ошибка регистрации стартовых данных бота:', error)
-        })
-}
-
-console.log(`! Номер запущенного экземпляра : ${instanceNumber} Время запуска [${currentDateTime}]`)
-console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
-console.log('MODE =', MODE)
-
-if (MODE === 'build') bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`, { parse_mode: 'HTML' })
-
+runBot(instanceNumber, currentDateTime)
 // Обработчики команд
-bot.command(['start', 'reg'], async (ctx) => {
-    await sendToLog(ctx)
-    if (ctx.chat.type !== 'private') return
-    resetFlags(ctx)
-    await handleRegComment(ctx, ctx.session.isAwaitFio = true)
-})
-bot.command('new_comment', async (ctx) => {
-    await sendToLog(ctx)
-    if (ctx.chat.type !== 'private') return
-    resetFlags(ctx)
-    await notifyUsers(ctx, ctx.session.isUserInitiated = true)
-})
-bot.command('new_comment_all', async (ctx) => {
-    await sendToLog(ctx)
-    if (ctx.chat.type !== 'private') return
-    resetFlags(ctx)
-    await notifyAllUsers(ctx)
-})
-bot.command('help', async (ctx) => {
-    await sendToLog(ctx)
-    if (ctx.chat.type !== 'private') return
-    await handleHelpCommand(ctx)
-})
-bot.command('oplata', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
-    await oplataNotification(ctx)
-})
-bot.command('msg', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
-    await handleMsgCommand(ctx)
-})
-bot.command('status', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
-    await handleStatusCommand(ctx, instanceNumber, currentDateTime)
-})
-bot.command('get_group_info', async (ctx) => {
-    if (ctx.chat.type !== 'private') return
-    await handleGetGroupInfoCommand(ctx)
-})
+bot.command(['start', 'reg'], (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true))
+bot.command('new_comment', (ctx) => notifyUsers(ctx))
+bot.command('new_comment_all', notifyAllUsers)
+bot.command('help', handleHelpCommand)
+bot.command('oplata', oplataNotification)
+bot.command('msg', handleMsgCommand)
+bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber, currentDateTime))
+bot.command('get_group_info', (ctx) => handleGetGroupInfoCommand(ctx))
+bot.command('who', (ctx) => whoCommand(ctx))
 
-bot.command('who', async (ctx) => {
-    // if (ctx.chat.type !== 'private') return
-    await whoCommand(ctx)
-})
-
-bot.on('message', async (ctx) => {
-    // Проверка на пересланное сообщение
-    if (ctx.message.forward_from) {
-        const userId = ctx.message.forward_from.id;
-        const username = ctx.message.forward_from.username;
-        const firstName = ctx.message.forward_from.first_name;
-        const lastName = ctx.message.forward_from.last_name;
-
-        try {
-            // Запрос к внешнему API для получения данных о пользователе
-            const response = await axios.get(`${WEB_API}/users/get_all_fio.php`);
-            const usersData = response.data.users_data;
-            const user = usersData.find(u => u.user_id === userId);
-
-            if (user) {
-                // Если пользователь найден в данных внешнего API, отправляем информацию о нем
-                const fullName = `${firstName || ''} ${lastName || ''}`.trim();
-                await ctx.reply(`Пользователь\nID <code>${userId}</code>\nTG: <code>${username || ''}</code> (<code>${fullName}</code>)\nfio: <code>${user.fio}</code>`, { parse_mode: 'HTML' });
-            } else {
-                // Если пользователь не найден, отправляем сообщение об ошибке
-                await ctx.reply(`Пользователь\nID <code>${userId}</code>\nне зарегистрирован в системе`, { parse_mode: 'HTML' });
-            }
-        } catch (error) {
-            console.error('Ошибка при получении данных с внешнего API:', error);
-            await ctx.reply('Произошла ошибка при выполнении команды');
-        }
-    }
-});
-
-
-
-async function whoCommand(ctx) {
-    let userId
-    let username
-    let firstName
-    let lastName
-
-
-    if (ctx.message.forward_from) {
-        console.log(ctx.message.forward_from)
-        // Сообщение переслано
-        userId = ctx.message.forward_from.id
-        username = ctx.message.forward_from.username
-        firstName = ctx.message.forward_from.first_name
-        lastName = ctx.message.forward_from.last_name
-    } else if (ctx.message.reply_to_message) {
-        // Ответ на сообщение
-        console.log(ctx.message.reply_to_message)
-        userId = ctx.message.reply_to_message.from.id
-        username = ctx.message.reply_to_message.from.username
-        firstName = ctx.message.reply_to_message.from.first_name
-        lastName = ctx.message.reply_to_message.from.last_name
-    } else {
-        // Прямое сообщение
-        console.log(input[1] ? parseInt(input[1]) : ctx.from.id)
-        const input = ctx.message.text.split(' ')
-        userId = input[1] ? parseInt(input[1]) : ctx.from.id
-        username = ctx.from.username
-        firstName = ctx.from.first_name
-        lastName = ctx.from.last_name
-    }
-
-    try {
-        // Получение данных о пользователях с внешнего API
-        const response = await axios.get(`${WEB_API}/users/get_all_fio.php`)
-
-        // Проверка наличия пользователя в полученных данных
-        const usersData = response.data.users_data
-        const user = usersData.find(u => u.user_id === userId)
-
-        if (user) {
-            // Если пользователь найден, отправляем информацию о нем
-            const fullName = `${firstName || ''} ${lastName || ''}`.trim()
-            await ctx.reply(`Пользователь\nID: <code>${userId}</code>\nTG: <code>${username || ''}</code> (<code>${fullName}</code>)\nfio: <code>${user.fio}</code>`, { parse_mode: 'HTML' })
-        } else {
-            // Если пользователь не найден, отправляем сообщение об ошибке
-            await ctx.reply(`Пользователь\nID: <code>${userId}</code>\nне зарегистрирован в системе`, { parse_mode: 'HTML' })
-        }
-    } catch (error) {
-        console.error('Ошибка при получении данных с внешнего API:', error)
-        await ctx.reply('Произошла ошибка при выполнении команды')
-    }
-}
-
-
-
+bot.on('text', (ctx) => handleTextCommand(ctx))
+bot.on('message', (ctx) => handleForwardedMessage(ctx))
 
 // Обработчик текстовых сообщений
-bot.on('text', async (ctx) => {
-    await sendToLog(ctx)
-    if (ctx.chat.type !== 'private') return
-    await handleTextCommand(ctx)
-})
 
 bot.on('new_chat_members', logNewChatMembers)
 bot.on('left_chat_member', logLeftChatMember)
@@ -245,7 +95,6 @@ bot.on('left_chat_member', logLeftChatMember)
 // Запуск бота
 bot.launch().catch((err) => {
     console.error('Fatal Error! Error while launching the bot:', err)
-    // Перезапуск бота или другие действия по восстановлению
     setTimeout(() => bot.launch(), 30000) // Попробовать перезапустить через 30 секунд
 })
 

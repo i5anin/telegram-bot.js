@@ -2,6 +2,8 @@ const fs = require('fs')
 const { sendToLog } = require('#src/utils/log')
 
 async function handleHelpCommand(ctx) {
+    await sendToLog(ctx)
+    if (ctx.chat.type !== 'private') return
     // Отправка фото из файла с подписью (caption)
     const photo = fs.createReadStream('src/media/answer.jpg')
     const video = fs.createReadStream('src/media/answer.mp4')

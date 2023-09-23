@@ -1,14 +1,15 @@
 const ruLang = require('#src/utils/ru_lang')
-const fetchData = require('#src/utils/helpers')
+const { fetchData } = require('#src/utils/helpers')
 const { notifyUsers } = require('#src/modules/notify')
 const { handleAddComment } = require('#src/modules/comment')
+const { sendToLog } = require('#src/utils/log')
 
 async function handleTextCommand(ctx) {
+    await sendToLog(ctx)
+    if (ctx.chat.type !== 'private') return
     // Деструктуризация полей из сообщения
     const { text, chat, from } = ctx.message
-
-    console.log(ctx.message.reply_to_message)
-
+    
     // Ранний выход для улучшения читаемости
     if (!ctx.session.isAwaitFio && !ctx.session.isAwaitComment && !ctx.message.reply_to_message) return
 

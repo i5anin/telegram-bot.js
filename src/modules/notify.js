@@ -1,5 +1,5 @@
 // Импортируем необходимые функции
-const fetchData = require('#src/utils/helpers')
+const { fetchData, resetFlags } = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
 
@@ -71,6 +71,10 @@ async function notifyAllUsers() {
 // Вторая функция
 
 async function notifyUsers(ctx) {
+    await sendToLog(ctx)
+    if (ctx.chat.type !== 'private') return
+    resetFlags(ctx)
+
     const chatId = ctx.message.chat.id
     const isUserInitiated = ctx.session.isUserInitiated || false // Получаем флаг из сессии
     try {
@@ -78,7 +82,7 @@ async function notifyUsers(ctx) {
         const uncommentedTasks = await fetchComments(chatId)
         if (!uncommentedTasks || uncommentedTasks.length === 0) {
             if (isUserInitiated) {
-                ctx.session.isUserInitiated = false // Сбрасываем флаг
+                // ctx.session.isUserInitiated = false // Сбрасываем флаг
                 return sendMessage(chatId, 'Пустые комментарии не найдены.')
             }
             return
@@ -91,7 +95,7 @@ async function notifyUsers(ctx) {
         sendMessage(chatId, message)
 
         await updateTaskStatus(userActualComments[0].id_task)
-        ctx.session.isUserInitiated = false // Сбрасываем флаг
+        // ctx.session.isUserInitiated = false // Сбрасываем флаг
     } catch (error) {
         console.log('Notify Error in notifyUsers:', error)
         await sendMessage(LOG_CHANNEL_ID, `Notify <code>${error} </code>`)
