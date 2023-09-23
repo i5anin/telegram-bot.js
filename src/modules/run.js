@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-function runBot(instanceNumber,currentDateTime){
+function runBot(instanceNumber, currentDateTime) {
     if (MODE === 'build') {
         const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDateTime.getMonth() + 1).padStart(2, '0')}-${String(currentDateTime.getDate()).padStart(2, '0')} ${String(currentDateTime.getHours()).padStart(2, '0')}:${String(currentDateTime.getMinutes()).padStart(2, '0')}:${String(currentDateTime.getSeconds()).padStart(2, '0')}`
 // URL для регулярного обновления данных о боте
@@ -24,4 +24,4 @@ function runBot(instanceNumber,currentDateTime){
 
 }
 
-module.exports = {runBot}
+module.exports = { runBot }
