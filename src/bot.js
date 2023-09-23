@@ -2,7 +2,6 @@
 require('dotenv').config()
 const { Telegraf } = require('telegraf')
 const LocalSession = require('telegraf-session-local')
-const axios = require('axios')
 
 // Импорт модулей
 const { initCronJobs } = require('#src/modules/cron')
@@ -12,7 +11,7 @@ const { handleHelpCommand } = require('#src/modules/help')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
-const { logNewChatMembers, logLeftChatMember, sendToLog } = require('#src/utils/log')
+const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
 const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 const { runBot } = require('#src/modules/run')
 const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
