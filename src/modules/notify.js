@@ -59,12 +59,15 @@ async function notifyAllUsers() {
     const user_ids = [...new Set(data.comments.map(comment => comment.user_id))]
 
     for (const chatId of user_ids) {
-        const userComment = allComments.find(comment => comment.user_id === chatId && comment.sent === 0)
-        if (!userComment) continue
+        // Фильтрация комментариев для текущего пользователя
+        const userComments = allComments.filter(comment => comment.user_id === chatId && comment.sent === 0)
 
-        const message = formatMessage(userComment, allComments.length)
-        await sendMessage(chatId, message+"\n<code>Cron</code>")
-        await updateTaskStatus(userComment.id_task)
+        // Если нет комментариев для текущего пользователя, продолжаем следующую итерацию
+        if (userComments.length === 0) continue
+
+        const message = formatMessage(userComments[0], userComments.length) // Используем userComments.length для подсчета количества сообщений для текущего пользователя
+        await sendMessage(chatId, message + "\n<code>Cron</code>")
+        await updateTaskStatus(userComments[0].id_task)
     }
 }
 
