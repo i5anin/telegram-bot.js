@@ -28,7 +28,7 @@ bot.use(localSession.middleware())
 
 // Сессионный middleware
 bot.use((ctx, next) => {
-    ctx.session = ctx.session || { isAwaitFio: false, isAwaitComment: false, userInitiated: false }
+    ctx.session = ctx.session || { isAwaitFio: false, isAwaitComment: false, isUserInitiated: false }
     return next()
 })
 
@@ -43,7 +43,14 @@ global.DIR_OPLATA = process.env.DIR_OPLATA
 global.OPLATA_GROUP = process.env.OPLATA_GROUP
 global.OPLATA_REPORT_ACTIVE = process.env.OPLATA_REPORT_ACTIVE //OPLATA_REPORT_ACTIVE = true;
 global.MODE = process.env.NODE_ENV || 'development'  // Если NODE_ENV не определен, по умолчанию используется 'development'
-global.emoji = { x: '&#10060;', ok: '&#9989;', error: '&#10071;', warning: '&#x26A0;', bot: '&#129302;', star:'&#11088;' }   //❌ //✅ //❗ //⚠️ //🤖 //⭐
+global.emoji = {
+    x: '&#10060;',
+    ok: '&#9989;',
+    error: '&#10071;',
+    warning: '&#x26A0;',
+    bot: '&#129302;',
+    star: '&#11088;',
+}   //❌ //✅ //❗ //⚠️ //🤖 //⭐
 
 global.bot = bot
 global.stateCounter = {
@@ -68,7 +75,7 @@ const currentDateTime = new Date()
 runBot(instanceNumber, currentDateTime)
 // Обработчики команд
 bot.command(['start', 'reg'], (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true))
-bot.command('new_comment', (ctx) => notifyUsers(ctx))
+bot.command('new_comment', (ctx) => notifyUsers(ctx, ctx.session.isUserInitiated = true))
 bot.command('new_comment_all', notifyAllUsers)
 bot.command('help', handleHelpCommand)
 bot.command('oplata', oplataNotification)

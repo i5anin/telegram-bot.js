@@ -71,34 +71,36 @@ async function notifyAllUsers() {
 // Вторая функция
 
 async function notifyUsers(ctx) {
-    await sendToLog(ctx)
-    if (ctx.chat.type !== 'private') return
-    resetFlags(ctx)
+    await sendToLog(ctx);
+    if (ctx.chat.type !== 'private') return;
+    resetFlags(ctx);
+    const chatId = ctx.message.chat.id;
+    const isUserInitiated = ctx.session.isUserInitiated || false; // Получаем флаг из сессии
 
-    const chatId = ctx.message.chat.id
-    const isUserInitiated = ctx.session.isUserInitiated || false // Получаем флаг из сессии
+
     try {
         // Получаем список некомментированных задач для данного пользователя
-        const uncommentedTasks = await fetchComments(chatId)
-        if (!uncommentedTasks || uncommentedTasks.length === 0) {
-            if (isUserInitiated) {
-                // ctx.session.isUserInitiated = false // Сбрасываем флаг
-                return sendMessage(chatId, 'Пустые комментарии не найдены.')
-            }
-            return
+        const uncommentedTasks = await fetchComments(chatId);
+
+        // Проверяем, есть ли задачи для текущего пользователя
+        const isUserInList = uncommentedTasks.some(task => task.user_id === chatId);
+
+        if (!isUserInList) {
+            ctx.session.isUserInitiated = false; // Сбрасываем флаг
+            return sendMessage(chatId, 'Пустые комментарии не найдены.');
         }
 
-        const userActualComments = uncommentedTasks.filter(({ user_id }) => user_id === chatId)
-        if (userActualComments.length === 0) return
+        const userActualComments = uncommentedTasks.filter(({ user_id }) => user_id === chatId);
+        if (userActualComments.length === 0) return;
 
-        const message = formatMessage(userActualComments[0], userActualComments.length)
-        sendMessage(chatId, message)
+        const message = formatMessage(userActualComments[0], userActualComments.length);
+        sendMessage(chatId, message);
 
-        await updateTaskStatus(userActualComments[0].id_task)
-        // ctx.session.isUserInitiated = false // Сбрасываем флаг
+        await updateTaskStatus(userActualComments[0].id_task);
+        // ctx.session.isUserInitiated = false; // Сбрасываем флаг
     } catch (error) {
-        console.log('Notify Error in notifyUsers:', error)
-        await sendMessage(LOG_CHANNEL_ID, `Notify <code>${error} </code>`)
+        console.log('Notify Error in notifyUsers:', error);
+        await sendMessage(LOG_CHANNEL_ID, `Notify <code>${error} </code>`);
     }
 }
 
