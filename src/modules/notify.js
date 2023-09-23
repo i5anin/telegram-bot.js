@@ -78,7 +78,7 @@ async function notifyUsers(ctx) {
     if (ctx.chat.type !== 'private') return;
     resetFlags(ctx);
     const chatId = ctx.message.chat.id;
-    const isUserInitiated = ctx.session.isUserInitiated || false; // Получаем флаг из сессии
+    // const isUserInitiated = ctx.session.isUserInitiated || false; // Получаем флаг из сессии
 
 
     try {
