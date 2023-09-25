@@ -7,7 +7,8 @@ async function handleHelpCommand(ctx) {
     // Отправка фото из файла с подписью (caption)
     const photo = fs.createReadStream('src/media/answer.jpg')
     const video = fs.createReadStream('src/media/answer.mp4')
-    const messageJpg = `Доступные команды:
+    const messageJpg =
+        `Доступные команды:
     
 1. /reg - Регистрация пользователя
 Шаблон: <code>Иванов И.И.</code>
@@ -28,4 +29,11 @@ async function handleHelpCommand(ctx) {
     await ctx.replyWithVideo({ source: video })
 }
 
-module.exports = { handleHelpCommand }
+async function handleDocsCommand(ctx) {
+    ctx.reply('Вот несколько полезных ссылок:\n' +
+        '- [Общая Штатная папка](https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW)\n' +
+        '- [Должностная папка оператора](https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V)',
+        { parse_mode: 'Markdown' })
+}
+
+module.exports = { handleHelpCommand, handleDocsCommand }

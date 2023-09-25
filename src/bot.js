@@ -7,7 +7,7 @@ const LocalSession = require('telegraf-session-local')
 const { initCronJobs } = require('#src/modules/cron')
 const { handleRegComment } = require('#src/modules/reg')
 const { handleTextCommand } = require('#src/modules/text')
-const { handleHelpCommand } = require('#src/modules/help')
+const { handleHelpCommand, handleDocsCommand } = require('#src/modules/help')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
@@ -74,7 +74,7 @@ const currentDateTime = new Date()
 
 runBot(instanceNumber, currentDateTime)
 // Обработчики команд
-bot.command(['start', 'reg'], (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true))
+bot.command('reg_key', (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true)) //['start', 'reg']
 bot.command('new_comment', (ctx) => notifyUsers(ctx, ctx.session.isUserInitiated = true))
 bot.command('new_comment_all', notifyAllUsers)
 bot.command('help', handleHelpCommand)
@@ -83,6 +83,7 @@ bot.command('msg', handleMsgCommand)
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber, currentDateTime))
 bot.command('get_group_info', (ctx) => handleGetGroupInfoCommand(ctx))
 bot.command('who', (ctx) => whoCommand(ctx))
+bot.command('docs', (ctx) => handleDocsCommand(ctx))
 
 bot.on('message', (ctx) => {
     if (ctx.message.forward_from) {
