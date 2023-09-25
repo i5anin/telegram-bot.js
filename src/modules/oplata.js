@@ -5,7 +5,7 @@ async function oplataNotification() {
 
     if (!OPLATA_REPORT_ACTIVE) return
 
-    let e_ADMIN_IDS = null
+    let i_ADMIN_IDS = null
     const BATCH_SIZE = 10
 
     try {
@@ -44,7 +44,7 @@ async function oplataNotification() {
 
                 // Отправляем сообщение каждому администратору
                 for (const adminId of ADMIN_IDS) {
-                    e_ADMIN_IDS = adminId
+                    i_ADMIN_IDS = adminId
                     await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' })
                 }
 
@@ -59,7 +59,7 @@ async function oplataNotification() {
     } catch (error) {
         await bot.telegram.sendMessage(
             LOG_CHANNEL_ID,
-            `Попытка отправить сообщение <code>${e_ADMIN_IDS}</code> оплата \n<code>${error}</code>`,
+            `Попытка отправить сообщение <code>${i_ADMIN_IDS}</code> оплата \n<code>${error}</code>`,
             { parse_mode: 'HTML' },
         )
     }
