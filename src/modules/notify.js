@@ -96,6 +96,8 @@ async function notifyUsers(ctx) {
         const userActualComments = uncommentedTasks.filter(({ user_id }) => user_id === chatId);
         if (userActualComments.length === 0) return;
 
+        await sendMessage(LOG_CHANNEL_ID, `Отправлено пользователю <code>${chatId} </code>`);
+
         const message = formatMessage(userActualComments[0], userActualComments.length);
         sendMessage(chatId, message);
 
