@@ -3,6 +3,7 @@ const axios = require('axios')
 //fetchComments
 async function fetchComments() {
     const url = `${WEB_API}/comment/get_all.php?key=${SECRET_KEY}`
+    stateCounter.comment_get_all++
     try {
         const response = await axios.get(url)
         if (response.data && response.data.comments) {
@@ -59,6 +60,7 @@ async function handleAddComment(ctx) {
         }
 
         const url = `${WEB_API}/comment/update.php`
+        stateCounter.comment_update++
         console.log('taskID=ctx.message.text=SECRET_KEY' + taskID + ' ' + ctx.message.text + ' ' + SECRET_KEY)
         const params = {
             id_task: taskID,

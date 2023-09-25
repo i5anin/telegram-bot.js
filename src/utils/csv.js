@@ -4,6 +4,7 @@ const axios = require('axios');
 const getExternalUsers = async () => {
     try {
         const response = await axios.get(WEB_API + '/users/get_all_fio.php')
+        stateCounter.users_get_all_fio++
         return response.data.users_data
     } catch (error) {
         console.error('Ошибка при получении данных с внешнего API:', error)

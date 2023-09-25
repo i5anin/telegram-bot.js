@@ -34,6 +34,7 @@ async function handleTextCommand(ctx) {
                 username: from.username,
                 active: 1,
             },
+            stateCounter.users_add++
         )
         ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
         const defMsg = `\nID: <code>${userId}</code>` +

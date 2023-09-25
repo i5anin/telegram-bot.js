@@ -19,6 +19,7 @@ async function sendMessage(chatId, message) {
 
 async function updateTaskStatus(id_task) {
     const updateUrl = `${WEB_API}/comment/update.php?id_task=${id_task}&sent=1&access_key=${SECRET_KEY}`
+    stateCounter.comment_update++
     try {
         const response = await fetch(updateUrl)
         if (response.ok) {
@@ -58,6 +59,7 @@ function formatMessage(comment, total) {
 async function notifyAllUsers() {
     const allComments = await fetchComments()
     const data = await fetchData(`${WEB_API}/comment/get_all.php?key=${SECRET_KEY}`)
+    stateCounter.comment_get_all++
     const user_ids = [...new Set(data.comments.map(comment => comment.user_id))]
 
     for (const chatId of user_ids) {

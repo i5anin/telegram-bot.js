@@ -57,7 +57,7 @@ global.emoji = {
     warning: '&#x26A0;',
     bot: '&#129302;',
     star: '&#11088;',
-}   //❌ //✅ //❗ //⚠️ //🤖 //⭐
+}   //❌ //✅ //❗ //⚠ //🤖 //⭐
 
 global.bot = bot
 global.stateCounter = {
@@ -65,8 +65,9 @@ global.stateCounter = {
     bot_check: 0,
 
     user_get_all: 0,
-    user_get_all_fio: 0,
-    user_add: 0,  // user_update: 0,
+    users_get: 0,
+    users_get_all_fio: 0,
+    users_add: 0,
 
     comment_get_all: 0,
     comment_update: 0,
@@ -115,8 +116,9 @@ bot.launch().catch((err) => {
 
 createMetric('bot_check', stateCounter, 'bot_check')
 createMetric('user_get_all', stateCounter, 'user_get_all')
-createMetric('user_get_all_fio', stateCounter, 'user_get_all_fio')
+createMetric('users_get_all_fio', stateCounter, 'users_get_all_fio')
 createMetric('user_add', stateCounter, 'user_add')
+createMetric('users_get', stateCounter, 'users_get')
 createMetric('comment_get_all', stateCounter, 'comment_get_all')
 createMetric('comment_update', stateCounter, 'comment_update')
 createMetric('oplata_get_all', stateCounter, 'oplata_get_all')

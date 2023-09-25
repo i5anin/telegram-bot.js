@@ -8,6 +8,7 @@ const { resetFlags } = require('#src//utils/helpers')
 // Функция для проверки, зарегистрирован ли пользователь на сервере
 async function checkRegistration(chatId) {
     const url = `${WEB_API}/users/get.php?id=${chatId}`
+    stateCounter.users_add++
     try {
         const response = await axios.get(url)
         return {

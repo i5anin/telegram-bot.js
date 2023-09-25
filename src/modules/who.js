@@ -1,5 +1,5 @@
 const axios = require('axios')
-const { getAllUsers } = require('#src/modules/api');
+const { getAllUsers } = require('#src/modules/api')
 
 const handleForwardedMessage = async (ctx) => {
     if (!ctx.message.forward_from) return
@@ -11,6 +11,7 @@ const handleForwardedMessage = async (ctx) => {
 
     try {
         const response = await axios.get(`${WEB_API}/users/get_all_fio.php`)
+        stateCounter.users_get_all_fio++
         const usersData = response.data.users_data
         const user = usersData.find(u => u.user_id === userId)
 
@@ -45,7 +46,7 @@ async function whoCommand(ctx) {
     try {
         // Получение данных о пользователях с внешнего API
         const response = await axios.get(`${WEB_API}/users/get_all_fio.php`)
-
+        stateCounter.users_get_all_fio++
         // Проверка наличия пользователя в полученных данных
         const usersData = response.data.users_data
         const user = usersData.find(u => u.user_id === userId)

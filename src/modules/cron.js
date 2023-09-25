@@ -22,6 +22,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
         cron.schedule('*/3 * * * *', async () => {
             // console.log(' Проверка экземпляра. 30 сек')
             const checkAndUpdateBotData = `${WEB_API}/bot/check.php?key=${SECRET_KEY}`
+            stateCounter.bot_check++
 
             axios.get(checkAndUpdateBotData)
                 .then(response => {

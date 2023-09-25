@@ -5,6 +5,7 @@ function runBot(instanceNumber, currentDateTime) {
         const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDateTime.getMonth() + 1).padStart(2, '0')}-${String(currentDateTime.getDate()).padStart(2, '0')} ${String(currentDateTime.getHours()).padStart(2, '0')}:${String(currentDateTime.getMinutes()).padStart(2, '0')}:${String(currentDateTime.getSeconds()).padStart(2, '0')}`
 // URL для регулярного обновления данных о боте
         const updateBotURL = `${WEB_API}/bot/update.php?key=${SECRET_KEY}&date=${encodeURIComponent(formattedDateTime)}&random_key=${instanceNumber}`
+        stateCounter.bot_update++
 
 // Отправка данных при запуске бота
         axios.get(updateBotURL)
