@@ -29,36 +29,34 @@ async function getUserInfo(userId) {
 async function handleHelpCommand(ctx) {
     await sendToLog(ctx);
 
-    // Получаем аргументы после команды
     const input = ctx.message.text.split(' ');
     const userId = input[1] ? parseInt(input[1]) : null;
 
-    // Проверяем, является ли отправитель администратором и был ли предоставлен аргумент
     if (userId && String(ctx.from.id) === GRAND_ADMIN) {
         try {
             const userChatId = userId;
             await sendHelpToUser(ctx, userChatId);
 
-            // Получаем информацию о пользователе с помощью функции getUserInfo
-            const user = await getUserInfo(userId);
-
-            // Отправляем сообщение администратору с информацией о пользователе
-            await ctx.reply(`Сообщение отправлено пользователю\nID: <code>${user.userId}</code>\nФИО: <code>${user.fio}</code>`, { parse_mode: 'HTML' });
-
+            // Если sendMessage прошло успешно, здесь можно получить информацию о пользователе и отправить сообщение администратору.
         } catch (err) {
             console.error('Error sending help to user:', err);
+            await ctx.reply('Не удалось отправить сообщение пользователю. Возможно, пользователь не начал чат с ботом.');
         }
     } else if (!userId) {
-        // Если аргумент не предоставлен, отправляем справку отправителю
-        await sendHelpToUser(ctx, ctx.chat.id);
+        try {
+            await sendHelpToUser(ctx, ctx.chat.id);
+        } catch (err) {
+            console.error('Error sending help to sender:', err);
+            await ctx.reply('Произошла ошибка при отправке справки.');
+        }
     }
 }
 
 async function sendHelpToUser(ctx, chatId) {
-    // Формируем и отправляем справку пользователю с указанным chatId
-    const photo = fs.createReadStream('src/media/answer.jpg');
-    const video = fs.createReadStream('src/media/answer.mp4'); // Убедитесь, что путь к файлу верный
-    const messageJpg = `Доступные команды:
+    try {
+        const photo = fs.createReadStream('src/media/answer.jpg');
+        const video = fs.createReadStream('src/media/answer.mp4');
+        const messageJpg = `Доступные команды:
 
 1. /new_comment - Получить новые комментарии
 · прокомментировать задачу через <u>ответить</u>
@@ -69,15 +67,17 @@ async function sendHelpToUser(ctx, chatId) {
 
 Для регистрации подойдите в отдел <b>IT</b>
 
-В случае ошибки напишите разработчику @i5anin Сергей.`;
+В случае ошибки напишите разработчику @i5anin Сергей.`; // Ваше сообщение
 
-    await ctx.telegram.sendPhoto(chatId, { source: photo }, {
-        caption: messageJpg,
-        parse_mode: 'HTML',
-    });
-
-    // Отправка видео
-    await ctx.telegram.sendVideo(chatId, { source: video });
+        await ctx.telegram.sendPhoto(chatId, { source: photo }, {
+            caption: messageJpg,
+            parse_mode: 'HTML',
+        });
+        await ctx.telegram.sendVideo(chatId, { source: video });
+    } catch (err) {
+        console.error('Error in sendHelpToUser:', err);
+        throw err; // Перебрасываем ошибку для обработки в handleHelpCommand
+    }
 }
 
 async function handleDocsCommand(ctx) {
