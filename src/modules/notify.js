@@ -64,14 +64,13 @@ async function notifyAllUsers() {
         // Фильтрация комментариев для текущего пользователя
         const userComments = allComments.filter(comment => comment.user_id === chatId && comment.sent === 0)
 
-        await sendMessage(LOG_CHANNEL_ID, `<code>Cron</code> Отправлено пользователю <code>${chatId}</code>`);
-
         // Если нет комментариев для текущего пользователя, продолжаем следующую итерацию
         if (userComments.length === 0) continue
 
         const message = formatMessage(userComments[0], userComments.length) // Используем userComments.length для подсчета количества сообщений для текущего пользователя
         await sendMessage(chatId, message + "\n<code>Cron</code>")
         await updateTaskStatus(userComments[0].id_task)
+        await sendMessage(LOG_CHANNEL_ID, `<code>Cron</code> Отправлено пользователю <code>${chatId}</code>`);
     }
 }
 

@@ -2,13 +2,32 @@ const fs = require('fs')
 const { sendToLog } = require('#src/utils/log')
 
 async function handleHelpCommand(ctx) {
-    await sendToLog(ctx)
-    if (ctx.chat.type !== 'private') return
-    // Отправка фото из файла с подписью (caption)
-    const photo = fs.createReadStream('src/media/answer.jpg')
-    const video = fs.createReadStream('src/media/answer.mp4')
-    const messageJpg =
-        `Доступные команды:
+    await sendToLog(ctx);
+
+    // Получаем аргументы после команды
+    const input = ctx.message.text.split(' ');
+    const userId = input[1] ? parseInt(input[1]) : null;
+
+    // Проверяем, является ли отправитель администратором и был ли предоставлен аргумент
+    if (userId && String(ctx.from.id) === GRAND_ADMIN) {
+        // Отправляем справку пользователю с userId
+        try {
+            const userChatId = userId;
+            await sendHelpToUser(ctx, userChatId);
+        } catch (err) {
+            console.error('Error sending help to user:', err);
+        }
+    } else if (!userId) {
+        // Если аргумент не предоставлен, отправляем справку отправителю
+        await sendHelpToUser(ctx, ctx.chat.id);
+    }
+}
+
+async function sendHelpToUser(ctx, chatId) {
+    // Формируем и отправляем справку пользователю с указанным chatId
+    const photo = fs.createReadStream('src/media/answer.jpg');
+    const video = fs.createReadStream('src/media/answer.mp4'); // Убедитесь, что путь к файлу верный
+    const messageJpg = `Доступные команды:
 
 1. /new_comment - Получить новые комментарии
 · прокомментировать задачу через <u>ответить</u>
@@ -19,13 +38,15 @@ async function handleHelpCommand(ctx) {
 
 Для регистрации подойдите в отдел <b>IT</b>
 
-В случае ошибки напишите разработчику @i5anin Сергей.`
-    await ctx.replyWithPhoto({ source: photo }, {
+В случае ошибки напишите разработчику @i5anin Сергей.`;
+
+    await ctx.telegram.sendPhoto(chatId, { source: photo }, {
         caption: messageJpg,
-        parse_mode: 'HTML', // Опционально, если вы хотите использовать HTML-разметку в подписи
-    })
+        parse_mode: 'HTML',
+    });
+
     // Отправка видео
-    await ctx.replyWithVideo({ source: video })
+    await ctx.telegram.sendVideo(chatId, { source: video });
 }
 
 async function handleDocsCommand(ctx) {

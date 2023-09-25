@@ -27,6 +27,7 @@ async function checkAndUpdateBotData(formattedDateTime, instanceNumber) {
 
 async function getAllUsers() {
     const url = `${WEB_API}/users/get_all_fio.php`;
+    stateCounter.user_get_all++
     return performRequest(url);
 }
 

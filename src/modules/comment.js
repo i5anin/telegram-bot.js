@@ -25,6 +25,11 @@ async function handleAddComment(ctx) {
     const chatId = ctx.message.chat.id
     // const botUsername = ctx.botInfo.username
 
+    // Определение переменных username, firstName и lastName
+    const username = ctx.from.username || 'N/A'
+    const firstName = ctx.from.first_name || 'N/A'
+    const lastName = ctx.from.last_name || 'N/A'
+
     const taskText = ctx.message.reply_to_message.text || ''
 
     // Извлекаем task_ID и название с обозначением
@@ -67,6 +72,14 @@ async function handleAddComment(ctx) {
             if (response.data.status === 'OK') {
                 await ctx.reply(
                     `Комментарий:\n<code>${ctx.message.text}</code>\nДля:\n<code>${ctx.session.userComments.det_name}</code>\nдобавлен успешно.`,
+                    { parse_mode: 'HTML' },
+                )
+                await bot.telegram.sendMessage(
+                    LOG_CHANNEL_ID,
+                    `${emoji.star.repeat(3)} Успешно прокомментировал задачу\n Пользователь с ID <code>${chatId}</code>` +
+                    ` @${username}` +
+                    `\nИмя: <code>${firstName} ${lastName}</code>` +
+                    `\nКомментарий:\n<code>${ctx.message.text}</code>`,
                     { parse_mode: 'HTML' },
                 )
             } else {
