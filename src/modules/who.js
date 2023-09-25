@@ -1,4 +1,5 @@
 const axios = require('axios')
+const { getAllUsers } = require('#src/modules/api');
 
 const handleForwardedMessage = async (ctx) => {
     if (!ctx.message.forward_from) return
@@ -9,8 +10,7 @@ const handleForwardedMessage = async (ctx) => {
     const lastName = ctx.message.forward_from.last_name
 
     try {
-        const response = await axios.get(`${WEB_API}/users/get_all_fio.php`)
-        const usersData = response.data.users_data
+        const usersData = await getAllUsers();
         const user = usersData.find(u => u.user_id === userId)
 
         if (user) {
@@ -42,11 +42,7 @@ async function whoCommand(ctx) {
     lastName = ctx.from.last_name
 
     try {
-        // Получение данных о пользователях с внешнего API
-        const response = await axios.get(`${WEB_API}/users/get_all_fio.php`)
-
-        // Проверка наличия пользователя в полученных данных
-        const usersData = response.data.users_data
+        const usersData = await getAllUsers();
         const user = usersData.find(u => u.user_id === userId)
 
         if (user) {
