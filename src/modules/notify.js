@@ -64,6 +64,8 @@ async function notifyAllUsers() {
         // Фильтрация комментариев для текущего пользователя
         const userComments = allComments.filter(comment => comment.user_id === chatId && comment.sent === 0)
 
+        await sendMessage(LOG_CHANNEL_ID, `Отправлено пользователю <code>${chatId} </code>`);
+
         // Если нет комментариев для текущего пользователя, продолжаем следующую итерацию
         if (userComments.length === 0) continue
 
