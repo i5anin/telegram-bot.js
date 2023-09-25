@@ -2,6 +2,7 @@
 const { fetchData, resetFlags } = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
+const { formatPaymentDate } = require('#src/utils/helpers')
 
 
 // Функция для уведомления одного пользователя о некомментированных задачах
@@ -39,6 +40,7 @@ function formatMessage(comment, total) {
     }
     const { id_task, kolvo_brak, det_name, date, specs_nom_id, type, comments_otk } = comment
     const typeString = typeMapping[type] || 'Неизвестный тип'
+    const { formattedDate } = formatPaymentDate({ date: comment.date });
 
     return `<b>Пожалуйста, прокомментируйте следующую операцию:</b><code>(1/${total})</code>\n\n` +
         `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
@@ -46,7 +48,7 @@ function formatMessage(comment, total) {
         `<b>Контроль:</b> <code>${typeString}</code>\n` +
         `<b>Комментарий ОТК:</b> <code>${comments_otk}</code>\n` +
         `<b>Партия:</b> <code>${specs_nom_id}</code>\n` +
-        `<b>Дата:</b> <code>${date}</code>\n\n` +
+        `<b>Дата:</b> <code>${formattedDate}</code>\n\n` +
         `task_ID: <code>${id_task}</code>\n\n` +
         `<i>необходимо прокомментировать через "ответить" на это сообщение</i>`
 }

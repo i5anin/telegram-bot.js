@@ -34,4 +34,11 @@ function resetFlags(ctx) {
     ctx.session.isUserInitiated = false
 }
 
-module.exports = { fetchData, resetFlags }
+function formatPaymentDate(payment) {
+    const [year, month, day] = payment.date.split('-')
+    const formattedDate = `${day}.${month}.${year}`
+
+    return { formattedDate }
+}
+
+module.exports = { fetchData, resetFlags, formatPaymentDate }

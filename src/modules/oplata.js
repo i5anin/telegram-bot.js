@@ -1,4 +1,5 @@
 const axios = require('axios')
+const { formatPaymentDate } = require('#src/utils/helpers')
 
 async function oplataNotification() {
 
@@ -30,8 +31,7 @@ async function oplataNotification() {
 
                 batch.forEach((payment) => {
                     const formattedSum = Number(payment.sum).toLocaleString('ru-RU')
-                    const [year, month, day] = payment.date.split('-')
-                    const formattedDate = `${day}.${month}.${year}`
+                    const { formattedDate } = formatPaymentDate(payment);
 
                     message += `<b>Дата:</b> <code>${formattedDate}</code>\n`
                     message += `<b>Имя клиента:</b> <code>${payment.client_name}</code>\n`
