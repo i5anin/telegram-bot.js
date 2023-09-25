@@ -1,5 +1,30 @@
 const fs = require('fs')
 const { sendToLog } = require('#src/utils/log')
+const axios = require('axios')
+
+async function getUserInfo(userId) {
+    try {
+        // Запрашиваем данные всех пользователей
+        const response = await axios.get(`${WEB_API}/users/get_all_fio.php`);
+
+        // Ищем пользователя с заданным userId в полученных данных
+        const user = response.data.users_data.find(u => u.user_id === userId);
+
+        if (user) {
+            // Если пользователь найден, возвращаем его данные
+            return {
+                userId: user.user_id,
+                fio: user.fio,
+            };
+        } else {
+            // Если пользователь не найден, выбрасываем ошибку или возвращаем undefined/null
+            throw new Error('User not found');
+        }
+    } catch (error) {
+        console.error('Ошибка при получении данных пользователя:', error);
+        throw error;
+    }
+}
 
 async function handleHelpCommand(ctx) {
     await sendToLog(ctx);
@@ -10,10 +35,16 @@ async function handleHelpCommand(ctx) {
 
     // Проверяем, является ли отправитель администратором и был ли предоставлен аргумент
     if (userId && String(ctx.from.id) === GRAND_ADMIN) {
-        // Отправляем справку пользователю с userId
         try {
             const userChatId = userId;
             await sendHelpToUser(ctx, userChatId);
+
+            // Получаем информацию о пользователе с помощью функции getUserInfo
+            const user = await getUserInfo(userId);
+
+            // Отправляем сообщение администратору с информацией о пользователе
+            await ctx.reply(`Сообщение отправлено пользователю\nID: <code>${user.userId}</code>\nФИО: <code>${user.fio}</code>`, { parse_mode: 'HTML' });
+
         } catch (err) {
             console.error('Error sending help to user:', err);
         }
