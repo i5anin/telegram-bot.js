@@ -2,6 +2,12 @@
 require('dotenv').config()
 const { Telegraf } = require('telegraf')
 const LocalSession = require('telegraf-session-local')
+const io = require('@pm2/io')
+
+io.init({
+    transactions: true, // включить отслеживание транзакций
+    http: true, // включить метрики веб-сервера (необязательно)
+})
 
 // Импорт модулей
 const { initCronJobs } = require('#src/modules/cron')
@@ -15,6 +21,7 @@ const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
 const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 const { runBot } = require('#src/modules/run')
 const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
+const { createMetric } = require('#src/utils/metric')
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -105,6 +112,15 @@ bot.launch().catch((err) => {
     console.error('Fatal Error! Error while launching the bot:', err)
     setTimeout(() => bot.launch(), 30000) // Попробовать перезапустить через 30 секунд
 })
+
+createMetric('bot_check', stateCounter, 'bot_check')
+createMetric('user_get_all', stateCounter, 'user_get_all')
+createMetric('user_get_all_fio', stateCounter, 'user_get_all_fio')
+createMetric('user_add', stateCounter, 'user_add')
+createMetric('comment_get_all', stateCounter, 'comment_get_all')
+createMetric('comment_update', stateCounter, 'comment_update')
+createMetric('oplata_get_all', stateCounter, 'oplata_get_all')
+createMetric('oplata_update', stateCounter, 'oplata_update')
 
 // Инициализация cron-заданий
 initCronJobs(currentDateTime, instanceNumber)
