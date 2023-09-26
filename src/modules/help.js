@@ -1,6 +1,6 @@
 const fs = require('fs')
 const axios = require('axios')
-const { sendToLog } = require('#src/utils/ProcessingLog')
+const { sendToLog } = require('#src/utils/log')
 const { getAllUsers } = require('#src/modules/api')
 
 async function getUserInfo(userId) {

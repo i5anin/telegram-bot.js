@@ -102,7 +102,4 @@ async function handleAddComment(ctx) {
 }
 
 
-module.exports = {
-    fetchComments,
-    handleAddComment,
-}
+module.exports = { fetchComments, handleAddComment }

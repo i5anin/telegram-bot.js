@@ -1,8 +1,8 @@
 const ruLang = require('#src/utils/ru_lang')
-const { fetchData } = require('#src/utils/ProcessingHelpers')
-const { notifyUsers } = require('#src/modules/ProcessingNotify')
-const { handleAddComment } = require('#src/modules/ProcessingComment')
-const { sendToLog } = require('#src/utils/ProcessingLog')
+
+const { notifyUsers } = require('#src/modules/notify')
+const { handleAddComment } = require('#src/modules/comment')
+const { sendToLog } = require('#src/utils/log')
 
 async function handleTextCommand(ctx) {
     await sendToLog(ctx)

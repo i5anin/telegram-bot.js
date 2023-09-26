@@ -1,8 +1,8 @@
 // Подключаем необходимые модули и переменные
 const axios = require('axios')
 const ruLang = require('#src/utils/ru_lang')  // Локализация сообщений
-const { sendToLog } = require('#src/utils/ProcessingLog') // Добавление лога
-const { resetFlags } = require('#src/utils/ProcessingHelpers')
+const { sendToLog } = require('#src/utils/log') // Добавление лога
+const { resetFlags } = require('#src/utils/helpers')
 const { checkUser } = require('#src/api/users')
 // const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
 

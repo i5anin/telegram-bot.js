@@ -1,5 +1,5 @@
 const axios = require('axios')
-const { formatPaymentDate } = require('#src/utils/ProcessingHelpers')
+const { formatPaymentDate } = require('#src/utils/helpers')
 
 async function oplataNotification() {
 

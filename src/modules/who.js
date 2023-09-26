@@ -1,13 +1,15 @@
 const axios = require('axios')
-const { getAllUsers } = require('#src/modules/api')
+const { getAllUsers } = require('#src/api/index')
+const msg = require('#src/utils/ru_lang')
 
 const handleForwardedMessage = async (ctx) => {
     if (!ctx.message.forward_from) return
 
-    const userId = ctx.message.forward_from.id
-    const username = ctx.message.forward_from.username
-    const firstName = ctx.message.forward_from.first_name
-    const lastName = ctx.message.forward_from.last_name
+    const res = ctx.message
+    const userId = res.forward_from.id
+    const username = res.forward_from.username
+    const firstName = res.forward_from.first_name
+    const lastName = res.forward_from.last_name
 
     try {
         const usersData = await getAllUsers()
@@ -15,18 +17,18 @@ const handleForwardedMessage = async (ctx) => {
 
         if (user) {
             const fullName = `${firstName || ''} ${lastName || ''}`.trim()
-            await ctx.reply(`Пользователь\nID <code>${userId}</code>\nTG: <code>${username || ''}</code> (<code>${fullName}</code>)\nfio: <code>${user.fio}</code>`, { parse_mode: 'HTML' })
+            await ctx.reply(msg.userFound(userId, username, fullName, user.fio), { parse_mode: 'HTML' })
         } else {
-            await ctx.reply(`Пользователь\nID <code>${userId}</code>\nне зарегистрирован в системе`, { parse_mode: 'HTML' })
+            await ctx.reply(msg.userNotFound(userId), { parse_mode: 'HTML' })
         }
     } catch (error) {
-        console.error('Ошибка при получении данных с внешнего API:', error)
-        await ctx.reply('Произошла ошибка при выполнении команды')
+        console.error(msg.errorAPI, error)
+        await ctx.reply(msg.error)
     }
 }
 
 
-async function whoCommand(ctx) {
+async function whoCommand(ctx) { // /who
     let userId
     let username
     let firstName
@@ -35,7 +37,6 @@ async function whoCommand(ctx) {
     // Инициализация input
     const input = ctx.message.text.split(' ')
 
-    console.log('input[1]=', input[1] ? parseInt(input[1]) : ctx.from.id)
     userId = input[1] ? parseInt(input[1]) : ctx.from.id
     username = ctx.from.username
     firstName = ctx.from.first_name
@@ -51,14 +52,14 @@ async function whoCommand(ctx) {
         if (user) {
             // Если пользователь найден, отправляем информацию о нем
             const fullName = `${firstName || ''} ${lastName || ''}`.trim()
-            await ctx.reply(`Пользователь\nID: <code>${userId}</code>\nfio: <code>${user.fio}</code>`, { parse_mode: 'HTML' })
+            await ctx.reply(msg.userFound(userId, user.fio), { parse_mode: 'HTML' })
         } else {
             // Если пользователь не найден, отправляем сообщение об ошибке
-            await ctx.reply(`Пользователь\nID: <code>${userId}</code>\nне зарегистрирован в системе`, { parse_mode: 'HTML' })
+            await ctx.reply(msg.userNotFound(userId), { parse_mode: 'HTML' })
         }
     } catch (error) {
-        console.error('Ошибка при получении данных с внешнего API:', error)
-        await ctx.reply('Произошла ошибка при выполнении команды')
+        console.error(msg.errorAPI, error)
+        await ctx.reply(msg.error)
     }
 }
 

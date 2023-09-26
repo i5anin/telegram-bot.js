@@ -1,8 +1,8 @@
 // cronJobs.js
 const axios = require('axios')
 const cron = require('node-cron')
-const { notifyAllUsers } = require('#src/modules/ProcessingNotify')  // Уведомления пользователя
-const { oplataNotification } = require('#src/modules/ProcessingOplata') // Добавлени
+const { notifyAllUsers } = require('#src/modules/notify')  // Уведомления пользователя
+const { oplataNotification } = require('#src/modules/oplata') // Добавлени
 
 function initCronJobs(currentDateTime, instanceNumber) {
     // Уведомлять о сообщениях каждые 15 мин
