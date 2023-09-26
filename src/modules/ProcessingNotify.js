@@ -1,8 +1,8 @@
 // Импортируем необходимые функции
-const { fetchData, resetFlags } = require('#src/utils/helpers')
-const { fetchComments } = require('#src/modules/comment')
-const { sendToLog } = require('#src/utils/log')
-const { formatPaymentDate } = require('#src/utils/helpers')
+const { fetchData, resetFlags } = require('#src/utils/ProcessingHelpers')
+const { fetchComments } = require('#src/modules/ProcessingComment')
+const { sendToLog } = require('#src/utils/ProcessingLog')
+const { formatPaymentDate } = require('#src/utils/ProcessingHelpers')
 
 
 // Функция для уведомления одного пользователя о некомментированных задачах

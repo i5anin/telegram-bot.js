@@ -1,13 +1,14 @@
 const axios = require('axios')
+const { getAllUsers } = require('#src/api/index')
 
 //fetchComments
 async function fetchComments() {
-    const url = `${WEB_API}/comment/get_all.php?key=${SECRET_KEY}`
-    stateCounter.comment_get_all++
+    // const url = `${WEB_API}/comment/get_all.php?key=${SECRET_KEY}`
+    // stateCounter.comment_get_all++
     try {
-        const response = await axios.get(url)
-        if (response.data && response.data.comments) {
-            return response.data.comments
+        const response = getAllUsers()
+        if (response && response.comments) {
+            return response.comments
         } else {
             throw new Error('Не удалось получить комментарии')
         }
@@ -71,7 +72,7 @@ async function handleAddComment(ctx) {
         try {
             const response = await axios.get(url, { params })
 
-            if (response.data.status === 'OK') {
+            if (response.status === 'OK') {
                 await ctx.reply(
                     `Комментарий:\n<code>${ctx.message.text}</code>\nДля:\n<code>${ctx.session.userComments.det_name}</code>\nдобавлен успешно.`,
                     { parse_mode: 'HTML' },
@@ -93,7 +94,7 @@ async function handleAddComment(ctx) {
                 `Ошибка при добавлении комментария:\n${error}`,
                 { parse_mode: 'HTML' },
             )
-            console.log('Comment Axios Error:', error, error.response && error.response.data)
+            console.log('Comment Axios Error:', error, error.response)
         }
     } else {
         console.log('Invalid task_ID format or missing detName in the reply message!')

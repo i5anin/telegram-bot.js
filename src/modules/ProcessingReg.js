@@ -1,19 +1,18 @@
 // Подключаем необходимые модули и переменные
 const axios = require('axios')
 const ruLang = require('#src/utils/ru_lang')  // Локализация сообщений
-const { sendToLog } = require('#src/utils/log') // Добавление лога
-const { resetFlags } = require('#src//utils/helpers')
+const { sendToLog } = require('#src/utils/ProcessingLog') // Добавление лога
+const { resetFlags } = require('#src/utils/ProcessingHelpers')
+const { checkUser } = require('#src/api/users')
 // const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
 
 // Функция для проверки, зарегистрирован ли пользователь на сервере
 async function checkRegistration(chatId) {
-    const url = `${WEB_API}/users/get.php?id=${chatId}`
-    stateCounter.users_add++
     try {
-        const response = await axios.get(url)
+        const response = checkUser()
         return {
-            exists: response.data.exists === true,
-            fio: response.data.fio,
+            exists: response.exists === true,
+            fio: response.fio,
         }
     } catch (error) {
         await bot.telegram.sendMessage(LOG_CHANNEL_ID, `reg <code>${error}</code>`, { parse_mode: 'HTML' })

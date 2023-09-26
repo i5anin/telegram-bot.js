@@ -1,15 +1,15 @@
 const ruLang = require('#src/utils/ru_lang')
-const { fetchData } = require('#src/utils/helpers')
-const { notifyUsers } = require('#src/modules/notify')
-const { handleAddComment } = require('#src/modules/comment')
-const { sendToLog } = require('#src/utils/log')
+const { fetchData } = require('#src/utils/ProcessingHelpers')
+const { notifyUsers } = require('#src/modules/ProcessingNotify')
+const { handleAddComment } = require('#src/modules/ProcessingComment')
+const { sendToLog } = require('#src/utils/ProcessingLog')
 
 async function handleTextCommand(ctx) {
     await sendToLog(ctx)
     if (ctx.chat.type !== 'private') return
     // Деструктуризация полей из сообщения
     const { text, chat, from } = ctx.message
-    
+
     // Ранний выход для улучшения читаемости
     if (!ctx.session.isAwaitFio && !ctx.session.isAwaitComment && !ctx.message.reply_to_message) return
 
@@ -22,28 +22,16 @@ async function handleTextCommand(ctx) {
         }
         // Дальнейшая логика обработки ФИО
         const cleanedText = text.replace(/ë/g, 'ё').replace(/Ë/g, 'Ё').replace(/\. /g, '.')
-        // const encodedFio = encodeURIComponent(cleanedText)
         const userId = chat.id
 
         // Запрос на добавление пользователя
-        const dataAddUser = await fetchData(
-            `${WEB_API}/users/add.php`,
-            {
-                id: userId,
-                fio: cleanedText,
-                username: from.username,
-                active: 1,
-            },
-            stateCounter.users_add++
-        )
+        const dataAddUser = await addUser(userId, cleanedText, from.username)
         ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
         const defMsg = `\nID: <code>${userId}</code>` +
             `\nfio: <code>${cleanedText}</code>`
 
         await bot.telegram.sendMessage(
-            LOG_CHANNEL_ID,
-            dataAddUser ? `${emoji.star}Пользователь добавлен.${defMsg}` :
-                `⚠️Ошибка регистрации${defMsg}`,
+            LOG_CHANNEL_ID, dataAddUser ? `${emoji.star}Пользователь добавлен.${defMsg}` : `⚠️Ошибка регистрации${defMsg}`,
             { parse_mode: 'HTML' },
         )
 

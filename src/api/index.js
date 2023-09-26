@@ -15,13 +15,21 @@ async function performRequest(url, method = 'get', data = {}, params = {}) {
 // Bot
 async function checkBotData(formattedDateTime, instanceNumber) {
     const url = `${WEB_API}/bot/check.php`
-    const params = { key: SECRET_KEY, date: formattedDateTime, random_key: instanceNumber }
+    const params = {
+        key: SECRET_KEY,
+        date: formattedDateTime,
+        random_key: instanceNumber,
+    }
     return performRequest(url, 'get', {}, params)
 }
 
 async function updateBotData(formattedDateTime, instanceNumber) {
     const url = `${WEB_API}/bot/update.php`
-    const params = { key: SECRET_KEY, date: formattedDateTime, random_key: instanceNumber }
+    const params = {
+        key: SECRET_KEY,
+        date: formattedDateTime,
+        random_key: instanceNumber,
+    }
     return performRequest(url, 'get', {}, params)
 }
 
@@ -33,39 +41,57 @@ async function getAllUsers() {
 
 async function checkUser(chatId) {
     const url = `${WEB_API}/users/check.php`
-    const params = { id: chatId }
+    const params = {
+        id: chatId,
+    }
     return performRequest(url, 'get', {}, params)
 }
 
 async function addUser(userId, cleanedText, username) {
     const url = `${WEB_API}/users/add.php`
-    const data = { id: userId, fio: cleanedText, username: username, active: 1 }
+    const data = {
+        id: userId,
+        fio: cleanedText,
+        username: username,
+        active: 1,
+    }
     return performRequest(url, 'post', data)
 }
 
 // Comments
 async function getAllComments() {
     const url = `${WEB_API}/comment/get_all.php`
-    const params = { key: SECRET_KEY }
+    const params = {
+        key: SECRET_KEY,
+    }
     return performRequest(url, 'get', {}, params)
 }
 
 async function updateComment(id_task) {
     const url = `${WEB_API}/comment/update.php`
-    const params = { id_task, sent: 1, access_key: SECRET_KEY }
+    const params = {
+        id_task,
+        sent: 1,
+        access_key: SECRET_KEY,
+    }
     return performRequest(url, 'get', {}, params)
 }
 
 // Payments
 async function getAllPayments() {
     const url = `${WEB_API}/oplata/get_all.php`
-    const params = { key: SECRET_KEY }
+    const params = {
+        key: SECRET_KEY,
+    }
     return performRequest(url, 'get', {}, params)
 }
 
 async function updatePayments(sentIds) {
     const url = `${WEB_API}/oplata/update.php`
-    const params = { key: SECRET_KEY, sent_ids: sentIds.join(',') }
+    const params = {
+        key: SECRET_KEY,
+        sent_ids: sentIds.join(','),
+    }
     return performRequest(url, 'get', {}, params)
 }
 
