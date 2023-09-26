@@ -10,9 +10,9 @@ io.init({
 })
 
 // Импорт модулей
-const { initCronJobs } = require('#src/modules/ProcessingСron')
+const { initCronJobs } = require('#src/modules/cron')
 const { handleRegComment } = require('#src/modules/reg')
-const { handleTextCommand } = require('#src/modules/ProcessingText')
+const { handleTextCommand } = require('#src/modules/text')
 const { handleHelpCommand, handleDocsCommand } = require('#src/modules/help')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
@@ -20,7 +20,7 @@ const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
 const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
 const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 const { runBot } = require('#src/modules/runBot')
-const { handleForwardedMessage, whoCommand } = require('#src/modules/ProcessingWho')
+const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
 const { createMetric } = require('#src/utils/metric')
 
 // Конфигурационные переменные

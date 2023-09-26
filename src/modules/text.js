@@ -1,8 +1,9 @@
 const ruLang = require('#src/utils/ru_lang')
 
-const { notifyUsers } = require('#src/modules/notify')
 const { handleAddComment } = require('#src/modules/comment')
+const { notifyUsers } = require('#src/modules/notify')
 const { sendToLog } = require('#src/utils/log')
+const { addUser } = require('#src/api/index')
 
 async function handleTextCommand(ctx) {
     await sendToLog(ctx)
