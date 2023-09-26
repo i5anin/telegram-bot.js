@@ -12,74 +12,71 @@ async function performRequest(url, method = 'get', data = {}, params = {}) {
     }
 }
 
-async function checkAndUpdateBotData(formattedDateTime, instanceNumber) {
+// Bot
+async function checkBotData(formattedDateTime, instanceNumber) {
     const url = `${WEB_API}/bot/check.php`
-    stateCounter.bot_check++
-    const params = {
-        key: SECRET_KEY,
-        date: formattedDateTime,
-        random_key: instanceNumber,
-    }
-    const checkResponse = await performRequest(url, 'get', {}, params)
-    const updateUrl = `${WEB_API}/bot/update.php`
-    stateCounter.bot_update++
-    await performRequest(updateUrl, 'get', {}, params)
-    return checkResponse
+    const params = { key: SECRET_KEY, date: formattedDateTime, random_key: instanceNumber }
+    return performRequest(url, 'get', {}, params)
 }
 
-// получить всех пользователей id и fio
+async function updateBotData(formattedDateTime, instanceNumber) {
+    const url = `${WEB_API}/bot/update.php`
+    const params = { key: SECRET_KEY, date: formattedDateTime, random_key: instanceNumber }
+    return performRequest(url, 'get', {}, params)
+}
+
+// Users
 async function getAllUsers() {
     const url = `${WEB_API}/users/get_all_fio.php`
-    stateCounter.users_get_all_fio++
     return performRequest(url)
 }
 
-async function getAndUpdateComments(id_task) {
-    const getUrl = `${WEB_API}/comment/get_all.php`
-    stateCounter.comment_get_all++
-    const getParams = { key: SECRET_KEY }
-    const data = await performRequest(getUrl, 'get', {}, getParams)
-
-    const updateUrl = `${WEB_API}/comment/update.php`
-    stateCounter.comment_update++
-    const updateParams = { id_task, sent: 1, access_key: SECRET_KEY }
-    await performRequest(updateUrl, 'get', {}, updateParams)
-    return data
+async function checkUser(chatId) {
+    const url = `${WEB_API}/users/check.php`
+    const params = { id: chatId }
+    return performRequest(url, 'get', {}, params)
 }
 
-async function getAndUpdatePayments(sentIds) {
-    const getUrl = `${WEB_API}/oplata/get_all.php`
-    stateCounter.oplata_get_all++
-    const getParams = { key: SECRET_KEY }
-    const response = await performRequest(getUrl, 'get', {}, getParams)
-    const updateUrl = `${WEB_API}/oplata/update.php`
-    stateCounter.oplata_update++
-    const updateParams = { key: SECRET_KEY, sent_ids: sentIds.join(',') }
-    await performRequest(updateUrl, 'get', {}, updateParams)
-    return response
+async function addUser(userId, cleanedText, username) {
+    const url = `${WEB_API}/users/add.php`
+    const data = { id: userId, fio: cleanedText, username: username, active: 1 }
+    return performRequest(url, 'post', data)
 }
 
-async function getUserAndAdd(chatId, userId, cleanedText, username) {
-    const getUrl = `${WEB_API}/users/get.php`
-    stateCounter.users_get++
-    const getParams = { id: chatId }
-    const userData = await performRequest(getUrl, 'get', {}, getParams)
-    const addUserUrl = `${WEB_API}/users/add.php`
-    stateCounter.users_add++
-    const addUserParams = {
-        id: userId,
-        fio: cleanedText,
-        username: username,
-        active: 1,
-    }
-    const addUserResponse = await performRequest(addUserUrl, 'post', addUserParams)
-    return { userData, addUserResponse }
+// Comments
+async function getAllComments() {
+    const url = `${WEB_API}/comment/get_all.php`
+    const params = { key: SECRET_KEY }
+    return performRequest(url, 'get', {}, params)
+}
+
+async function updateComment(id_task) {
+    const url = `${WEB_API}/comment/update.php`
+    const params = { id_task, sent: 1, access_key: SECRET_KEY }
+    return performRequest(url, 'get', {}, params)
+}
+
+// Payments
+async function getAllPayments() {
+    const url = `${WEB_API}/oplata/get_all.php`
+    const params = { key: SECRET_KEY }
+    return performRequest(url, 'get', {}, params)
+}
+
+async function updatePayments(sentIds) {
+    const url = `${WEB_API}/oplata/update.php`
+    const params = { key: SECRET_KEY, sent_ids: sentIds.join(',') }
+    return performRequest(url, 'get', {}, params)
 }
 
 module.exports = {
-    checkAndUpdateBotData,
+    checkBotData,
+    updateBotData,
     getAllUsers,
-    getAndUpdateComments,
-    getAndUpdatePayments,
-    getUserAndAdd,
+    checkUser,
+    addUser,
+    getAllComments,
+    updateComment,
+    getAllPayments,
+    updatePayments,
 }
