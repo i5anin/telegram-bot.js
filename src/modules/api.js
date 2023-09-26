@@ -27,6 +27,7 @@ async function checkAndUpdateBotData(formattedDateTime, instanceNumber) {
     return checkResponse
 }
 
+// получить всех пользователей id и fio
 async function getAllUsers() {
     const url = `${WEB_API}/users/get_all_fio.php`
     stateCounter.users_get_all_fio++
@@ -38,6 +39,7 @@ async function getAndUpdateComments(id_task) {
     stateCounter.comment_get_all++
     const getParams = { key: SECRET_KEY }
     const data = await performRequest(getUrl, 'get', {}, getParams)
+
     const updateUrl = `${WEB_API}/comment/update.php`
     stateCounter.comment_update++
     const updateParams = { id_task, sent: 1, access_key: SECRET_KEY }

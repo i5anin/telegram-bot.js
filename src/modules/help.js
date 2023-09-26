@@ -1,15 +1,14 @@
 const fs = require('fs')
-const { sendToLog } = require('#src/utils/log')
 const axios = require('axios')
+const { sendToLog } = require('#src/utils/log')
+const { getAllUsers } = require('#src/modules/api')
 
 async function getUserInfo(userId) {
     try {
         // Запрашиваем данные всех пользователей
-        const response = await axios.get(`${WEB_API}/users/get_all_fio.php`)
-
+        const response = await getAllUsers()
         // Ищем пользователя с заданным userId в полученных данных
-        const user = response.data.users_data.find(u => u.user_id === userId)
-
+        const user = response.users_data.find(u => u.user_id === userId)
         if (user) {
             // Если пользователь найден, возвращаем его данные
             return {

@@ -1,16 +1,22 @@
 const fs = require('fs');
 const axios = require('axios');
+const { getAllUsers } = require('#src/modules/api')
 
 const getExternalUsers = async () => {
     try {
-        const response = await axios.get(WEB_API + '/users/get_all_fio.php')
-        stateCounter.users_get_all_fio++
-        return response.data.users_data
+        const response = await getAllUsers();
+        stateCounter.users_get_all_fio++;
+        if (response && response.users_data) {
+            return response.users_data;
+        } else {
+            throw new Error('Invalid response from getAllUsers');
+        }
     } catch (error) {
-        console.error('Ошибка при получении данных с внешнего API:', error)
-        return []
+        console.error('Ошибка при получении данных с внешнего API:', error);
+        return [];
     }
-}
+};
+
 
 async function generateReport(ctx, chatId) {
     // Локальные переменные для CSV отчета
