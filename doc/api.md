@@ -1,28 +1,55 @@
-1. **Проверка и обновление данных бота:**
+### Comment
 
-    - `GET ${WEB_API}/bot/check.php?key=${SECRET_KEY}`
-        - Проверяет текущее состояние бота.
-    - `GET ${WEB_API}/bot/update.php?key=${SECRET_KEY}&date=${formattedDateTime}&random_key=${instanceNumber}`
-        - Обновляет данные бота.
-2. **Получение всех пользователей:**
+1. **Get All Comments**
 
-    - `GET ${WEB_API}/users/get_all_fio.php`
-        - Возвращает список всех пользователей.
-3. **Работа с комментариями:**
+    - URL: `https://bot.pf-forum.ru/api/comment/get_all.php`
+    - Method: GET
+    - Parameters: `key`
+2. **Update Comment**
 
-    - `GET ${WEB_API}/comment/get_all.php?key=${SECRET_KEY}`
-        - Получает все комментарии.
-    - `GET ${WEB_API}/comment/update.php?id_task=${id_task}&sent=1&access_key=${SECRET_KEY}`
-        - Обновляет статус отправленных комментариев по задаче.
-4. **Работа с платежами:**
+    - URL: `https://bot.pf-forum.ru/api/comment/update.php`
+    - Method: GET
+    - Parameters: `id_task`, `sent`, `access_key`
 
-    - `GET ${WEB_API}/oplata/get_all.php?key=${SECRET_KEY}`
-        - Получает все платежи.
-    - `GET ${WEB_API}/oplata/update.php?key=${SECRET_KEY}&sent_ids=${sentIds.join(',')}`
-        - Обновляет статус отправленных платежей.
-5. **Работа с пользователями:**
+### Users
 
-    - `GET ${WEB_API}/users/get.php?id=${chatId}`
-        - Получает информацию о конкретном пользователе по ID чата.
-    - `POST ${WEB_API}/users/add.php`
-        - Добавляет нового пользователя с переданными параметрами: id, fio, username, active.
+1. **Get All Users**
+
+    - URL: `https://bot.pf-forum.ru/api/users/get_all_fio.php`
+    - Method: GET
+2. **Get User**
+
+    - URL: `https://bot.pf-forum.ru/api/users/get.php`
+    - Method: GET
+    - Parameters: `id`
+3. **Add User**
+
+    - URL: `https://bot.pf-forum.ru/api/users/add.php`
+    - Method: POST
+    - Parameters: `id`, `fio`, `username`, `active`
+
+### Oplata
+
+1. **Get All Payments**
+
+    - URL: `https://bot.pf-forum.ru/api/oplata/get_all.php`
+    - Method: GET
+    - Parameters: `key`
+2. **Update Payment**
+
+    - URL: `https://bot.pf-forum.ru/api/oplata/update.php`
+    - Method: GET
+    - Parameters: `key`, `sent_ids`
+
+### Bot
+
+1. **Check Bot Data**
+
+    - URL: `https://bot.pf-forum.ru/api/bot/check.php`
+    - Method: GET
+    - Parameters: `key`, `date`, `random_key`
+2. **Update Bot Data**
+
+    - URL: `https://bot.pf-forum.ru/api/bot/update.php`
+    - Method: GET
+    - Parameters: `key`, `date`, `random_key`
