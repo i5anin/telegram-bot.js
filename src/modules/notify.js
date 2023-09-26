@@ -57,10 +57,17 @@ function formatMessage(comment, total) {
 // Первая функция
 
 async function notifyAllUsers() {
+    // Получаем все комментарии с использованием функции fetchComments
     const allComments = await fetchComments()
-    const data = await fetchData(`${WEB_API}/comment/get_all.php?key=${SECRET_KEY}`)
-    stateCounter.comment_get_all++
-    const user_ids = [...new Set(data.comments.map(comment => comment.user_id))]
+
+    // Проверяем, что комментарии были успешно получены
+    if (!allComments) {
+        console.error('Не удалось получить комментарии')
+        return
+    }
+
+    // Получаем уникальные идентификаторы пользователей из комментариев
+    const user_ids = [...new Set(allComments.map(comment => comment.user_id))]
 
     for (const chatId of user_ids) {
         // Фильтрация комментариев для текущего пользователя
@@ -69,7 +76,7 @@ async function notifyAllUsers() {
         // Если нет комментариев для текущего пользователя, продолжаем следующую итерацию
         if (userComments.length === 0) continue
 
-        const message = formatMessage(userComments[0], userComments.length) // Используем userComments.length для подсчета количества сообщений для текущего пользователя
+        const message = formatMessage(userComments[0], userComments.length)
         await sendMessage(chatId, message + "\n<code>Cron</code>")
         await updateTaskStatus(userComments[0].id_task)
         await sendMessage(LOG_CHANNEL_ID, `<code>Cron</code> Отправлено пользователю <code>${chatId}</code>`);
