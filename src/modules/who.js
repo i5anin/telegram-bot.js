@@ -1,4 +1,3 @@
-const axios = require('axios')
 const { getAllUsers } = require('#src/api/index')
 const msg = require('#src/utils/ru_lang')
 

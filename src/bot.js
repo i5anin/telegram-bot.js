@@ -4,10 +4,9 @@ const { Telegraf } = require('telegraf')
 const LocalSession = require('telegraf-session-local')
 const io = require('@pm2/io')
 
-io.init({
-    transactions: true, // включить отслеживание транзакций
-    http: true, // включить метрики веб-сервера (необязательно)
-})
+// включить отслеживание транзакций
+// включить метрики веб-сервера (необязательно)
+io.init({ transactions: true, http: true })
 
 // Импорт модулей
 const { initCronJobs } = require('#src/modules/cron')
