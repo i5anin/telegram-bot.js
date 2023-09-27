@@ -3,7 +3,7 @@ const { resetFlags } = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
 const { formatPaymentDate } = require('#src/utils/helpers')
-const { updateComment } = require('#src/api')
+const { updateComment } = require('#src/api/index')
 
 
 // Функция для уведомления одного пользователя о некомментированных задачах
