@@ -2,6 +2,7 @@ const cron = require('node-cron')
 const { notifyAllUsers } = require('#src/modules/notify')
 const { oplataNotification } = require('#src/modules/oplata')
 const { checkBotData } = require('#src/api/index')
+const { format } = require('date-fns') // импортируйте функцию format
 
 function initCronJobs(currentDateTime, instanceNumber) {
     // Уведомлять о сообщениях каждые 15 мин
@@ -10,7 +11,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
         await notifyAllUsers(ctx)
     })
 
-    // !!! Уведомлять об ОПЛАТЕ каждые 6 мин
+    // Уведомлять об ОПЛАТЕ каждые 6 мин
     cron.schedule('*/6 * * * *', async () => {
         await oplataNotification()
     })
@@ -20,13 +21,13 @@ function initCronJobs(currentDateTime, instanceNumber) {
         cron.schedule('*/3 * * * *', async () => {
             stateCounter.bot_check++
 
+            // Получаем текущую дату и время
+            const formattedDateTime = format(currentDateTime, 'yyyy-MM-dd HH:mm:ss')
+            console.log('formattedDateTime=', formattedDateTime, 'instanceNumber=', instanceNumber)
+
             try {
                 const response = await checkBotData(formattedDateTime, instanceNumber)
                 console.log('Данные о актуальном экземляре:', response.data.latest_entry)
-
-                // Получаем текущую дату и время
-                const formattedDateTime = `${currentDateTime.getFullYear()}-${String(currentDateTime.getMonth() + 1).padStart(2, '0')}-${String(currentDateTime.getDate()).padStart(2, '0')} ${String(currentDateTime.getHours()).padStart(2, '0')}:${String(currentDateTime.getMinutes()).padStart(2, '0')}:${String(currentDateTime.getSeconds()).padStart(2, '0')}`
-                console.log('formattedDateTime=', formattedDateTime, 'instanceNumber=', instanceNumber)
 
                 // Проверяем соответствие
                 if (formattedDateTime !== response.data.latest_entry.date || instanceNumber !== response.data.latest_entry.random_key) {
