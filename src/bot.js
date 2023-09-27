@@ -3,6 +3,8 @@ require('dotenv').config()
 const { Telegraf } = require('telegraf')
 const LocalSession = require('telegraf-session-local')
 const io = require('@pm2/io')
+const fs = require('fs')
+const path = require('path')
 
 // включить отслеживание транзакций
 // включить метрики веб-сервера (необязательно)
@@ -34,7 +36,7 @@ bot.use(localSession.middleware())
 
 // Сессионный middleware
 bot.use((ctx, next) => {
-    ctx.session = ctx.session || { isAwaitFio: false, isAwaitComment: false, isUserInitiated: false }
+    ctx.session = ctx.session || { fileId: false, isAwaitFio: false, isAwaitComment: false, isUserInitiated: false }
     return next()
 })
 
@@ -50,12 +52,7 @@ global.OPLATA_GROUP = process.env.OPLATA_GROUP
 global.OPLATA_REPORT_ACTIVE = process.env.OPLATA_REPORT_ACTIVE //OPLATA_REPORT_ACTIVE = true;
 global.MODE = process.env.NODE_ENV || 'development'  // Если NODE_ENV не определен, по умолчанию используется 'development'
 global.emoji = {
-    x: '&#10060;',
-    ok: '&#9989;',
-    error: '&#10071;',
-    warning: '&#x26A0;',
-    bot: '&#129302;',
-    star: '&#11088;',
+    x: '&#10060;', ok: '&#9989;', error: '&#10071;', warning: '&#x26A0;', bot: '&#129302;', star: '&#11088;',
 }   //❌ //✅ //❗ //⚠ //🤖 //⭐
 
 global.bot = bot
@@ -92,20 +89,52 @@ bot.command('get_group_info', (ctx) => handleGetGroupInfoCommand(ctx))
 bot.command('who', (ctx) => whoCommand(ctx))
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
 
-bot.on('message', (ctx) => {
-    if (ctx.message.forward_from) {
+
+bot.on('message', async (ctx) => {
+    console.log('Message received:', ctx.message) //для логирования
+    if (ctx.message.photo) {
+        console.log('Фотография получена!')
+        const fileId = ctx.message.photo[0].file_id
+        ctx.session.fileId = true
+
+        // Получить информацию о файле
+        const file = await bot.telegram.getFile(fileId)
+        const fileUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${file.file_path}`
+
+        // Скачать и сохранить файл
+        const response = await axios.get(fileUrl, { responseType: 'stream' })
+        const timestamp = new Date().toISOString().replace(/[:.-]/g, '_');
+        const filePath = path.join(photoDir, `${timestamp}.jpg`)
+        const writer = fs.createWriteStream(filePath)
+        response.data.pipe(writer)
+
+        ctx.reply('Пожалуйста, пришлите мне подпись:')
+        await handleTextCommand(ctx)
+    } else if (ctx.message.forward_from) {
         handleForwardedMessage(ctx)
     } else {
         handleTextCommand(ctx)
     }
 })
-bot.on('text', (ctx) => handleTextCommand(ctx)) // особо не нужна но пусть будет
-
+//bot.on('text', (ctx) => handleTextCommand(ctx)) // особо не нужна но пусть будет
 
 // Обработчик текстовых сообщений
-
 bot.on('new_chat_members', logNewChatMembers)
 bot.on('left_chat_member', logLeftChatMember)
+
+// Проверка и создание директорий
+const photoDir = path.join(__dirname, 'photos')
+const textDir = path.join(__dirname, 'texts')
+
+if (!fs.existsSync(photoDir)) {
+    fs.mkdirSync(photoDir)
+}
+
+if (!fs.existsSync(textDir)) {
+    fs.mkdirSync(textDir)
+}
+const axios = require('axios')
+
 
 // Запуск бота
 bot.launch().catch((err) => {

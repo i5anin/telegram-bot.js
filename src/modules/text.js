@@ -6,6 +6,7 @@ const { sendToLog } = require('#src/utils/log')
 const { addUser } = require('#src/api/index')
 
 async function handleTextCommand(ctx) {
+    console.log('handleTextCommand', ctx.message.text); // Добавьте эту строку
     await sendToLog(ctx)
     if (ctx.chat.type !== 'private') return
     // Деструктуризация полей из сообщения
@@ -44,6 +45,40 @@ async function handleTextCommand(ctx) {
     if (ctx.message.reply_to_message) {
         await handleAddComment(ctx)
         console.log('Обработка ожидания комментария handleAddComment')
+    }
+
+    console.log("ctx.session.fileId = ",ctx.session.fileId)
+
+    if (ctx.session.fileId) {
+        console.log('Handling message with fileId:', ctx.session.fileId);
+        const caption = ctx.message.text;
+        const timestamp = Date.now();
+        const photoFilename = `${timestamp}.jpg`;
+        const textFilename = `${timestamp}.txt`;
+
+        const photoPath = path.join(__dirname, 'photos', photoFilename);
+        const textPath = path.join(__dirname, 'texts', textFilename);
+
+        // Сохранение фото
+        const fileStream = await ctx.telegram.getFileLink(ctx.session.fileId);
+        const writeStream = fs.createWriteStream(photoPath);
+
+        // Дождитесь завершения сохранения фото
+        await new Promise((resolve, reject) => {
+            fileStream.pipe(writeStream).on('finish', resolve).on('error', reject);
+        });
+
+        // Сохранение подписи и идентификатора файла
+        const commentData = {
+            fileId: ctx.session.fileId,
+            caption: caption
+        };
+        fs.writeFileSync(textPath, JSON.stringify(commentData));
+
+        // Сброс значения fileId
+        delete ctx.session.fileId;
+
+        ctx.reply('Фото и подпись сохранены!');
     }
 }
 
