@@ -1,20 +1,18 @@
 const axios = require('axios')
-const { getAllUsers } = require('#src/api/index')
+const { getAllComments } = require('#src/api/index')
 
 //fetchComments
 async function fetchComments() {
-    // const url = `${WEB_API}/comment/get_all.php?key=${SECRET_KEY}`
-    // stateCounter.comment_get_all++
     try {
-        const response = getAllUsers()
+        const response = await getAllComments();
         if (response && response.comments) {
-            return response.comments
+            return response.comments;
         } else {
-            throw new Error('Не удалось получить комментарии')
+            throw new Error('Не удалось получить комментарии');
         }
     } catch (error) {
-        console.log(`${url} Произошла ошибка: ${error}`)
-        return null
+        console.error(`Произошла ошибка: ${error}`);
+        return null;
     }
 }
 

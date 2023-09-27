@@ -90,18 +90,20 @@ async function notifyUsers(ctx) {
     if (ctx.chat.type !== 'private') return;
     resetFlags(ctx);
     const chatId = ctx.message.chat.id;
-    // const isUserInitiated = ctx.session.isUserInitiated || false; // Получаем флаг из сессии
-
 
     try {
-        // Получаем список некомментированных задач для данного пользователя
         const uncommentedTasks = await fetchComments(chatId);
 
-        // Проверяем, есть ли задачи для текущего пользователя
+        // Добавьте эту проверку:
+        if (!uncommentedTasks) {
+            console.error('Не удалось получить комментарии.');
+            return sendMessage(chatId, 'Произошла ошибка при получении комментариев.');
+        }
+
         const isUserInList = uncommentedTasks.some(task => task.user_id === chatId);
 
         if (!isUserInList) {
-            ctx.session.isUserInitiated = false; // Сбрасываем флаг
+            ctx.session.isUserInitiated = false;
             return sendMessage(chatId, 'Пустые комментарии не найдены.');
         }
 
@@ -109,17 +111,15 @@ async function notifyUsers(ctx) {
         if (userActualComments.length === 0) return;
 
         await sendMessage(LOG_CHANNEL_ID, `Отправлено пользователю <code>${chatId} </code>`);
-
         const message = formatMessage(userActualComments[0], userActualComments.length);
         sendMessage(chatId, message);
-
         await updateTaskStatus(userActualComments[0].id_task);
-        // ctx.session.isUserInitiated = false; // Сбрасываем флаг
     } catch (error) {
         console.log('Notify Error in notifyUsers:', error);
         await sendMessage(LOG_CHANNEL_ID, `Notify <code>${error} </code>`);
     }
 }
+
 
 
 // Экспортируем функции

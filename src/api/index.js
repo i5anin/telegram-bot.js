@@ -36,7 +36,8 @@ async function updateBotData(formattedDateTime, instanceNumber) {
 // Users
 async function getAllUsers() {
     const url = `${WEB_API}/users/get_all_fio.php`
-    return performRequest(url)
+    const result = await performRequest(url)
+    return result.users_data
 }
 
 async function checkUser(chatId) {

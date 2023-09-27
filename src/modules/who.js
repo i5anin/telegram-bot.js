@@ -43,11 +43,9 @@ async function whoCommand(ctx) { // /who
     lastName = ctx.from.last_name
 
     try {
-        // Получение данных о пользователях с использованием функции getAllUsers
-        const usersData = await getAllUsers()
-
-        // Проверка наличия пользователя в полученных данных
-        const user = usersData.find(u => u.user_id === userId)
+        const usersDataResponse = await getAllUsers();
+        const usersData = usersDataResponse;
+        const user = usersData.find(u => u.user_id === userId);
 
         if (user) {
             // Если пользователь найден, отправляем информацию о нем

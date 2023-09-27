@@ -1,6 +1,6 @@
 const fs = require('fs');
 const axios = require('axios');
-const { getAllUsers } = require('#src/modules/api')
+const { getAllUsers } = require('#src/api/index')
 
 const getExternalUsers = async () => {
     try {
