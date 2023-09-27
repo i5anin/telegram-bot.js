@@ -4,15 +4,15 @@ const { getAllComments } = require('#src/api/index')
 //fetchComments
 async function fetchComments() {
     try {
-        const response = await getAllComments();
+        const response = await getAllComments()
         if (response && response.comments) {
-            return response.comments;
+            return response.comments
         } else {
-            throw new Error('Не удалось получить комментарии');
+            throw new Error('Не удалось получить комментарии')
         }
     } catch (error) {
-        console.error(`Произошла ошибка: ${error}`);
-        return null;
+        console.error(`Произошла ошибка: ${error}`)
+        return null
     }
 }
 
@@ -60,7 +60,6 @@ async function handleAddComment(ctx) {
 
         const url = `${WEB_API}/comment/update.php`
         stateCounter.comment_update++
-        console.log('taskID=ctx.message.text=SECRET_KEY' + taskID + ' ' + ctx.message.text + ' ' + SECRET_KEY)
         const params = {
             id_task: taskID,
             comments_op: ctx.message.text,
@@ -70,7 +69,7 @@ async function handleAddComment(ctx) {
         try {
             const response = await axios.get(url, { params })
 
-            if (response.status === 'OK') {
+            if (response.status === 200) {
                 await ctx.reply(
                     `Комментарий:\n<code>${ctx.message.text}</code>\nДля:\n<code>${ctx.session.userComments.det_name}</code>\nдобавлен успешно.`,
                     { parse_mode: 'HTML' },
