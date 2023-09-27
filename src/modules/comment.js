@@ -57,7 +57,9 @@ async function handleAddComment(ctx) {
             return;
         }
 
-        const response = await updateComment(taskID);
+        // Используем текст сообщения как комментарий при вызове функции updateComment
+        const commentText = ctx.message.text;
+        const response = await updateComment(taskID, commentText);
 
         if (response && response.status === 'OK') {
             await ctx.reply(

@@ -68,15 +68,16 @@ async function getAllComments() {
     return performRequest(url, 'get', {}, params)
 }
 
-async function updateComment(id_task) {
+async function updateComment(taskID, commentText = null) {
     const url = `${WEB_API}/comment/update.php`
     const params = {
-        id_task,
-        sent: 1,
+        id_task: taskID,
         access_key: SECRET_KEY,
+        ...(commentText ? { comments_op: commentText } : { sent: 1 }),
     }
     return performRequest(url, 'get', {}, params)
 }
+
 
 // Payments
 async function getAllPayments() {
