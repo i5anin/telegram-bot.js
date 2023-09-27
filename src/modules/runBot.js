@@ -18,7 +18,7 @@ function runBot(instanceNumber, currentDateTime) {
     }
 
     // Теперь мы можем использовать formattedDateTime здесь
-    console.log(`! Running instance number : ${instanceNumber}\n! Start-up time: ${formattedDateTime}`)
+    console.log(`! Running instance number : ${instanceNumber}\n! Start-up time ${formattedDateTime}`)
     console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE, '\nMODE =', MODE)
 
     if (MODE === 'build') {
