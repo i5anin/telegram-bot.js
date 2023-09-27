@@ -3,6 +3,7 @@ const { resetFlags } = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
 const { formatPaymentDate } = require('#src/utils/helpers')
+const { updateComment } = require('#src/api')
 
 
 // Функция для уведомления одного пользователя о некомментированных задачах
@@ -18,19 +19,18 @@ async function sendMessage(chatId, message) {
 }
 
 async function updateTaskStatus(id_task) {
-    const updateUrl = `${WEB_API}/comment/update.php?id_task=${id_task}&sent=1&access_key=${SECRET_KEY}`
-    stateCounter.comment_update++
     try {
-        const response = await fetch(updateUrl)
-        if (response.ok) {
-            console.log('Notify. Task status updated successfully')
+        const response = await updateComment(id_task);
+        if (response && response.status === 'OK') {
+            console.log('Notify. Task status updated successfully');
         } else {
-            console.log('Notify. Failed to update task status:', response.status)
+            console.log('Notify. Failed to update task status:', response.status);
         }
     } catch (error) {
-        console.log('Notify. Error while updating task status:', error)
+        console.log('Notify. Error while updating task status:', error);
     }
 }
+
 
 function formatMessage(comment, total) {
     const typeMapping = {
