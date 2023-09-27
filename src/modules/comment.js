@@ -1,6 +1,5 @@
-const { getAllComments, updateComment } = require('#src/api/index')
 const axios = require('axios')
-const msg = require('#src/utils/ru_lang')
+const { getAllComments } = require('#src/api/index')
 
 //fetchComments
 async function fetchComments() {
@@ -59,16 +58,32 @@ async function handleAddComment(ctx) {
             return
         }
 
-        const url = updateComment()
+        const url = `${WEB_API}/comment/update.php`
+        stateCounter.comment_update++
+        const params = {
+            id_task: taskID,
+            comments_op: ctx.message.text,
+            access_key: SECRET_KEY,
+        }
 
         try {
             const response = await axios.get(url, { params })
 
             if (response.status === 200) {
-                await ctx.reply(msg.commentAdded(ctx.message.text, ctx.session.userComments.det_name), { parse_mode: 'HTML' })
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, msg.taskCommentedSuccessfully(chatId, username, firstName, lastName, ctx.message.text), { parse_mode: 'HTML' })
+                await ctx.reply(
+                    `Комментарий:\n<code>${ctx.message.text}</code>\nДля:\n<code>${ctx.session.userComments.det_name}</code>\nдобавлен успешно.`,
+                    { parse_mode: 'HTML' },
+                )
+                await bot.telegram.sendMessage(
+                    LOG_CHANNEL_ID,
+                    `${emoji.star.repeat(3)} Успешно прокомментировал задачу\n Пользователь с ID <code>${chatId}</code>` +
+                    ` @${username}` +
+                    `\nИмя: <code>${firstName} ${lastName}</code>` +
+                    `\nКомментарий:\n<code>${ctx.message.text}</code>`,
+                    { parse_mode: 'HTML' },
+                )
             } else {
-                throw new Error(msg.serverErrorOnCommentAdd)
+                throw new Error('Ошибка на стороне сервера')
             }
         } catch (error) {
             await ctx.telegram.sendMessage(

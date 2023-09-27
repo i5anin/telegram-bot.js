@@ -10,8 +10,5 @@ module.exports = {
     userFound: (userId, username, fullName, fio) => `Пользователь\nID <code>${userId}</code>\nTG: <code>${username || ''}</code> (<code>${fullName}</code>)\nfio: <code>${fio}</code>`,
     userNotFound: (userId) => `Пользователь\nID <code>${userId}</code>\nне зарегистрирован в системе`,
     errorAPI: 'Ошибка при получении данных с внешнего API:',
-    error: 'Произошла ошибка при выполнении команды',
-    commentAdded: (commentText, detName) => `Комментарий:\n<code>${commentText}</code>\nДля:\n<code>${detName}</code>\nдобавлен успешно.`,
-    taskCommentedSuccessfully: (chatId, username, firstName, lastName, commentText) => `${emoji.star.repeat(3)} Успешно прокомментировал задачу\n Пользователь с ID <code>${chatId}</code> @${username}\nИмя: <code>${firstName} ${lastName}</code>\nКомментарий:\n<code>${commentText}</code>`,
-    serverErrorOnCommentAdd: 'Ошибка на стороне сервера',
+    error: 'Произошла ошибка при выполнении команды'
 };
