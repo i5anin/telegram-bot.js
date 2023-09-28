@@ -22,7 +22,7 @@ async function sendMessage(chatId, message) {
         console.error(`Notify. Failed to send message to chatId: ${chatId}`, error)
         if (error.code === 400 && error.description === 'Bad Request: chat not found') {
             // Отправляем сообщение об ошибке в канал для логирования
-            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Чат не найден для chatId: ${chatId}`)
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `<code>Чат не найден для chatId: ${chatId}</code>`, { parse_mode: 'HTML' })
         }
         return false // Возвращаем false, если произошла ошибка
     }
@@ -83,15 +83,17 @@ async function notifyAllUsers() {
             if (userComments.length === 0) continue
 
             const message = formatMessage(userComments[0], userComments.length)
-            await sendMessage(chatId, message + '\n<code>Cron</code>')
+            const isMessageSent = await sendMessage(chatId, message + '\n<code>Cron</code>')
+
+            if (!isMessageSent) continue
+
             await updateTaskStatus(userComments[0].id_task)
             await sendMessage(LOG_CHANNEL_ID, `<code>Cron</code> Отправлено пользователю <code>${chatId}</code>`)
         } catch (error) {
             console.error(`Ошибка при отправке сообщения пользователю ${chatId}:`, error)
             await sendMessage(LOG_CHANNEL_ID, `Чат не найден для chatId: ${chatId}`)
         }
-        // Пауза между запросами, чтобы избежать превышения ограничений API
-        await new Promise(resolve => setTimeout(resolve, 1000)) // Пауза в 1 секунду
+        await sleep(500)
     }
 }
 
@@ -106,7 +108,6 @@ async function notifyUsers(ctx) {
     try {
         const uncommentedTasks = await fetchComments(chatId)
 
-        // Добавьте эту проверку:
         if (!uncommentedTasks) {
             console.error('Не удалось получить комментарии.')
             await sendMessage(chatId, 'Произошла ошибка при получении комментариев.')
@@ -128,8 +129,11 @@ async function notifyUsers(ctx) {
 
         await sendMessage(LOG_CHANNEL_ID, `Отправлено пользователю <code>${chatId} </code>`)
         const message = formatMessage(userActualComments[0], userActualComments.length)
-        sendMessage(chatId, message)
-        await updateTaskStatus(userActualComments[0].id_task)
+        const isMessageSent = await sendMessage(chatId, message)
+
+        if (isMessageSent) {
+            await updateTaskStatus(userActualComments[0].id_task)
+        }
     } catch (error) {
         console.log('Notify Error in notifyUsers:', error)
         await sendMessage(LOG_CHANNEL_ID, `Notify <code>${error} </code>`)
