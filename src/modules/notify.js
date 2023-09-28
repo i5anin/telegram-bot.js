@@ -17,12 +17,14 @@ async function sendMessage(chatId, message) {
     await sleep(500)
     try {
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
+        return true // Возвращаем true, если сообщение отправлено успешно
     } catch (error) {
         console.error(`Notify. Failed to send message to chatId: ${chatId}`, error)
         if (error.code === 400 && error.description === 'Bad Request: chat not found') {
             // Отправляем сообщение об ошибке в канал для логирования
             await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Чат не найден для chatId: ${chatId}`)
         }
+        return false // Возвращаем false, если произошла ошибка
     }
 }
 
@@ -65,30 +67,31 @@ function formatMessage(comment, total) {
 // Первая функция
 
 async function notifyAllUsers() {
-    // Получаем все комментарии с использованием функции fetchComments
     const allComments = await fetchComments()
 
-    // Проверяем, что комментарии были успешно получены
     if (!allComments) {
         console.error('Не удалось получить комментарии')
         return
     }
 
-    // Получаем уникальные идентификаторы пользователей из комментариев
     const user_ids = [...new Set(allComments.map(comment => comment.user_id))]
 
     for (const chatId of user_ids) {
-        // Фильтрация комментариев для текущего пользователя
-        const userComments = allComments.filter(comment => comment.user_id === chatId && comment.sent === 0)
+        try {
+            const userComments = allComments.filter(comment => comment.user_id === chatId && comment.sent === 0)
 
-        // Если нет комментариев для текущего пользователя, продолжаем следующую итерацию
-        if (userComments.length === 0) continue
+            if (userComments.length === 0) continue
 
-        const message = formatMessage(userComments[0], userComments.length)
-        await sendMessage(chatId, message + '\n<code>Cron</code>')
-        await sendMessage(LOG_CHANNEL_ID, chatId + ' ' + message + '\n<code>Cron</code>')
-        await updateTaskStatus(userComments[0].id_task)
-        await sendMessage(LOG_CHANNEL_ID, `<code>Cron</code> Отправлено пользователю <code>${chatId}</code>`)
+            const message = formatMessage(userComments[0], userComments.length)
+            await sendMessage(chatId, message + '\n<code>Cron</code>')
+            await updateTaskStatus(userComments[0].id_task)
+            await sendMessage(LOG_CHANNEL_ID, `<code>Cron</code> Отправлено пользователю <code>${chatId}</code>`)
+        } catch (error) {
+            console.error(`Ошибка при отправке сообщения пользователю ${chatId}:`, error)
+            await sendMessage(LOG_CHANNEL_ID, `Чат не найден для chatId: ${chatId}`)
+        }
+        // Пауза между запросами, чтобы избежать превышения ограничений API
+        await new Promise(resolve => setTimeout(resolve, 1000)) // Пауза в 1 секунду
     }
 }
 
