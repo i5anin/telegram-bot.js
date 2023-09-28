@@ -1,7 +1,7 @@
 const axios = require('axios')
 
 const SECRET_KEY = process.env.SECRET_KEY
-const WEB_API = 'https://bot.pf-forum.ru/api'
+const WEB_API = 'https://bot.pf-forum.ru/api'  // process.env.WEB_API
 
 async function performRequest(url, method = 'get', data = {}, params = {}) {
     try {
@@ -34,13 +34,13 @@ async function updateBotData(formattedDateTime, instanceNumber) {
 }
 
 // Users
-async function getAllUsers() {
+async function getAllUsers() { // TODO: SECRET_KEY
     const url = `${WEB_API}/users/get_all_fio.php`
     const result = await performRequest(url)
     return result.users_data
 }
 
-async function checkUser(chatId) {
+async function checkUser(chatId) { // TODO: SECRET_KEY
     const url = `${WEB_API}/users/check.php`
     const params = {
         id: chatId,
@@ -48,7 +48,7 @@ async function checkUser(chatId) {
     return performRequest(url, 'get', {}, params)
 }
 
-async function addUser(userId, cleanedText, username) {
+async function addUser(userId, cleanedText, username) { // TODO: SECRET_KEY
     const url = `${WEB_API}/users/add.php`
     const data = {
         id: userId,
