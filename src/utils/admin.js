@@ -1,3 +1,5 @@
+const { format } = require('date-fns')
+
 async function handleMsgCommand(ctx) {
     // Проверяем, является ли отправитель грант-админом
     if (ctx.from.id.toString() === GRAND_ADMIN) {
@@ -20,7 +22,8 @@ async function handleMsgCommand(ctx) {
 
 // Функция для обработки команды /status
 async function handleStatusCommand(ctx, instanceNumber, currentDateTime) {
-    await ctx.reply(`Номер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${currentDateTime}</code>`,{ parse_mode: 'HTML' })
+    const formattedDateTime = format(currentDateTime, 'HH:mm:ss dd.MM.yyyy')
+    await ctx.reply(`Номер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${formattedDateTime}</code>`,{ parse_mode: 'HTML' })
 }
 
 module.exports = { handleStatusCommand, handleMsgCommand }

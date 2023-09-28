@@ -22,7 +22,7 @@ function runBot(instanceNumber, currentDateTime) {
     console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE, '\nMODE =', MODE)
 
     if (MODE === 'build') {
-        bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${formattedDateTime}</code>`, { parse_mode: 'HTML' })
+        bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nНомер запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${format(currentDateTime, 'HH:mm:ss dd.MM.yyyy')}</code>`, { parse_mode: 'HTML' })
     }
 }
 
