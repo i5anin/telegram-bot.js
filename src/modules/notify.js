@@ -22,7 +22,7 @@ async function sendMessage(chatId, message) {
         console.error(`Notify. Failed to send message to chatId: ${chatId}`, error)
         if (error.code === 400 && error.description === 'Bad Request: chat not found') {
             // Отправляем сообщение об ошибке в канал для логирования
-            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `<code>Чат не найден для chatId: ${chatId}</code>`, { parse_mode: 'HTML' })
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Чат не найден: <code>${chatId}</code>`, { parse_mode: 'HTML' })
         }
         return false // Возвращаем false, если произошла ошибка
     }
@@ -88,7 +88,7 @@ async function notifyAllUsers() {
             if (!isMessageSent) continue
 
             await updateTaskStatus(userComments[0].id_task)
-            await sendMessage(LOG_CHANNEL_ID, `<code>Cron</code> Отправлено пользователю <code>${chatId}</code>`)
+            await sendMessage(LOG_CHANNEL_ID, `<code>Cron</code> Отправлено пользователю <code>${chatId}</code> task_ID: <code>${id_task}</code>`)
         } catch (error) {
             console.error(`Ошибка при отправке сообщения пользователю ${chatId}:`, error)
             await sendMessage(LOG_CHANNEL_ID, `Чат не найден для chatId: ${chatId}`)
@@ -111,7 +111,7 @@ async function notifyUsers(ctx) {
         if (!uncommentedTasks) {
             console.error('Не удалось получить комментарии.')
             await sendMessage(chatId, 'Произошла ошибка при получении комментариев.')
-            await sendMessage(LOG_CHANNEL_ID, `${chatId} Произошла ошибка при получении комментариев.`)
+            await sendMessage(LOG_CHANNEL_ID, `<code>${chatId}</code> Произошла ошибка при получении комментариев.`)
             return
         }
 
@@ -120,14 +120,15 @@ async function notifyUsers(ctx) {
         if (!isUserInList) {
             ctx.session.isUserInitiated = false
             await sendMessage(chatId, 'Пустые комментарии не найдены.')
-            await sendMessage(LOG_CHANNEL_ID, `${chatId} Пустые комментарии не найдены.`)
+            await sendMessage(LOG_CHANNEL_ID, `<code>${chatId}</code> Пустые комментарии не найдены.`)
             return
         }
 
         const userActualComments = uncommentedTasks.filter(({ user_id }) => user_id === chatId)
         if (userActualComments.length === 0) return
 
-        await sendMessage(LOG_CHANNEL_ID, `Отправлено пользователю <code>${chatId} </code>`)
+        const taskId = userActualComments[0].id_task
+        await sendMessage(LOG_CHANNEL_ID, `Отправлено пользователю <code>${chatId} </code> task_ID: <code>${taskId}</code>`)
         const message = formatMessage(userActualComments[0], userActualComments.length)
         const isMessageSent = await sendMessage(chatId, message)
 
