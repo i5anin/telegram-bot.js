@@ -23,7 +23,7 @@ async function logLeftChatMember(ctx) {
     const fullName = `${leftMember.first_name || ''} ${leftMember.last_name || ''}`.trim()
     const userId = leftMember.id
 
-    const message = `${emoji.x} Пользователь покинул группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`
+    const message = `${emoji.x} Пользователь покинул группу <code>${chatTitle}</code>\nИмя: <pre>${fullName}</pre>\nID: <code>${userId}</code>\nUsername: <pre>${username}</pre>`
 
     await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
 }
@@ -55,13 +55,13 @@ async function logLeftChatMember(ctx) {
 async function sendToLog(ctx) {
     const { chat, from, text } = ctx.message
     if (chat.id !== parseInt(GRAND_ADMIN)) {
-        const username = from.username ? '@' + from.username : '<code>N/A</code>'
+        const username = from.username ? '@' + from.username : '<pre>N/A</pre>'
         await bot.telegram.sendMessage(
             LOG_CHANNEL_ID,
             `ID <code>${chat.id}</code>` +
             ` username: ${username}` +
-            `\nname: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>` +
-            `\nmsg: <code>${text}</code>`,
+            `\nname: <pre>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</pre>` +
+            `\nmsg: <pre>${text}</pre>`,
             { parse_mode: 'HTML' },
         )
     }
