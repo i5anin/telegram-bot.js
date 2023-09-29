@@ -3,9 +3,6 @@ const { formatPaymentDate } = require('#src/utils/helpers')
 
 async function oplataNotification() {
 
-    console.log('oplataNotification')
-    console.log(OPLATA_REPORT_ACTIVE)
-
     if (!OPLATA_REPORT_ACTIVE) return
 
     let i_ADMIN_IDS = null

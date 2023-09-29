@@ -16,7 +16,7 @@ const handleForwardedMessage = async (ctx) => {
 
         if (user) {
             const fullName = `${firstName || ''} ${lastName || ''}`.trim()
-            await ctx.reply(msg.userFound(userId, username, fullName, user.fio), { parse_mode: 'HTML' })
+            await ctx.reply(msg.userFound(userId,user.fio, username, fullName), { parse_mode: 'HTML' })
         } else {
             await ctx.reply(msg.userNotFound(userId), { parse_mode: 'HTML' })
         }

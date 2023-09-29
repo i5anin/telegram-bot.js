@@ -27,8 +27,6 @@ function initCronJobs(currentDateTime, instanceNumber) {
 
             try {
                 const response = await checkBotData(formattedDateTime, instanceNumber)
-                console.log('Данные о актуальном экземляре:', response.latest_entry)
-                console.log('Данные о актуальном экземляре:', response.latest_entry.date)
 
                 // Проверяем соответствие
                 if (formattedDateTime !== response.latest_entry.date || instanceNumber !== response.latest_entry.random_key) {
