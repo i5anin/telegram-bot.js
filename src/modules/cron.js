@@ -8,7 +8,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
     // Уведомлять о сообщениях каждые 15 мин
     cron.schedule('*/15 8-23 * * *', async () => {
         console.log('notifyAllUsers Running a task every 15 minutes')
-        await notifyAllUsers(ctx)
+        await notifyAllUsers()
     })
 
     // Уведомлять об ОПЛАТЕ каждые 6 мин
