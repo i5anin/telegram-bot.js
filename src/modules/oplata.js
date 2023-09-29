@@ -1,54 +1,70 @@
-const { getAllPayments, updatePayments } = require('#src/api/index'); // Импортируем функции
-const { formatPaymentDate } = require('#src/utils/helpers');
+const { getAllPayments, updatePayments } = require('#src/api/index') // Импортируем функции
+const { formatPaymentDate } = require('#src/utils/helpers')
 
 async function oplataNotification() {
 
-    if (!OPLATA_REPORT_ACTIVE) return;
+    console.log('oplataNotification')
+    console.log(OPLATA_REPORT_ACTIVE)
 
-    let i_ADMIN_IDS = null;
-    const BATCH_SIZE = 10;
+    if (!OPLATA_REPORT_ACTIVE) return
+
+    let i_ADMIN_IDS = null
+    const BATCH_SIZE = 10
 
     try {
-        const response = await getAllPayments(); // Используем функцию
-        stateCounter.oplata_get_all++;
+        const response = await getAllPayments() // Используем функцию
+        console.log(response)
+        stateCounter.oplata_get_all++
 
-        if (response.data && response.data.payments && response.data.payments.length > 0) {
-            let payments = response.data.payments;
+        if (response && response.payments && response.payments.length > 0) {
+            let payments = response.payments
+            console.log('Payments received:', payments)
 
-            const sortedPayments = payments.sort((a, b) => new Date(b.date) - new Date(a.date));
+            const sortedPayments = payments.sort((a, b) => new Date(b) - new Date(a))
 
-            let batches = [];
+            let batches = []
             for (let i = 0; i < sortedPayments.length; i += BATCH_SIZE) {
-                batches.push(sortedPayments.slice(i, i + BATCH_SIZE));
+                batches.push(sortedPayments.slice(i, i + BATCH_SIZE))
             }
 
-            const ADMIN_IDS = [OPLATA_GROUP, DIR_OPLATA];
+            const ADMIN_IDS = [OPLATA_GROUP, DIR_OPLATA, 123]
+            console.log(ADMIN_IDS)
 
             for (let batch of batches) {
-                let message = '<code>--------------------</code>\n';
-                let sentIds = [];
+                console.log('Processing batch:', batch)
+                let message = '<code>--------------------</code>\n'
+                let sentIds = []
 
                 batch.forEach((payment) => {
-                    const formattedSum = Number(payment.sum).toLocaleString('ru-RU');
-                    const { formattedDate } = formatPaymentDate(payment);
-
-                    message += `<b>Дата:</b> <code>${formattedDate}</code>\n`;
-                    message += `<b>Имя клиента:</b> <code>${payment.client_name}</code>\n`;
-                    message += `<b>Сумма:</b> <code>${formattedSum} руб</code>\n`;
-                    message += `<b>Информация:</b> <code>${payment.info}</code>\n`;
-                    message += '<code>--------------------</code>\n';
-
-                    sentIds.push(payment.id);
-                });
+                    const formattedSum = Number(payment.sum).toLocaleString('ru-RU')
+                    const { formattedDate } = formatPaymentDate(payment)
+                    message += `<b>Дата:</b> <code>${formattedDate}</code>\n`
+                    message += `<b>Имя клиента:</b> <code>${payment.client_name}</code>\n`
+                    message += `<b>Сумма:</b> <code>${formattedSum} руб</code>\n`
+                    message += `<b>Информация:</b> <code>${payment.info}</code>\n`
+                    message += '<code>--------------------</code>\n'
+                    sentIds.push(payment.id)
+                })
 
                 for (const adminId of ADMIN_IDS) {
                     i_ADMIN_IDS = adminId;
-                    await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' });
+                    console.log('Sending message to adminId:', adminId);
+                    try {
+                        await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' });
+                        console.log('Message sent successfully to adminId:', adminId);
+                    } catch (error) {
+                        console.error('Failed to send message to adminId:', adminId, 'Error:', error);
+                        await bot.telegram.sendMessage(
+                            LOG_CHANNEL_ID,
+                            `Не удалось отправить сообщение <code>${i_ADMIN_IDS}</code> оплата \n<code>${error}</code>`,
+                            { parse_mode: 'HTML' },
+                        );
+                    }
                 }
-
                 if (sentIds.length > 0) {
-                    await updatePayments(sentIds); // Используем функцию
-                    stateCounter.oplata_get_all++;
+                    console.log('Updating payments:', sentIds)
+                    await updatePayments(sentIds)
+                    stateCounter.oplata_get_all++
                 }
             }
         }
@@ -57,8 +73,8 @@ async function oplataNotification() {
             LOG_CHANNEL_ID,
             `Попытка отправить сообщение <code>${i_ADMIN_IDS}</code> оплата \n<code>${error}</code>`,
             { parse_mode: 'HTML' },
-        );
+        )
     }
 }
 
-module.exports = { oplataNotification };
+module.exports = { oplataNotification }

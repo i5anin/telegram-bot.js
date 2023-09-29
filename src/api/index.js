@@ -81,7 +81,8 @@ async function updateComment(taskID, commentText = null) {
 
 // Payments
 async function getAllPayments() {
-    const url = `${WEB_API}/oplata/get_all.php`
+    const basePath = process.env.NODE_ENV === 'build' ? 'get_all.php' : 'get_all_test.php';
+    const url = `${WEB_API}/oplata/${basePath}`
     const params = {
         key: SECRET_KEY,
     }
@@ -89,7 +90,8 @@ async function getAllPayments() {
 }
 
 async function updatePayments(sentIds) {
-    const url = `${WEB_API}/oplata/update.php`
+    const basePath = process.env.NODE_ENV === 'build' ? 'update.php' : 'update_test.php';
+    const url = `${WEB_API}/oplata/${basePath}`
     const params = {
         key: SECRET_KEY,
         sent_ids: sentIds.join(','),
