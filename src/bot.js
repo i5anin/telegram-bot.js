@@ -81,7 +81,7 @@ const currentDateTime = new Date()
 
 bot.use((ctx, next) => {
     // Проверяем, существует ли сообщение и является ли оно пересланным
-    if (ctx.message && 'forward_from' in ctx.message) {
+    if (ctx.message && ctx.message.forward_from) {
         // Если сообщение переслано
         handleForwardedMessage(ctx);
         return;
