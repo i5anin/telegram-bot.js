@@ -79,6 +79,17 @@ global.stateCounter = {
 const instanceNumber = Math.floor(Math.random() * 9000) + 1000
 const currentDateTime = new Date()
 
+bot.use((ctx, next) => {
+    // Проверяем, существует ли сообщение и является ли оно пересланным
+    if (ctx.message && 'forward_from' in ctx.message) {
+        // Если сообщение переслано
+        handleForwardedMessage(ctx);
+        return;
+    }
+    // Если сообщение не переслано или не содержит команды, передаем обработку следующему middleware
+    return next();
+});
+
 runBot(instanceNumber, currentDateTime)
 // Обработчики команд
 bot.command('reg_key', (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true)) //['start', 'reg']
@@ -91,14 +102,7 @@ bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber, currentD
 bot.command('get_group_info', (ctx) => handleGetGroupInfoCommand(ctx))
 bot.command('who', (ctx) => whoCommand(ctx))
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
-
-bot.on('message', (ctx) => {
-    if (ctx.message.forward_from) {
-        handleForwardedMessage(ctx)
-    } else {
-        handleTextCommand(ctx)
-    }
-})
+// bot.on('message', (ctx) => handleTextCommand(ctx))
 bot.on('text', (ctx) => handleTextCommand(ctx)) // особо не нужна но пусть будет
 
 
