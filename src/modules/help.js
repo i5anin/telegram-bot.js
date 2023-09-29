@@ -42,7 +42,7 @@ async function handleHelpCommand(ctx) {
             const user = await getUserInfo(userId)
 
             // Отправляем сообщение администратору с информацией о пользователе
-            await ctx.reply(`Сообщение отправлено пользователю\nID: <code>${user.userId}</code>\nФИО: <pre>${user.fio}</pre>`, { parse_mode: 'HTML' })
+            await ctx.reply(`Сообщение отправлено пользователю\nID: <code>${user.userId}</code>\nФИО: <code>${user.fio}</code>`, { parse_mode: 'HTML' })
 
         } catch (err) {
             // Проверяем, является ли ошибка ошибкой Telegram

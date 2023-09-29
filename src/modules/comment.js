@@ -52,7 +52,7 @@ async function handleAddComment(ctx) {
 
         if (!comment) {
             await bot.telegram.sendMessage(chatId, 'Ошибка! задача уже прокомментирована');
-            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Ошибка! задача уже прокомментирована\ntaskID: <pre>${taskID}</pre>\nchatId: <code>${chatId}</code>`, { parse_mode: 'HTML' });
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Ошибка! задача уже прокомментирована\ntaskID: <code>${taskID}</code>\nchatId: <code>${chatId}</code>`, { parse_mode: 'HTML' });
             console.log('Не найдено ни одного подходящего комментария');
             return;
         }
@@ -63,15 +63,15 @@ async function handleAddComment(ctx) {
 
         if (response && response.status === 'OK') {
             await ctx.reply(
-                `Комментарий:\n<pre>${ctx.message.text}</pre>\nДля:\n<pre>${ctx.session.userComments.det_name}</pre>\nдобавлен успешно.`,
+                `Комментарий:\n<code>${ctx.message.text}</code>\nДля:\n<code>${ctx.session.userComments.det_name}</code>\nдобавлен успешно.`,
                 { parse_mode: 'HTML' },
             );
             await bot.telegram.sendMessage(
                 LOG_CHANNEL_ID,
                 `${emoji.star.repeat(3)} Успешно прокомментировал задачу\n Пользователь с ID <code>${chatId}</code>` +
                 ` @${username}` +
-                `\nИмя: <pre>${firstName} ${lastName}</pre>` +
-                `\nКомментарий:\n<pre>${ctx.message.text}</pre>`,
+                `\nИмя: <code>${firstName} ${lastName}</code>` +
+                `\nКомментарий:\n<code>${ctx.message.text}</code>`,
                 { parse_mode: 'HTML' },
             );
         } else {

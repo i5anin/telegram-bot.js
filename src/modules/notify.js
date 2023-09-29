@@ -88,7 +88,7 @@ async function notifyAllUsers() {
             if (!isMessageSent) continue
 
             await updateTaskStatus(userComments[0].id_task)
-            await sendMessage(LOG_CHANNEL_ID, `<code>Cron</code> Отправлено пользователю <code>${chatId}</code> task_ID: <code>${userComments[0].id_task}</code>\n`)
+            await sendMessage(LOG_CHANNEL_ID, `<code>Cron</code> Отправлено пользователю <code>${chatId}</code> task_ID: <code>${userComments[0].id_task}</code>`)
         } catch (error) {
             console.error(`Ошибка при отправке сообщения пользователю ${chatId}:`, error)
             await sendMessage(LOG_CHANNEL_ID, `Чат не найден для chatId: <code>${chatId}</code>`)
@@ -128,7 +128,7 @@ async function notifyUsers(ctx) {
         if (userActualComments.length === 0) return
 
         const taskId = userActualComments[0].id_task
-        await sendMessage(LOG_CHANNEL_ID, `Отправлено пользователю <code>${chatId} </code> task_ID: <pre>${taskId}</pre>`)
+        await sendMessage(LOG_CHANNEL_ID, `Отправлено пользователю <code>${chatId} </code> task_ID: <code>${taskId}</code>`)
         const message = formatMessage(userActualComments[0], userActualComments.length)
         const isMessageSent = await sendMessage(chatId, message)
 
@@ -137,7 +137,7 @@ async function notifyUsers(ctx) {
         }
     } catch (error) {
         console.log('Notify Error in notifyUsers:', error)
-        await sendMessage(LOG_CHANNEL_ID, `Notify <code>${error}</code>`)
+        await sendMessage(LOG_CHANNEL_ID, `Notify <code>${error} </code>`)
     }
 }
 
