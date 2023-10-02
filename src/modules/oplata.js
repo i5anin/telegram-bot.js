@@ -24,14 +24,13 @@ async function oplataNotification() {
                 batches.push(sortedPayments.slice(i, i + BATCH_SIZE))
             }
 
-            const ADMIN_IDS = [OPLATA_GROUP, DIR_OPLATA, 123]
+            const ADMIN_IDS = [DIR_OPLATA, OPLATA_GROUP]
             console.log(ADMIN_IDS)
 
             for (let batch of batches) {
                 console.log('Processing batch:', batch)
-                let message = '<code>--------------------</code>\n'
                 let sentIds = []
-
+                let message = '<code>--------------------</code>\n'
                 batch.forEach((payment) => {
                     const formattedSum = Number(payment.sum).toLocaleString('ru-RU')
                     const { formattedDate } = formatPaymentDate(payment)
