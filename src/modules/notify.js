@@ -1,20 +1,13 @@
-const { resetFlags, formatPaymentDate } = require('#src/utils/helpers');
+const { resetFlags, formatPaymentDate, getUserName, getDescription } = require('#src/utils/helpers');
 const { fetchComments } = require('#src/modules/comment');
 const { sendToLog } = require('#src/utils/log');
 const { updateComment, getAllUsers } = require('#src/api/index');
-const { getDescription } = require('#src/modules/help')
 
 
 
-let usersData = [];
 
-async function loadUsersData() {
-    try {
-        usersData = await getAllUsers() || [];
-    } catch (error) {
-        console.error('Failed to fetch users data:', error);
-    }
-}
+
+
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -59,10 +52,6 @@ function formatMessage(comment, total) {
         `<i>необходимо прокомментировать через "ответить" на это сообщение</i>`;
 }
 
-function getUserName(userId) {
-    const user = usersData.find(u => u.user_id === userId);
-    return user ? user.fio : '<code>Неизвестный пользователь</code>';
-}
 
 async function processUserComments(userComments) {
     const chatId = userComments[0].user_id;
@@ -72,19 +61,19 @@ async function processUserComments(userComments) {
     if (isMessageSent) {
         const masterChatId = userComments[0].user_id_master;
         if (masterChatId) {
-            const masterMessage = formatMasterMessage(userComments[0], chatId);
+            const masterMessage = formatMasterMessage(userComments[0], chatId, userName);
             await sendMessage(masterChatId, masterMessage);
         }
         await updateTaskStatus(userComments[0].id_task);
     }
 }
 
-function formatMasterMessage(comment, chatId) {
+function formatMasterMessage(comment, chatId, userName) {
     const { det_name, kolvo_brak, type, comments_otk, specs_nom_id } = comment;
     const typeString = getDescription(type);
     const { formattedDate } = formatPaymentDate({ date: comment.date });
 
-    return `<b>Уведомление отправлено</b> <code>${getUserName(chatId)}</code>\n\n` +
+    return `<b>Уведомление отправлено</b> <code>${userName}</code>\n\n` +
         `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
         `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
         `<b>Контроль:</b> <code>${typeString}</code>\n` +
@@ -94,7 +83,7 @@ function formatMasterMessage(comment, chatId) {
 }
 
 async function notifyAllUsers() {
-    await loadUsersData();
+    let userName = await getUserName(chatId);
     const allComments = await fetchComments();
     const user_ids = [...new Set(allComments.map(comment => comment.user_id))];
 
@@ -113,7 +102,7 @@ async function notifyUsers(ctx) {
     resetFlags(ctx);
     const chatId = ctx.message.chat.id;
 
-    await loadUsersData();
+    let userName = await getUserName(chatId);
     const uncommentedTasks = await fetchComments(chatId);
 
     if (uncommentedTasks.some(task => task.user_id === chatId)) {

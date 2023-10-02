@@ -1,6 +1,5 @@
 const { getAllComments, updateComment } = require('#src/api/index')
-const { getDescription } = require('#src/modules/help')
-const { formatPaymentDate } = require('#src/utils/helpers')
+const { formatPaymentDate, getDescription, getUserName } = require('#src/utils/helpers')
 
 
 async function fetchComments() {
@@ -75,7 +74,8 @@ async function handleAddComment(ctx) {
             const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment;
             const typeString = getDescription(type);
             const { formattedDate } = formatPaymentDate({ date: comment.date });
-            const master_msg = `<b>Человек прокомментировал</b> <code>${chatId}</code> ${'@' + username}\n\n` +
+            const userName = await getUserName(chatId);
+            const master_msg = `<b>Прокомментировал</b> <code>${userName}</code> ${'@' + username}\n\n` +
                 `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
                 `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
                 `<b>Контроль:</b> <code>${typeString}</code>\n` +

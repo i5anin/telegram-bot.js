@@ -4,17 +4,6 @@ const { sendToLog } = require('#src/utils/log')
 const { getAllUsers } = require('#src/api/index')
 
 
-
-function getDescription(code) {
-    const typeMapping = {
-        'ПО': 'Пооперационный контроль окончательный',
-        'ПН': 'Пооперационный контроль неокончательный',
-        'УО': 'Контроль перед упаковкой окончательный',
-        'УН': 'Контроль перед упаковкой неокончательный',
-    };
-    return typeMapping[code] || 'Неизвестный код';
-}
-
 async function getUserInfo(userId) {
     try {
         // Запрашиваем данные всех пользователей
@@ -106,4 +95,4 @@ async function handleDocsCommand(ctx) {
         { parse_mode: 'Markdown' })
 }
 
-module.exports = { handleHelpCommand, handleDocsCommand, getDescription }
+module.exports = { handleHelpCommand, handleDocsCommand }
