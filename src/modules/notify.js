@@ -128,4 +128,4 @@ async function notifyUsers(ctx) {
     }
 }
 
-module.exports = { notifyUsers, notifyAllUsers };
+module.exports = { notifyUsers, notifyAllUsers, typeMapping };

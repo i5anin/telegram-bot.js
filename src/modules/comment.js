@@ -1,4 +1,5 @@
 const { getAllComments, updateComment } = require('#src/api/index')
+const { typeMapping } = require('#src/modules/notify')
 
 async function fetchComments() {
     try {
@@ -56,6 +57,9 @@ async function handleAddComment(ctx) {
         const commentText = ctx.message.text
         const response = await updateComment(taskID, commentText)
 
+        const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment;
+        const typeString = typeMapping[type] || 'Неизвестный тип';
+
         if (response && response.status === 'OK') {
             await ctx.reply(
                 `Комментарий:\n<code>${ctx.message.text}</code>\nДля:\n<code>${ctx.session.userComments.det_name}</code>\nдобавлен успешно.`,
@@ -69,9 +73,18 @@ async function handleAddComment(ctx) {
                 `\nКомментарий:\n<code>${ctx.message.text}</code>`,
                 { parse_mode: 'HTML' },
             )
+            const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment;
+            const master_msg = `<b>Человек прокомментировал</b> <code>${chatId}</code> ${'@' + username}\n\n` +
+                `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
+                `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
+                `<b>Контроль:</b> <code>${typeString}</code>\n` +
+                `<b>Комментарий ОТК:</b> <code>${comments_otk}</code>\n` +
+                `<b>Партия:</b> <code>${specs_nom_id}</code>\n` +
+                `<b>Дата:</b> <code>${formattedDate}</code>\n` +
+                `<b>Комментарий:</b> <code>${commentText}</code>`
 
             // Если user_id_master существует, отправляем сообщение мастеру
-            if (comment.user_id_master) await bot.telegram.sendMessage(comment.user_id_master, `Новый комментарий к задаче от ${username}: ${commentText}`)
+            if (comment.user_id_master) await bot.telegram.sendMessage(comment.user_id_master, master_msg)
 
         } else {
             console.error('Ошибка на стороне сервера:', response.message || response.errorMessage || 'Неизвестная ошибка')
