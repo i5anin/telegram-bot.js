@@ -83,12 +83,12 @@ bot.use((ctx, next) => {
     // Проверяем, существует ли сообщение и является ли оно пересланным
     if (ctx.message && ctx.message.forward_from) {
         // Если сообщение переслано
-        handleForwardedMessage(ctx);
-        return;
+        handleForwardedMessage(ctx)
+        return
     }
     // Если сообщение не переслано или не содержит команды, передаем обработку следующему middleware
-    return next();
-});
+    return next()
+})
 
 runBot(instanceNumber, currentDateTime)
 // Обработчики команд
