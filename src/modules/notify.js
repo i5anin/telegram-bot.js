@@ -1,7 +1,6 @@
-const { resetFlags } = require('#src/utils/helpers')
+const { resetFlags, formatPaymentDate } = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
-const { formatPaymentDate } = require('#src/utils/helpers')
 const { updateComment, getAllUsers } = require('#src/api/index')
 
 let usersData = []
@@ -9,8 +8,7 @@ let usersData = []
 async function loadUsersData() {
     try {
         const result = await getAllUsers()
-        console.log(result)
-        usersData = result.users_data || []
+        usersData = result || []
     } catch (error) {
         console.error('Failed to fetch users data:', error)
     }
@@ -69,6 +67,15 @@ function formatMessage(comment, total) {
         `<i>необходимо прокомментировать через "ответить" на это сообщение</i>`
 }
 
+function getUserName(userId) {
+    const user = usersData.find(u => u.user_id === userId)
+    if (!user) {
+        console.error('User not found for userId:', userId)
+        return '<code>Неизвестный пользователь</code>'
+    }
+    return user.fio
+}
+
 async function notifyAllUsers() {
     await loadUsersData()
     const allComments = await fetchComments()
@@ -79,17 +86,25 @@ async function notifyAllUsers() {
 
         if (userComments.length === 0) continue
 
-        const getUserName = (userId) => {
-            const user = usersData.find(u => u.user_id === userId)
-            return user ? user.fio : '<code>Неизвестный пользователь</code>'
-        }
+        const { det_name, kolvo_brak, type, comments_otk, specs_nom_id } = userComments[0]
+        const typeString = typeMapping[type] || 'Неизвестный тип'
+        const { formattedDate } = formatPaymentDate({ date: userComments[0].date })
+
         const message = formatMessage(userComments[0], userComments.length)
         const isMessageSent = await sendMessage(chatId, message + '\n<code>Cron</code>')
 
         if (isMessageSent) {
             const masterChatId = userComments[0].user_id_master
             if (masterChatId) {
-                const masterMessage = `Уведомление отправлено пользователю <code>${getUserName(chatId)}</code>.`
+                const masterMessage =
+                    `Уведомление отправлено пользователю <code>${getUserName(chatId)}</code>.` +
+                    `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
+                    `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
+                    `<b>Контроль:</b> <code>${typeString}</code>\n` +
+                    `<b>Комментарий ОТК:</b> <code>${comments_otk}</code>\n` +
+                    `<b>Партия:</b> <code>${specs_nom_id}</code>\n` +
+                    `<b>Дата:</b> <code>${formattedDate}</code>\n`
+
                 await sendMessage(masterChatId, masterMessage)
             }
 
@@ -110,7 +125,7 @@ async function notifyUsers(ctx) {
     const chatId = ctx.message.chat.id
 
     await loadUsersData()
-    console.log('loadUsersData = ', loadUsersData())
+
     const uncommentedTasks = await fetchComments(chatId)
 
     if (!uncommentedTasks) {
@@ -134,11 +149,6 @@ async function notifyUsers(ctx) {
     await sendMessage(LOG_CHANNEL_ID, `Отправлено пользователю <code>${chatId} </code> task_ID: <code>${taskId}</code>`)
     const message = formatMessage(userActualComments[0], userActualComments.length)
     const isMessageSent = await sendMessage(chatId, message)
-
-    const getUserName = (userId) => {
-        const user = usersData.find(u => u.user_id === userId)
-        return user ? user.fio : '<code>Неизвестный пользователь</code>'
-    }
 
     if (isMessageSent) {
         const masterChatId = userActualComments[0].user_id_master
