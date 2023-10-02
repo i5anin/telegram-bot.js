@@ -24,7 +24,7 @@ async function handleAddComment(ctx) {
 
     const chatId = ctx.message.chat.id
 
-    const username = ctx.from.username || 'N/A'
+    const username = '@'+ctx.from.username || ''
     const firstName = ctx.from.first_name || 'N/A'
     const lastName = ctx.from.last_name || 'N/A'
 
@@ -75,7 +75,7 @@ async function handleAddComment(ctx) {
             const typeString = getDescription(type);
             const { formattedDate } = formatPaymentDate({ date: comment.date });
             const userName = await getUserName(chatId);
-            const master_msg = `<b>Прокомментировал</b> <code>${userName}</code> ${'@' + username}\n\n` +
+            const master_msg = `<b>Прокомментировал</b> <code>${userName}</code> ${username}\n\n` +
                 `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
                 `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
                 `<b>Контроль:</b> <code>${typeString}</code>\n` +
