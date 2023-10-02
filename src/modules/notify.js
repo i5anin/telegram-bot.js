@@ -2,13 +2,9 @@ const { resetFlags, formatPaymentDate } = require('#src/utils/helpers');
 const { fetchComments } = require('#src/modules/comment');
 const { sendToLog } = require('#src/utils/log');
 const { updateComment, getAllUsers } = require('#src/api/index');
+const { getDescription } = require('#src/modules/help')
 
-const typeMapping = {
-    'ПО': 'Пооперационный контроль окончательный',
-    'ПН': 'Пооперационный контроль неокончательный',
-    'УО': 'Контроль перед упаковкой окончательный',
-    'УН': 'Контроль перед упаковкой неокончательный',
-};
+
 
 let usersData = [];
 
@@ -49,7 +45,7 @@ async function updateTaskStatus(id_task) {
 
 function formatMessage(comment, total) {
     const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment;
-    const typeString = typeMapping[type] || 'Неизвестный тип';
+    const typeString = getDescription(type);
     const { formattedDate } = formatPaymentDate({ date: comment.date });
 
     return `<b>Пожалуйста, прокомментируйте следующую операцию:</b><code>(1/${total})</code>\n\n` +
@@ -85,7 +81,7 @@ async function processUserComments(userComments) {
 
 function formatMasterMessage(comment, chatId) {
     const { det_name, kolvo_brak, type, comments_otk, specs_nom_id } = comment;
-    const typeString = typeMapping[type] || 'Неизвестный тип';
+    const typeString = getDescription(type);
     const { formattedDate } = formatPaymentDate({ date: comment.date });
 
     return `<b>Уведомление отправлено</b> <code>${getUserName(chatId)}</code>\n\n` +
@@ -128,4 +124,4 @@ async function notifyUsers(ctx) {
     }
 }
 
-module.exports = { notifyUsers, notifyAllUsers, typeMapping };
+module.exports = { notifyUsers, notifyAllUsers };
