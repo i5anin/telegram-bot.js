@@ -3,6 +3,13 @@ const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
 const { updateComment, getAllUsers } = require('#src/api/index')
 
+const typeMapping = {
+    'ПО': 'Пооперационный контроль окончательный',
+    'ПН': 'Пооперационный контроль неокончательный',
+    'УО': 'Контроль перед упаковкой окончательный',
+    'УН': 'Контроль перед упаковкой неокончательный',
+}
+
 let usersData = []
 
 async function loadUsersData() {
@@ -46,12 +53,6 @@ async function updateTaskStatus(id_task) {
 }
 
 function formatMessage(comment, total) {
-    const typeMapping = {
-        'ПО': 'Пооперационный контроль окончательный',
-        'ПН': 'Пооперационный контроль неокончательный',
-        'УО': 'Контроль перед упаковкой окончательный',
-        'УН': 'Контроль перед упаковкой неокончательный',
-    }
     const { id_task, kolvo_brak, det_name, date, specs_nom_id, type, comments_otk } = comment
     const typeString = typeMapping[type] || 'Неизвестный тип'
     const { formattedDate } = formatPaymentDate({ date: comment.date })
@@ -97,7 +98,7 @@ async function notifyAllUsers() {
             const masterChatId = userComments[0].user_id_master
             if (masterChatId) {
                 const masterMessage =
-                    `Уведомление отправлено пользователю <code>${getUserName(chatId)}</code>.` +
+                    `<b>Уведомление отправлено</b> <code>${getUserName(chatId)}</code>\n\n` +
                     `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
                     `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
                     `<b>Контроль:</b> <code>${typeString}</code>\n` +
@@ -153,7 +154,19 @@ async function notifyUsers(ctx) {
     if (isMessageSent) {
         const masterChatId = userActualComments[0].user_id_master
         if (masterChatId) {
-            const masterMessage = `Уведомление отправлено пользователю <code>${getUserName(chatId)}</code>.`
+            const { det_name, kolvo_brak, type, comments_otk, specs_nom_id } = userActualComments[0]
+            const typeString = typeMapping[type] || 'Неизвестный тип'
+            const { formattedDate } = formatPaymentDate({ date: userActualComments[0].date })
+
+            const masterMessage =
+                `<b>Уведомление отправлено</b> <code>${getUserName(chatId)}</code>\n\n` +
+                `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
+                `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
+                `<b>Контроль:</b> <code>${typeString}</code>\n` +
+                `<b>Комментарий ОТК:</b> <code>${comments_otk}</code>\n` +
+                `<b>Партия:</b> <code>${specs_nom_id}</code>\n` +
+                `<b>Дата:</b> <code>${formattedDate}</code>\n`
+
             await sendMessage(masterChatId, masterMessage)
         }
     } else {
