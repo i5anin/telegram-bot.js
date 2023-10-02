@@ -1,7 +1,7 @@
 const axios = require('axios')
 
 const SECRET_KEY = process.env.SECRET_KEY
-const WEB_API = 'https://bot.pf-forum.ru/api'  // process.env.WEB_API
+const WEB_API = process.env.WEB_API
 
 async function performRequest(url, method = 'get', data = {}, params = {}) {
     try {
@@ -81,7 +81,7 @@ async function updateComment(taskID, commentText = null) {
 
 // Payments
 async function getAllPayments() {
-    const basePath = process.env.NODE_ENV === 'build' ? 'get_all.php' : 'get_all_test.php';
+    const basePath = process.env.NODE_ENV === 'build' ? 'get_all.php' : 'get_all_test.php'
     const url = `${WEB_API}/oplata/${basePath}`
     const params = {
         key: SECRET_KEY,
@@ -90,7 +90,7 @@ async function getAllPayments() {
 }
 
 async function updatePayments(sentIds) {
-    const basePath = process.env.NODE_ENV === 'build' ? 'update.php' : 'update_test.php';
+    const basePath = process.env.NODE_ENV === 'build' ? 'update.php' : 'update_test.php'
     const url = `${WEB_API}/oplata/${basePath}`
     const params = {
         key: SECRET_KEY,
