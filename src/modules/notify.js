@@ -1,7 +1,7 @@
 const { resetFlags, formatPaymentDate, getUserName, getDescription } = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
-const { updateComment, getAllUsers } = require('#src/api/index')
+const { updateComment } = require('#src/api/index')
 
 // Функция задержки
 function sleep(ms) {
