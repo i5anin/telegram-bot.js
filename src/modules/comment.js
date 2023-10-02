@@ -24,7 +24,7 @@ async function handleAddComment(ctx) {
 
     const chatId = ctx.message.chat.id
 
-    const username = '@'+ctx.from.username || ''
+    const username = ctx.from.username ? '@' + ctx.from.username : '';
     const firstName = ctx.from.first_name || 'N/A'
     const lastName = ctx.from.last_name || 'N/A'
 
