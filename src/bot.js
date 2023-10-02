@@ -41,7 +41,7 @@ bot.use((ctx, next) => {
 
 // Глобальные переменные
 global.SECRET_KEY = process.env.SECRET_KEY
-global.WEB_API = process.env.WEB_API
+// global.WEB_API = process.env.WEB_API
 
 global.GRAND_ADMIN = process.env.GRAND_ADMIN
 global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
