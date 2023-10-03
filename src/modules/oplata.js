@@ -30,15 +30,15 @@ async function oplataNotification() {
             for (let batch of batches) {
                 console.log('Processing batch:', batch)
                 let sentIds = []
-                let message = '<code>--------------------</code>\n'
+                let message = '<b>--------------------</b>\n'
                 batch.forEach((payment) => {
                     const formattedSum = Number(payment.sum).toLocaleString('ru-RU')
                     const { formattedDate } = formatPaymentDate(payment)
-                    message += `<b>Дата:</b> <code>${formattedDate}</code>\n`
-                    message += `<b>Имя клиента:</b> <code>${payment.client_name}</code>\n`
-                    message += `<b>Сумма:</b> <code>${formattedSum} руб</code>\n`
-                    message += `<b>Информация:</b> <code>${payment.info}</code>\n`
-                    message += '<code>--------------------</code>\n'
+                    message += `Дата: <b>${formattedDate}</b>\n`
+                    message += `Имя клиента: <b>${payment.client_name}</b>\n`
+                    message += `Сумма: <b>${formattedSum}\u00A0₽</b>\n`
+                    message += `Информация: <b>${payment.info}</b>\n`
+                    message += '<b>--------------------</b>\n'
                     sentIds.push(payment.id)
                 })
 
