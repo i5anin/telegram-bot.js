@@ -21,6 +21,7 @@ const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 const { runBot } = require('#src/modules/runBot')
 const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
 const { createMetric } = require('#src/utils/metric')
+const { sendMetricsNotification } = require('#src/modules/metrics')
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -41,7 +42,7 @@ bot.use((ctx, next) => {
 
 // Глобальные переменные
 global.SECRET_KEY = process.env.SECRET_KEY
-// global.WEB_API = process.env.WEB_API
+global.WEB_API = process.env.WEB_API
 
 global.GRAND_ADMIN = process.env.GRAND_ADMIN
 global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
@@ -101,9 +102,11 @@ bot.command('msg', handleMsgCommand)
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber, currentDateTime))
 bot.command('get_group_info', (ctx) => handleGetGroupInfoCommand(ctx))
 bot.command('who', (ctx) => whoCommand(ctx))
+bot.command('metrics', sendMetricsNotification)
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
 // bot.on('message', (ctx) => handleTextCommand(ctx))
 bot.on('text', (ctx) => handleTextCommand(ctx)) // особо не нужна но пусть будет
+
 
 
 // Обработчик текстовых сообщений
