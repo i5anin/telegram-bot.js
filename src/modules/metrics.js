@@ -31,7 +31,7 @@ async function sendMetricsNotification() {
             const formattedValue = formatNumber(metric.value);
             const groupTitle = groupTitles[metric.id] || '';
             message += groupTitle;
-            message += `${metric.name}: <b>${formattedValue} ${metric.unit}</b>\n`;
+            message += `${metric.name}: <b>${formattedValue}</b>\u00A0<b>${metric.unit}</b>\n`;
         });
 
 
