@@ -47,7 +47,7 @@ async function oplataNotification() {
                     console.log('Sending message to adminId:', adminId);
                     try {
                         await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' });
-                        console.log('Message sent successfully to adminId:', adminId);
+                        console.log('OPLATA Message sent successfully to adminId:', adminId);
                     } catch (error) {
                         console.error('Failed to send message to adminId:', adminId, 'Error:', error);
                         await bot.telegram.sendMessage(

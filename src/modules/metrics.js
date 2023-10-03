@@ -40,7 +40,7 @@ async function sendMetricsNotification() {
         for (const adminId of ADMIN_IDS) {
             try {
                 await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' });
-                console.log('Message sent successfully to adminId:', adminId);
+                console.log('Metrics Message sent successfully to adminId:', adminId);
             } catch (error) {
                 console.error('Failed to send message to adminId:', adminId, 'Error:', error);
                 await bot.telegram.sendMessage(
