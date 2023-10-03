@@ -21,17 +21,17 @@ async function sendMetricsNotification() {
         const metrics = await fetchMetrics();
         let message = '';
         const groupTitles = {
-            3: '\nНе завершённое по М/О: \n',
-            4: '\nИтого внутреннего производства: ',
-            5: '\nОтклонение от плана \n',
-            6: '\nВоронка\n'
+            8: '\n',
+            9: '\n<u>Отклонение от плана:</u>\n',
+            12: '\n<u>Воронка:</u>\n',
+            16: '\n'
         };
 
         metrics.forEach((metric, index) => {
             const formattedValue = formatNumber(metric.value);
             const groupTitle = groupTitles[metric.id] || '';
             message += groupTitle;
-            message += `<b>${metric.name}:</b> ${formattedValue} ${metric.unit}\n`;
+            message += `${metric.name}: <b>${formattedValue} ${metric.unit}</b>\n`;
         });
 
 
