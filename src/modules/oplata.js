@@ -24,7 +24,7 @@ async function oplataNotification() {
                 batches.push(sortedPayments.slice(i, i + BATCH_SIZE))
             }
 
-            const ADMIN_IDS = [DIR_OPLATA, OPLATA_GROUP]
+            const ADMIN_IDS = [DIR_OPLATA, DIR_TEST_GROUP]
             console.log(ADMIN_IDS)
 
             for (let batch of batches) {

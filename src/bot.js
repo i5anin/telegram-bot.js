@@ -46,9 +46,14 @@ global.WEB_API = process.env.WEB_API
 
 global.GRAND_ADMIN = process.env.GRAND_ADMIN
 global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
+
 global.DIR_OPLATA = process.env.DIR_OPLATA
-global.OPLATA_GROUP = process.env.OPLATA_GROUP
+global.DIR_METRIC = process.env.DIR_METRIC
+
+global.DIR_TEST_GROUP = process.env.DIR_TEST_GROUP
+
 global.OPLATA_REPORT_ACTIVE = process.env.OPLATA_REPORT_ACTIVE //OPLATA_REPORT_ACTIVE = true;
+
 global.MODE = process.env.NODE_ENV || 'development'  // Если NODE_ENV не определен, по умолчанию используется 'development'
 global.emoji = {
     x: '&#10060;',

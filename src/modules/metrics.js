@@ -22,8 +22,8 @@ async function sendMetricsNotification() {
         let message = '';
         const groupTitles = {
             8: '\n',
-            9: '\n<u>Отклонение от плана:</u>\n',
-            12: '\n<u>Воронка:</u>\n',
+            9: '\n<u>Отклонение от плана</u>\n',
+            12: '\n<u>Воронка</u>\n',
             16: '\n'
         };
 
@@ -36,7 +36,7 @@ async function sendMetricsNotification() {
 
 
 
-        const ADMIN_IDS = [OPLATA_GROUP];
+        const ADMIN_IDS = [DIR_TEST_GROUP];
         for (const adminId of ADMIN_IDS) {
             try {
                 await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' });
