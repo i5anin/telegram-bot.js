@@ -43,13 +43,14 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-if ($stmt = $mysqli->prepare("SELECT `name`, `value`, `unit` FROM `metrics`")) {
+if ($stmt = $mysqli->prepare("SELECT `id`, `name`, `value`, `unit` FROM `metrics`")) {
     $stmt->execute();
-    $stmt->bind_result($name, $value, $unit);
+    $stmt->bind_result($id, $name, $value, $unit);
 
     $metrics = [];
     while ($stmt->fetch()) {
         $metrics[] = [
+            'id' => $id,
             'name' => $name,
             'value' => $value,
             'unit' => $unit
