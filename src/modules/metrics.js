@@ -20,21 +20,21 @@ async function sendMetricsNotification() {
     try {
         const metrics = await fetchMetrics();
         let message = '';
+        const groupTitles = {
+            3: '\nНе завершённое по М/О: \n',
+            4: '\nИтого внутреннего производства: ',
+            5: '\nОтклонение от плана \n',
+            6: '\nВоронка\n'
+        };
+
         metrics.forEach((metric, index) => {
             const formattedValue = formatNumber(metric.value);
-            // Добавляем заголовки для групп
-            if (metric.name === 'Не завершённое по М/О') {
-                message += '\nНе завершённое по М/О: \n';
-            } else if (metric.name === 'Итого внутреннего производства') {
-                message += '\nИтого внутреннего производства: ';
-            } else if (metric.name === 'Отклонение от плана Производства') {
-                message += '\nОтклонение от плана \n';
-            } else if (metric.name === 'Воронка Производство') {
-                message += '\nВоронка\n';
-            }
-            // Форматируем метрику и добавляем ее в сообщение
+            const groupTitle = groupTitles[metric.id] || '';
+            message += groupTitle;
             message += `<b>${metric.name}:</b> ${formattedValue} ${metric.unit}\n`;
         });
+
+
 
         const ADMIN_IDS = [OPLATA_GROUP];
         for (const adminId of ADMIN_IDS) {
