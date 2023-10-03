@@ -1,50 +1,39 @@
-// Подключение необходимых библиотек и модулей
-// const axios = require('axios'); // Если вы используете axios
-const fetch = require('node-fetch');  // Если вы используете fetch
+const axios = require('axios');
 
-// Функция для получения метрик
 async function fetchMetrics() {
     try {
-        const response = await fetch(`${WEB_API}/metrics/get.php?key=${SECRET_KEY}`);
-        const data = await response.json();
-        return data.metrics;
+        const response = await axios.get(`${WEB_API}/metrics/get.php?key=${SECRET_KEY}`);
+        return response.data.metrics;
     } catch (error) {
         throw new Error(`Failed to fetch metrics: ${error.message}`);
     }
 }
 
-// Функция для форматирования числа
-function formatNumber(number, isFractional) {
+function formatNumber(number) {
     return parseFloat(number).toLocaleString('ru-RU', {
-        minimumFractionDigits: isFractional ? 2 : 0,
-        maximumFractionDigits: isFractional ? 2 : 0,
-    });
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).replace(/,00$/, '');  // Убираем ,00 для целых чисел
 }
 
-// Функция для отправки уведомления с метриками
 async function sendMetricsNotification() {
     try {
         const metrics = await fetchMetrics();
-
         let message = '';
-        let groupTitle = '';
         metrics.forEach((metric, index) => {
-            const isFractional = metric.unit.includes('/');
-            const formattedValue = formatNumber(metric.value, isFractional);
-
+            const formattedValue = formatNumber(metric.value);
+            // Добавляем заголовки для групп
             if (metric.name === 'Не завершённое по М/О') {
-                groupTitle = '\n' + metric.name + ': \n';
+                message += '\nНе завершённое по М/О: \n';
             } else if (metric.name === 'Итого внутреннего производства') {
-                groupTitle = '\n' + metric.name + ': ';
+                message += '\nИтого внутреннего производства: ';
             } else if (metric.name === 'Отклонение от плана Производства') {
-                groupTitle = '\nОтклонение от плана \n';
+                message += '\nОтклонение от плана \n';
             } else if (metric.name === 'Воронка Производство') {
-                groupTitle = '\nВоронка\n';
-            } else {
-                groupTitle = '';
+                message += '\nВоронка\n';
             }
-
-            message += `${groupTitle}<b>${metric.name}:</b> ${formattedValue} ${metric.unit}\n`;
+            // Форматируем метрику и добавляем ее в сообщение
+            message += `<b>${metric.name}:</b> ${formattedValue} ${metric.unit}\n`;
         });
 
         const ADMIN_IDS = [OPLATA_GROUP];
@@ -71,5 +60,4 @@ async function sendMetricsNotification() {
     }
 }
 
-// Экспорт функции для использования в других модулях
 module.exports = { sendMetricsNotification };
