@@ -1,5 +1,6 @@
 const axios = require('axios')
 const moment = require('moment')
+const { checkUser } = require('#src/api/index')
 
 async function fetchMetrics() {
     try {
@@ -40,14 +41,22 @@ function formatPercentage(number, maxCharacters) {
 
 async function sendMetricsNotification(ctx, index) {
     try {
-        const metrics = await fetchMetrics()
-        if (metrics.length === 0 || !metrics[index]) {
-            throw new Error('No metrics data available')
+        const chatId = ctx.chat.id;  // Получите chatId из контекста
+        const userCheck = await checkUser(chatId);  // Проверьте пользователя
+
+        if (!userCheck.exists || (userCheck.role !== 'admin' && userCheck.role !== 'dir')) {
+            console.error(`User ${chatId} does not have the necessary permissions.`);
+            return;  // Если у пользователя нет необходимых прав, просто возвращаемся из функции
         }
 
-        const latestMetrics = metrics[index]
-        let message = ''
-        const maxCharacters = getMaxCharacters(latestMetrics)
+        const metrics = await fetchMetrics();
+        if (metrics.length === 0 || !metrics[index]) {
+            throw new Error('No metrics data available');
+        }
+
+        const latestMetrics = metrics[index];
+        let message = '';
+        const maxCharacters = getMaxCharacters(latestMetrics);
 
         message += `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n`
         message += `Не завершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b> ₽\n`
@@ -71,25 +80,25 @@ async function sendMetricsNotification(ctx, index) {
         message += `Отгрузка: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b> ₽\n`
 
         if (index === 1) {
-            await ctx.reply(message, { parse_mode: 'HTML' })
-            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Запрс метрики <code>${ctx.from.id}</code>\n` + message, { parse_mode: 'HTML' })
+            await ctx.reply(message, { parse_mode: 'HTML' });
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Запрос метрики <code>${ctx.from.id}</code>\n` + message, { parse_mode: 'HTML' });
         } else {
-            const ADMIN_IDS = [DIR_TEST_GROUP, 1164924330] //1164924330 - Лера
+            const ADMIN_IDS = [DIR_TEST_GROUP, 1164924330]; //1164924330 - Лера
             for (const adminId of ADMIN_IDS) {
                 try {
-                    await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' })
-                    console.log('Metrics Message sent successfully to adminId:', adminId)
+                    await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' });
+                    console.log('Metrics Message sent successfully to adminId:', adminId);
                 } catch (error) {
-                    console.error('Failed to send message to adminId:', adminId, 'Error:', error)
-                    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${adminId}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
+                    console.error('Failed to send message to adminId:', adminId, 'Error:', error);
+                    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${adminId}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' });
                 }
             }
         }
     } catch (error) {
-        console.error('Error fetching or sending metrics:', error)
-        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Error fetching or sending metrics\n<code>${error}</code>`, { parse_mode: 'HTML' })
+        console.error('Error fetching or sending metrics:', error);
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Error fetching or sending metrics\n<code>${error}</code>`, { parse_mode: 'HTML' });
     }
 }
 
-module.exports = { sendMetricsNotification }
+module.exports = { sendMetricsNotification };
 

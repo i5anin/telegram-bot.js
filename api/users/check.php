@@ -11,21 +11,21 @@ function check_user_id_exists($user_id)
     $mysqli = mysqli_connect($server, $user, $pass, $db);
     mysqli_set_charset($mysqli, 'utf8mb4');
 
-    $stmt = mysqli_prepare($mysqli, "SELECT COUNT(*), `fio` FROM `users` WHERE `user_id` = ?");
+    $stmt = mysqli_prepare($mysqli, "SELECT COUNT(*), `fio`, `role` FROM `users` WHERE `user_id` = ?");
     mysqli_stmt_bind_param($stmt, 'i', $user_id);
 
     if (!mysqli_stmt_execute($stmt)) {
         return ['error' => 'Ошибка: ' . mysqli_stmt_error($stmt)];
     }
 
-    mysqli_stmt_bind_result($stmt, $count, $fio);
+    mysqli_stmt_bind_result($stmt, $count, $fio, $role);
     mysqli_stmt_fetch($stmt);
 
     mysqli_stmt_close($stmt);
     mysqli_close($mysqli);
 
     if ($count > 0) {
-        return ['exists' => true, 'fio' => $fio];
+        return ['exists' => true, 'fio' => $fio, 'role' => $role];
     } else {
         return ['exists' => false];
     }
