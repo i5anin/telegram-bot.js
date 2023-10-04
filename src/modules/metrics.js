@@ -45,7 +45,7 @@ async function sendMetricsNotification() {
                 console.error('Failed to send message to adminId:', adminId, 'Error:', error);
                 await bot.telegram.sendMessage(
                     LOG_CHANNEL_ID,
-                    `Failed to send metrics message to <code>${adminId}</code>\n<code>${error}</code>`,
+                    `Не удалось отправить сообщение <code>${adminId}</code>\n<code>${error}</code>`,
                     { parse_mode: 'HTML' }
                 );
             }

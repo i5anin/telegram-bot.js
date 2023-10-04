@@ -20,7 +20,7 @@ const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
 const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 const { runBot } = require('#src/modules/runBot')
 const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
-const { createMetric } = require('#src/utils/metric')
+const { createMetric } = require('#src/utils/metricPM2')
 const { sendMetricsNotification } = require('#src/modules/metrics')
 
 // Конфигурационные переменные
@@ -79,11 +79,14 @@ global.stateCounter = {
 
     oplata_get_all: 0,
     oplata_update: 0,
+
+    instanceNumber: 0 //для метрики
 }
 
 // Случайный номер экземпляра
 const instanceNumber = Math.floor(Math.random() * 9000) + 1000
 const currentDateTime = new Date()
+stateCounter.instanceNumber = instanceNumber //для метрики
 
 bot.use((ctx, next) => {
     // Проверяем, существует ли сообщение и является ли оно пересланным
@@ -134,6 +137,7 @@ createMetric('comment_get_all', stateCounter, 'comment_get_all')
 createMetric('comment_update', stateCounter, 'comment_update')
 createMetric('oplata_get_all', stateCounter, 'oplata_get_all')
 createMetric('oplata_update', stateCounter, 'oplata_update')
+createMetric('instanceNumber', stateCounter, 'instanceNumber')
 
 // Инициализация cron-заданий
 initCronJobs(currentDateTime, instanceNumber)
