@@ -21,7 +21,7 @@ const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 const { runBot } = require('#src/modules/runBot')
 const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
 const { createMetric } = require('#src/utils/metricPM2')
-const { sendMetricsNotification } = require('#src/modules/metrics')
+const { metricsNotification } = require('#src/modules/metrics')
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -80,7 +80,7 @@ global.stateCounter = {
     oplata_get_all: 0,
     oplata_update: 0,
 
-    instanceNumber: 0 //для метрики
+    instanceNumber: 0, //для метрики
 }
 
 // Случайный номер экземпляра
@@ -110,12 +110,11 @@ bot.command('msg', handleMsgCommand)
 bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber, currentDateTime))
 bot.command('get_group_info', (ctx) => handleGetGroupInfoCommand(ctx))
 bot.command('who', (ctx) => whoCommand(ctx))
-bot.command('metrics',(ctx) => sendMetricsNotification(ctx, 1))
-bot.command('metrics_old',(ctx) => sendMetricsNotification(ctx, 0))
+bot.command(['m', 'metrics'], (ctx) => metricsNotification(ctx, 1))
+bot.command('metrics_old', metricsNotification())
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
 // bot.on('message', (ctx) => handleTextCommand(ctx))
 bot.on('text', (ctx) => handleTextCommand(ctx)) // особо не нужна но пусть будет
-
 
 
 // Обработчик текстовых сообщений
