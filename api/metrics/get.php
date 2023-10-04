@@ -43,30 +43,44 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-if ($stmt = $mysqli->prepare("SELECT `id`, `name`, `value`, `unit` FROM `metrics`")) {
+if ($stmt = $mysqli->prepare("SELECT `date`, `prod_price_mzp`, `prod_price_sles`, `prod_price_otk`, `prod_price_upk`, `prod_price_dorabotka`, `prod_price_dorabotka_sles`, `prod_price_sogl`, `prod_price`, `prod`, `sles`, `otk`, `upk`, `cumulative_brak_month`, `cumulative_sklad_month`, `cumulative_manager_month`, `productivity`, `get_sum_otgr` FROM `metrics`")) {
     $stmt->execute();
-    $stmt->bind_result($id, $name, $value, $unit);
+    $stmt->bind_result($date, $prod_price_mzp, $prod_price_sles, $prod_price_otk, $prod_price_upk, $prod_price_dorabotka, $prod_price_dorabotka_sles, $prod_price_sogl, $prod_price, $prod, $sles, $otk, $upk, $cumulative_brak_month, $cumulative_sklad_month, $cumulative_manager_month, $productivity, $get_sum_otgr);
 
-    $metrics = [];
+    $data = [];
     while ($stmt->fetch()) {
-        $metrics[] = [
-            'id' => $id,
-            'name' => $name,
-            'value' => $value,
-            'unit' => $unit
+        $data[] = [
+            'date' => $date,
+            'prod_price_mzp' => $prod_price_mzp,
+            'prod_price_sles' => $prod_price_sles,
+            'prod_price_otk' => $prod_price_otk,
+            'prod_price_upk' => $prod_price_upk,
+            'prod_price_dorabotka' => $prod_price_dorabotka,
+            'prod_price_dorabotka_sles' => $prod_price_dorabotka_sles,
+            'prod_price_sogl' => $prod_price_sogl,
+            'prod_price' => $prod_price,
+            'prod' => $prod,
+            'sles' => $sles,
+            'otk' => $otk,
+            'upk' => $upk,
+            'cumulative_brak_month' => $cumulative_brak_month,
+            'cumulative_sklad_month' => $cumulative_sklad_month,
+            'cumulative_manager_month' => $cumulative_manager_month,
+            'productivity' => $productivity,
+            'get_sum_otgr' => $get_sum_otgr,
         ];
     }
 
     $stmt->close();
 
-    if (!empty($metrics)) {
-        echo json_encode(['metrics' => $metrics]);
+    if (!empty($data)) {
+        echo json_encode(['data' => $data]);
     } else {
-        echo json_encode(['error' => 'Metrics not found']);
+        echo json_encode(['error' => 'Data not found']);
     }
 } else {
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to prepare SQL query for metrics']);
+    echo json_encode(['error' => 'Failed to prepare SQL query for data']);
 }
 
 $mysqli->close();
