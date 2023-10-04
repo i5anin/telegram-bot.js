@@ -15,8 +15,7 @@ $db = $dbConfig['db'];
 $mysqli = new mysqli($server, $user, $pass, $db);
 
 if ($mysqli->connect_error) {
-    http_response_code(500);
-    echo json_encode(['error' => "Connection failed: " . $mysqli->connect_error]);
+    echo "<script>console.error('Connection failed: " . $mysqli->connect_error . "');</script>";
     exit;
 }
 
@@ -30,11 +29,11 @@ $query = "
     AND DAY(`date`) = DAY(CURDATE())
 ";
 
+$employees = [];
 if ($stmt = $mysqli->prepare($query)) {
     $stmt->execute();
     $stmt->bind_result($name, $date, $post, $gender);
 
-    $employees = [];
     while ($stmt->fetch()) {
         $employees[] = [
             'name' => $name,
@@ -46,12 +45,53 @@ if ($stmt = $mysqli->prepare($query)) {
 
     $stmt->close();
 } else {
-    http_response_code(500);
-    echo json_encode(['error' => 'Failed to prepare SQL query: ' . $mysqli->error]);
+    echo "<script>console.error('Failed to prepare SQL query: " . $mysqli->error . "');</script>";
     exit;
 }
 
 $mysqli->close();
 
-// Выводим сотрудников, у которых сегодня день рождения, в формате JSON
-echo json_encode($employees);
+?>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>С ДНЕМ РОЖДЕНИЯ</title>
+    <link rel="stylesheet" href="./files/all.min.css">
+    <link rel="stylesheet" href="./files/adminlte.css">
+    <link rel="stylesheet" href="./files/soft.css">
+    <link rel="stylesheet" href="./files/flexslider.css">
+    <link rel="stylesheet" href="./files/monitor.css">
+</head>
+<body class="hold-transition sidebar-mini-md sidebar-collapse layout-fixed to-monitor layout-navbar-fixed">
+<div class="wrapper">
+    <div>
+        <div id="slider" class="flexslider">
+            <ul class="slides">
+                <?php foreach ($employees as $employee): ?>
+                    <li class="birth">
+                        <div class="slide-container">
+                            <div class="bd_img" style="background-image: url(<?= $employee['gender'] == 'm' ? './bd_m.jpg' : './bd_f.jpg' ?>);">
+                                <div class="name-holder <?= $employee['gender'] == 'm' ? 'm' : 'f' ?>">
+                                    <div class="poz">ПОЗДРАВЛЯЕМ</div>
+                                    <div class="hb">С ДНЕМ РОЖДЕНИЯ</div>
+                                    <div class="post"><?= $employee['post'] ?></div>
+                                    <div class="name"><?= $employee['name'] ?></div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    </div>
+    <footer class="main-footer">
+        <strong>Все права защищены © 2022 <a href="https://pf-forum.ru/">ПФ-ФОРУМ</a>.</strong>
+        Все права защищены.
+    </footer>
+</div>
+<script src="files/jquery.flexslider-min.js"></script>
+<script src="files/monitor.js"></script>
+</body>
+</html>
