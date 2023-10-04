@@ -47,9 +47,9 @@ if ($stmt = $mysqli->prepare("SELECT `date`, `prod_price_mzp`, `prod_price_sles`
     $stmt->execute();
     $stmt->bind_result($date, $prod_price_mzp, $prod_price_sles, $prod_price_otk, $prod_price_upk, $prod_price_dorabotka, $prod_price_dorabotka_sles, $prod_price_sogl, $prod_price, $prod, $sles, $otk, $upk, $cumulative_brak_month, $cumulative_sklad_month, $cumulative_manager_month, $productivity, $get_sum_otgr);
 
-    $data = [];
+    $metrics = [];
     while ($stmt->fetch()) {
-        $data[] = [
+        $metrics[] = [
             'date' => $date,
             'prod_price_mzp' => $prod_price_mzp,
             'prod_price_sles' => $prod_price_sles,
@@ -73,8 +73,8 @@ if ($stmt = $mysqli->prepare("SELECT `date`, `prod_price_mzp`, `prod_price_sles`
 
     $stmt->close();
 
-    if (!empty($data)) {
-        echo json_encode(['data' => $data]);
+    if (!empty($metrics)) {
+        echo json_encode(['metrics' => $metrics]);
     } else {
         echo json_encode(['error' => 'Data not found']);
     }
