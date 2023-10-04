@@ -42,7 +42,9 @@ function formatPercentage(number, maxCharacters) {
 async function metricsNotification(ctx = null, index = 0) {
     try {
         const metrics = await fetchMetrics()
-        if (metrics.length === 0 || !metrics[index]) throw new Error('No metrics data available')
+        if (metrics.length === 0 || !metrics[index]) {
+            throw new Error('No metrics data available')
+        }
 
         const latestMetrics = metrics[index]
         let message = ''
