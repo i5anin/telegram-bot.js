@@ -80,7 +80,7 @@ async function metricsNotification(ctx = null, index = 0) {
             await ctx.reply(message, { parse_mode: 'HTML' })
             await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Запрос метрики <code>${ctx.from.id}</code>\n` + message, { parse_mode: 'HTML' })
         } else {
-            const ADMIN_IDS = [DIR_TEST_GROUP, 1164924330] //1164924330 - Лера
+            const ADMIN_IDS = [DIR_TEST_GROUP, DIR_METRIC] //1164924330 - Лера
             for (const adminId of ADMIN_IDS) {
                 try {
                     await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' })
