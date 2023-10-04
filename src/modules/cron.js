@@ -2,7 +2,6 @@ const cron = require('node-cron')
 const { notifyAllUsers } = require('#src/modules/notify')
 const { oplataNotification } = require('#src/modules/oplata')
 const { checkBotData } = require('#src/api/index')
-const { format } = require('date-fns')
 const { metricsNotification } = require('#src/modules/metrics') // импортируйте функцию format
 
 function initCronJobs(currentDateTime, instanceNumber) {

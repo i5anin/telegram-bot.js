@@ -1,4 +1,3 @@
-const axios = require('axios')
 const moment = require('moment')
 const { checkUser } = require('#src/api/index')
 const { fetchMetrics } = require('#src/api/index')
