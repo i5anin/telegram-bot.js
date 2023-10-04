@@ -1,4 +1,5 @@
 const axios = require('axios');
+const moment = require('moment');
 
 async function fetchMetrics() {
     try {
@@ -45,20 +46,22 @@ function formatPercentage(number, maxCharacters) {
 }
 
 
-async function sendMetricsNotification() {
+async function sendMetricsNotification(ctx, index) {
     try {
         const metrics = await fetchMetrics();
-        if (metrics.length === 0) {  // Проверьте, определены ли метрики здесь
+        if (metrics.length === 0 || !metrics[index]) {  // Проверьте, есть ли данные и есть ли элемент с данным индексом
             throw new Error('No metrics data available');
         }
+
+        const latestMetrics = metrics[index];
         let message = '';
 
-        const latestMetrics = metrics[metrics.length - 1];
         if (!latestMetrics) {  // Проверьте, определены ли latestMetrics здесь
             throw new Error('No latest metrics data available');
         }
         const maxCharacters = getMaxCharacters(latestMetrics);
 
+        message += `Дата: <b>${moment(latestMetrics.date, "YYYY-MM-DD HH:mm:ss").format("DD.MM.YYYY HH:mm:ss")}</b>\n`;
         message += `Не завершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b> ₽\n`;
         message += `Слесарный участок: <b>${formatNumber(latestMetrics.prod_price_sles)}</b> ₽\n`;
         message += `ОТК: <b>${formatNumber(latestMetrics.prod_price_otk)}</b> ₽\n`;
@@ -70,9 +73,10 @@ async function sendMetricsNotification() {
         message += `\nИтого внутреннего производства: <b>${formatNumber(latestMetrics.prod_price)}</b> ₽\n`;
 
         message += `\n<u>Отклонение от плана</u>\n`;
-        message += `<code>${formatPercentage(latestMetrics.prod, maxCharacters)}</code> Производство\n`;
+        message += `<code>${formatPercentage(latestMetrics.cumulative_sklad_month, maxCharacters)}</code> Производство\n`;
         message += `<code>${formatPercentage(latestMetrics.cumulative_brak_month, maxCharacters)}</code> Брак\n`;
         message += `<code>${formatPercentage(latestMetrics.cumulative_manager_month, maxCharacters)}</code> Отдел продаж\n`;
+
 
         message += `\n<u>Воронка</u>\n`;
         message += `<code>${formatPercentage(latestMetrics.prod, maxCharacters)}</code> Производство\n`;  // Используйте maxCharacters здесь
