@@ -12,6 +12,17 @@ async function performRequest(url, method = 'get', data = {}, params = {}) {
     }
 }
 
+async function fetchMetrics() {
+    try {
+        const url = `${WEB_API}/metrics/get.php`
+        const params = { key: SECRET_KEY }
+        const response = await axios.get(url, { params })
+        return response.data.metrics || []
+    } catch (error) {
+        throw new Error(`Failed to fetch metrics: ${error.message}`)
+    }
+}
+
 // Bot
 async function checkBotData(formattedDateTime, instanceNumber) {
     const url = `${WEB_API}/bot/check.php`
@@ -89,6 +100,7 @@ async function getAllPayments() {
     return performRequest(url, 'get', {}, params)
 }
 
+
 async function updatePayments(sentIds) {
     const basePath = process.env.NODE_ENV === 'build' ? 'update.php' : 'update_test.php'
     const url = `${WEB_API}/oplata/${basePath}`
@@ -109,4 +121,5 @@ module.exports = {
     updateComment,
     getAllPayments,
     updatePayments,
+    fetchMetrics
 }

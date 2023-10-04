@@ -1,15 +1,7 @@
 const axios = require('axios')
 const moment = require('moment')
 const { checkUser } = require('#src/api/index')
-
-async function fetchMetrics() {
-    try {
-        const response = await axios.get(`${WEB_API}/metrics/get.php?key=${SECRET_KEY}`)
-        return response.data.metrics || []  // Добавьте здесь || [] для обработки undefined
-    } catch (error) {
-        throw new Error(`Failed to fetch metrics: ${error.message}`)
-    }
-}
+const { fetchMetrics } = require('#src/api/index')
 
 function formatNumber(number) {
     return parseFloat(number).toLocaleString('ru-RU', {
