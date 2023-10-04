@@ -15,11 +15,13 @@ function initCronJobs(currentDateTime, instanceNumber) {
     // Уведомлять об ОПЛАТЕ каждые 6 мин
     cron.schedule('*/6 * * * *', async () => {
         await oplataNotification()
+        console.log('Running oplataNotification()')
     })
 
 
-    cron.schedule('0 0 8 * * *', async () => {
+    cron.schedule('0 8 * * *', async () => {
         await metricsNotification();
+        console.log('Running metricsNotification()')
     });
 
 

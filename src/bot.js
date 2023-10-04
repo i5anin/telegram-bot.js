@@ -111,7 +111,7 @@ bot.command('status', (ctx) => handleStatusCommand(ctx, instanceNumber, currentD
 bot.command('get_group_info', (ctx) => handleGetGroupInfoCommand(ctx))
 bot.command('who', (ctx) => whoCommand(ctx))
 bot.command(['m', 'metrics'], (ctx) => metricsNotification(ctx, 1))
-bot.command('metrics_old', metricsNotification())
+bot.command('metrics_old', metricsNotification)
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
 // bot.on('message', (ctx) => handleTextCommand(ctx))
 bot.on('text', (ctx) => handleTextCommand(ctx)) // особо не нужна но пусть будет
