@@ -72,7 +72,7 @@ function formatMasterMessage(comment, chatId, userName) {
     const { formattedDate } = formatPaymentDate({ date: comment.date })
 
     return`<b>Мастер, Вам уведомление</b>\n` +
-    `<b>Уведомление отправлено оператору</b> <code>${userName}</code>\n\n` +
+    `<b>Отправлено оператору</b> <code>${userName}</code>\n\n` +
         `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
         `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
         `<b>Контроль:</b> <code>${typeString}</code>\n` +
