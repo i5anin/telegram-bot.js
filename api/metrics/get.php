@@ -43,9 +43,9 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-if ($stmt = $mysqli->prepare("SELECT `date`, `prod_price_mzp`, `prod_price_sles`, `prod_price_otk`, `prod_price_upk`, `prod_price_dorabotka`, `prod_price_dorabotka_sles`, `prod_price_sogl`, `prod_price`, `prod`, `sles`, `otk`, `upk`, `cumulative_brak_month`, `cumulative_sklad_month`, `cumulative_manager_month`, `productivity`, `get_sum_otgr` FROM `metrics`")) {
+if ($stmt = $mysqli->prepare("SELECT `date`, `prod_price_mzp`, `prod_price_sles`, `prod_price_otk`, `prod_price_upk`, `prod_price_dorabotka`, `prod_price_dorabotka_sles`, `prod_price_sogl`, `prod_price`, `prod`, `sles`, `otk`, `upk`, `cumulative_brak_month`, `cumulative_sklad_month`, `cumulative_manager_month`, `productivity`, `get_sum_otgr`, `predoplata`, `total_price`, `total_sklad_gp` FROM `metrics`")) {
     $stmt->execute();
-    $stmt->bind_result($date, $prod_price_mzp, $prod_price_sles, $prod_price_otk, $prod_price_upk, $prod_price_dorabotka, $prod_price_dorabotka_sles, $prod_price_sogl, $prod_price, $prod, $sles, $otk, $upk, $cumulative_brak_month, $cumulative_sklad_month, $cumulative_manager_month, $productivity, $get_sum_otgr);
+    $stmt->bind_result($date, $prod_price_mzp, $prod_price_sles, $prod_price_otk, $prod_price_upk, $prod_price_dorabotka, $prod_price_dorabotka_sles, $prod_price_sogl, $prod_price, $prod, $sles, $otk, $upk, $cumulative_brak_month, $cumulative_sklad_month, $cumulative_manager_month, $productivity, $get_sum_otgr, $predoplata, $total_price, $total_sklad_gp);
 
     $metrics = [];
     while ($stmt->fetch()) {
@@ -68,6 +68,9 @@ if ($stmt = $mysqli->prepare("SELECT `date`, `prod_price_mzp`, `prod_price_sles`
             'cumulative_manager_month' => $cumulative_manager_month,
             'productivity' => $productivity,
             'get_sum_otgr' => $get_sum_otgr,
+            'predoplata' => $predoplata,
+            'total_price' => $total_price,
+            'total_sklad_gp' => $total_sklad_gp,
         ];
     }
 
