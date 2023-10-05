@@ -1,4 +1,6 @@
 // Отслеживаем событие добавления нового пользователя в чат
+const { checkUser } = require('#src/api/index')
+
 async function logNewChatMembers(ctx) {
     const chatTitle = ctx.chat.title || 'Неназванный чат'
     const addedUsers = ctx.message.new_chat_members
@@ -52,20 +54,24 @@ async function logLeftChatMember(ctx) {
 
 
 // Функция лог в спец чат
+
+
 async function sendToLog(ctx) {
-    const { chat, from, text } = ctx.message
-    if (chat.id !== parseInt(GRAND_ADMIN)) {
-        const username = from.username ? '@' + from.username : '<code>N/A</code>'
-        await bot.telegram.sendMessage(
-            LOG_CHANNEL_ID,
-            `ID <code>${chat.id}</code>` +
-            ` username: ${username}` +
-            `\nname: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>` +
-            `\nmsg: <code>${text}</code>`,
-            { parse_mode: 'HTML' },
-        )
-    }
+    const { chat, from, text } = ctx.message;
+    const userData = await checkUser(chat.id);
+    const fio = userData?.fio || 'N/A';  // Предполагая, что ФИО хранится в свойстве 'fio'
+    const username = from.username ? '@' + from.username : '<code>N/A</code>';
+    await bot.telegram.sendMessage(
+        LOG_CHANNEL_ID,
+        `ID: <code>${chat.id}</code>\n` +
+        `username: ${username}\n` +
+        `name: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>\n` +
+        `fio: <code>${fio}</code>\n` +  // Добавлено ФИО
+        `msg: <code>${text}</code>`,
+        { parse_mode: 'HTML' },
+    );
 }
+
 
 
 module.exports = {
