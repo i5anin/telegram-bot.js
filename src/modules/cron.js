@@ -20,7 +20,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
     if (!METRICS_REPORT_ACTIVE) {
         return
     } else {
-        cron.schedule('0 8 * * *', async () => {
+        cron.schedule('30 7 * * *', async () => {
             await metricsNotification()
             console.log('Running metricsNotification()')
         })
