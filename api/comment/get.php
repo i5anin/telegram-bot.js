@@ -13,7 +13,7 @@ if ($mysqli->connect_error) {
 $mysqli->set_charset('utf8mb4');
 
 if (isset($_GET['user_id']) && is_numeric($_GET['user_id'])) {
-    if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`,`type`, `kolvo_brak`, `comments_otk`, `comments_op` FROM `sk_comments` WHERE `user_id` = ? AND `completed` = 0")) {
+    if ($stmt = $mysqli->prepare("SELECT `id_task`, `user_id`, `date`, `specs_nom_id`, `det_name`,`type`, `kolvo_brak`, `comments_otk`, `comments_op` FROM `sk_comments` WHERE `user_id` = ? AND `sent` = 0")) {
         $stmt->bind_param("i", $_GET['user_id']);
         $stmt->execute();
         $stmt->bind_result($id_task, $user_id, $date, $specs_nom_id, $det_name, $type, $kolvo_brak, $comments_otk, $comments_op); // Добавлено
