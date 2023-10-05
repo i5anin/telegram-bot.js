@@ -42,7 +42,7 @@ async function metricsNotification(ctx = null, index = 0) {
         const maxCharacters = getMaxCharacters(latestMetrics)
 
         message += `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n`
-        message += `Не завершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b> ₽\n`
+        message += `Незавершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b> ₽\n`
         message += `Слесарный участок: <b>${formatNumber(latestMetrics.prod_price_sles)}</b> ₽\n`
         message += `ОТК: <b>${formatNumber(latestMetrics.prod_price_otk)}</b> ₽\n`
         message += `Упаковка: <b>${formatNumber(latestMetrics.prod_price_upk)}</b> ₽\n`
