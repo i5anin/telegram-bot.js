@@ -11,8 +11,8 @@ function initCronJobs(currentDateTime, instanceNumber) {
         await notifyAllUsers()
     })
 
-    // Уведомлять об ОПЛАТЕ каждые 6 мин
-    cron.schedule('*/6 * * * *', async () => {
+    // Уведомлять об ОПЛАТЕ каждые 8 мин
+    cron.schedule('*/8 * * * *', async () => {
         await oplataNotification()
         console.log('Running oplataNotification()')
     })
@@ -27,8 +27,8 @@ function initCronJobs(currentDateTime, instanceNumber) {
     }
 
     if (MODE === 'build') {
-        // Проверка экземпляра
-        cron.schedule('*/5 * * * *', async () => {
+        // Проверка экземпляра 12 мин
+        cron.schedule('*/12 * * * *', async () => {
             stateCounter.bot_check++
 
             // Получаем текущую дату и время

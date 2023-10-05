@@ -52,7 +52,7 @@ async function handleHelpCommand(ctx) {
             } else {
                 // Если это другой тип ошибки, выводим ее в консоль и отправляем сообщение о неизвестной ошибке
                 console.error('Error sending help to user:', err)
-                await ctx.reply('Произошла неизвестная ошибка.')
+                await ctx.reply('Произошла неизвестная ошибка.\n<code>${err}</code>')
             }
         }
     } else if (!userId) {
