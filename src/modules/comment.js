@@ -75,7 +75,7 @@ async function handleAddComment(ctx) {
             const typeString = getDescription(type);
             const { formattedDate } = formatPaymentDate({ date: comment.date });
             const userName = await getUserName(chatId);
-            const master_msg = `<b>Мастер, вам уведомление</b>\n<b>Оператор прокомментировал</b> <code>${userName}</code>\n\n` +
+            const master_msg = `<b>Мастер, Вам уведомление</b>\n<b>Оператор прокомментировал</b> <code>${userName}</code>\n\n` +
                 `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
                 `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
                 `<b>Контроль:</b> <code>${typeString}</code>\n` +
