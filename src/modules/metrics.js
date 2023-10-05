@@ -1,6 +1,7 @@
 const moment = require('moment')
 const { checkUser } = require('#src/api/index')
 const { fetchMetrics } = require('#src/api/index')
+const { sendToLog } = require('#src/utils/log')
 
 function formatNumber(number) {
     return parseFloat(number).toLocaleString('ru-RU', {
@@ -50,6 +51,9 @@ async function metricsNotification(ctx = null, index = 0) {
         message += `Доработка в слесарном: <b>${formatNumber(latestMetrics.prod_price_dorabotka_sles)}</b> ₽\n`
         message += `Согласование: <b>${formatNumber(latestMetrics.prod_price_sogl)}</b> ₽\n`
         message += `\nИтого внутреннего производства: <b>${formatNumber(latestMetrics.prod_price)}</b> ₽\n`
+        message += `Ожидаемая предоплата с НДС: <b>${formatNumber(latestMetrics.predoplata)}</b> ₽\n`
+        message += `Итого внутреннего производства: <b>${formatNumber(latestMetrics.total_price)}</b> ₽\n`
+        message += `Готовая продукция на складе: <b>${formatNumber(latestMetrics.total_sklad_gp)}</b> ₽\n`
         message += `\n<u>Отклонение от плана</u>\n`
         message += `<code>${formatPercentage(latestMetrics.cumulative_sklad_month, maxCharacters)}</code> Производство\n`
         message += `<code>${formatPercentage(latestMetrics.cumulative_brak_month, maxCharacters)}</code> Брак\n`
@@ -63,6 +67,7 @@ async function metricsNotification(ctx = null, index = 0) {
         message += `Отгрузка: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b> ₽\n`
 
         if (index === 1) {
+            await sendToLog(ctx)
             const chatId = ctx.chat.id  // Получите chatId из контекста
             const userCheck = await checkUser(chatId)  // Проверьте пользователя
 

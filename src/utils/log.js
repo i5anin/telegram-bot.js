@@ -63,10 +63,10 @@ async function sendToLog(ctx) {
     const username = from.username ? '@' + from.username : '<code>N/A</code>';
     await bot.telegram.sendMessage(
         LOG_CHANNEL_ID,
-        `ID: <code>${chat.id}</code>\n` +
-        `username: ${username}\n` +
-        `name: <code>${from.first_name || 'N/A'} ${from.last_name || 'N/A'}</code>\n` +
-        `fio: <code>${fio}</code>\n` +  // Добавлено ФИО
+        `ID:\u00A0<code>${chat.id}</code> ` +
+        `fio:\u00A0<code>${fio}</code>\n` +  // Добавлено ФИО
+        `username: ${username} ` +
+        `name: <code>${from.first_name || 'N/A'}\u00A0${from.last_name || 'N/A'}</code>\n` +
         `msg: <code>${text}</code>`,
         { parse_mode: 'HTML' },
     );

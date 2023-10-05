@@ -38,9 +38,9 @@ function formatMessage(comment, total) {
     const typeString = getDescription(type)
     const { formattedDate } = formatPaymentDate({ date: comment.date })
 
-    return `<b>Пожалуйста, прокомментируйте следующую операцию:</b><code>(1/${total})</code>\n\n` +
+    return `<b>Пожалуйста, прокомментируйте на следующих деталях:</b><code>(1/${total})</code>\n\n` +
         `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
-        `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
+        `<b>Количество:</b> <code>${kolvo_brak}</code>шт\n` +
         `<b>Контроль:</b> <code>${typeString}</code>\n` +
         `<b>Комментарий ОТК:</b> <code>${comments_otk}</code>\n` +
         `<b>Партия:</b> <code>${specs_nom_id}</code>\n` +
