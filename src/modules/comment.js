@@ -1,5 +1,6 @@
 const { getAllComments, updateComment } = require('#src/api/index')
-const { formatPaymentDate, getDescription, getUserName } = require('#src/utils/helpers')
+const { formatPaymentDate, getDescription, getUserName, getControlType, getDefectType } = require('#src/utils/helpers')
+const { formatSKMessage } = require('#src/utils/ru_lang')
 
 
 async function fetchComments() {
@@ -24,7 +25,7 @@ async function handleAddComment(ctx) {
 
     const chatId = ctx.message.chat.id
 
-    const username = ctx.from.username ? '@' + ctx.from.username : '';
+    const username = ctx.from.username ? '@' + ctx.from.username : ''
     const firstName = ctx.from.first_name || 'N/A'
     const lastName = ctx.from.last_name || 'N/A'
 
@@ -65,24 +66,21 @@ async function handleAddComment(ctx) {
             )
             await bot.telegram.sendMessage(
                 LOG_CHANNEL_ID,
-                `${emoji.star.repeat(3)} Успешно прокомментировал задачу\n Пользователь с ID <code>${chatId}</code>` +
+                `${emoji.star.repeat(3)} Успешно прокомментировал задачу\n Пользователь с ID <code>${chatId}</code> ` +
                 `${username}` +
                 `\nИмя: <code>${firstName} ${lastName}</code>` +
                 `\nКомментарий:\n<code>${ctx.message.text}</code>`,
                 { parse_mode: 'HTML' },
             )
-            const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment;
-            const typeString = getDescription(type);
-            const { formattedDate } = formatPaymentDate({ date: comment.date });
-            const userName = await getUserName(chatId);
-            const master_msg = `<b>Мастер, Вам уведомление</b>\n<b>Оператор прокомментировал</b> <code>${userName}</code>\n\n` +
-                `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
-                `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
-                `<b>Контроль:</b> <code>${typeString}</code>\n` +
-                `<b>Комментарий ОТК:</b> <code>${comments_otk}</code>\n` +
-                `<b>Партия:</b> <code>${specs_nom_id}</code>\n` +
-                `<b>Дата:</b> <code>${formattedDate}</code>\n\n` +
-                `<b>Комментарий:</b> <code>${commentText}</code>`
+            const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment
+            const controlDescription = getControlType(type[0])
+            const defectDescription = getDefectType(type[1])
+            const { formattedDate } = formatPaymentDate({ date: comment.date })
+            const userName = await getUserName(chatId)
+            const master_msg =
+                `<b>Мастер, Вам уведомление</b>\n<b>Оператор прокомментировал</b> <code>${userName}</code>\n\n`
+                + formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate)
+                + `<b>Комментарий:</b> <code>${commentText}</code>`
 
             // Если user_id_master существует, отправляем сообщение мастеру
             if (comment.user_id_master) await bot.telegram.sendMessage(comment.user_id_master, master_msg, { parse_mode: 'HTML' })

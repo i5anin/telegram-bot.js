@@ -1,7 +1,8 @@
-const { resetFlags, formatPaymentDate, getUserName, getDescription } = require('#src/utils/helpers')
+const { resetFlags, formatPaymentDate, getUserName, getDescription, getDefectType, getControlType } = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
 const { updateComment } = require('#src/api/index')
+const { formatSKMessage } = require('#src/utils/ru_lang')
 
 // Функция задержки
 function sleep(ms) {
@@ -37,14 +38,10 @@ function formatMessage(comment, total) {
     const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment
     const typeString = getDescription(type)
     const { formattedDate } = formatPaymentDate({ date: comment.date })
-
+    const controlDescription = getControlType(type[0]);
+    const defectDescription = getDefectType(type[1]);
     return `<b>Пожалуйста, прокомментируйте на следующих деталях:</b><code>(1/${total})</code>\n\n` +
-        `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
-        `<b>Количество:</b> <code>${kolvo_brak}</code>шт\n` +
-        `<b>Контроль:</b> <code>${typeString}</code>\n` +
-        `<b>Комментарий ОТК:</b> <code>${comments_otk}</code>\n` +
-        `<b>Партия:</b> <code>${specs_nom_id}</code>\n` +
-        `<b>Дата:</b> <code>${formattedDate}</code>\n\n` +
+        formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate) +
         `task_ID: <code>${id_task}</code>\n\n` +
         `<i>необходимо прокомментировать через "ответить" на это сообщение</i>`
 }
@@ -70,15 +67,10 @@ function formatMasterMessage(comment, chatId, userName) {
     const { det_name, kolvo_brak, type, comments_otk, specs_nom_id } = comment
     const typeString = getDescription(type)
     const { formattedDate } = formatPaymentDate({ date: comment.date })
-
-    return`<b>Мастер, Вам уведомление</b>\n` +
-    `<b>Отправлено оператору</b> <code>${userName}</code>\n\n` +
-        `<b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
-        `<b>Брак:</b> <code>${kolvo_brak}</code>\n` +
-        `<b>Контроль:</b> <code>${typeString}</code>\n` +
-        `<b>Комментарий ОТК:</b> <code>${comments_otk}</code>\n` +
-        `<b>Партия:</b> <code>${specs_nom_id}</code>\n` +
-        `<b>Дата:</b> <code>${formattedDate}</code>\n`
+    const controlDescription = getControlType(type[0]);
+    const defectDescription = getDefectType(type[1]);
+    return `<b>Мастер, Вам уведомление</b>\n` +
+        formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate)
 }
 
 // Уведомление всех пользователей
@@ -108,7 +100,7 @@ async function notifyUsers(ctx) {
     const uncommentedTasks = await fetchComments(chatId)
 
     const userUnansweredComments =
-        uncommentedTasks.filter(({ user_id, answered }) => user_id === chatId && answered === 0)
+        uncommentedTasks.filter(({ user_id, sent }) => user_id === chatId && sent === 0)
 
     if (userUnansweredComments.length > 0) {
         await processUserComments(userUnansweredComments, userName)

@@ -11,6 +11,22 @@ function resetFlags(ctx) {
     ctx.session.isUserInitiated = false
 }
 
+function getControlType(char) {
+    const controlMapping = {
+        'П': 'Пооперационный контроль',
+        'У': 'Контроль перед упаковкой',
+    }
+    return controlMapping[char] || 'N/A'
+}
+
+function getDefectType(char) {
+    const defectMapping = {
+        'О': 'Окончательный',
+        'Н': 'Неокончательный',
+    }
+    return defectMapping[char] || 'N/A'
+}
+
 function getDescription(code) {
     const typeMapping = {
         'ПО': 'Пооперационный контроль окончательный',
@@ -39,4 +55,4 @@ function formatPaymentDate(payment) {
     return { formattedDate }
 }
 
-module.exports = { resetFlags, formatPaymentDate, getDescription, getUserName }
+module.exports = { resetFlags, formatPaymentDate, getDescription, getUserName, getDefectType, getControlType }
