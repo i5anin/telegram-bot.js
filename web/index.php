@@ -16,7 +16,7 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-$sql = "SELECT * FROM `sk_comments` WHERE `sent` = 1";
+$sql = "SELECT * FROM `sk_comments`";
 $result = $mysqli->query($sql);
 
 $mysqli->close();
@@ -81,7 +81,8 @@ $mysqli->close();
           <?php
           $rowNumber = 1;  // Counter variable for row numbers
           while ($row = $result->fetch_assoc()) : ?>
-            <tr>
+            <tr <?php if ($row['user_id'] == 0) echo 'class="table-danger"';
+                elseif ($row['sent'] == 0) echo 'class="table-primary"'; ?>>
               <th scope="row"><?php echo $rowNumber; ?></th>
               <td class="text-cell"><?php echo $row['id_task']; ?></td>
               <td class="text-cell"><?php echo $row['comments_op']; ?></td>
@@ -115,11 +116,9 @@ $mysqli->close();
 
         Array.from(tableElement.querySelectorAll('tbody tr'))
           .sort((trA, trB) => {
-            const cellA = trA.children[headerIndex].textContent;
-            const cellB = trB.children[headerIndex].textContent;
-            return currentIsAscending ?
-              cellA.localeCompare(cellB) :
-              cellB.localeCompare(cellA);
+            const cellA = parseInt(trA.children[headerIndex].textContent, 10);
+            const cellB = parseInt(trB.children[headerIndex].textContent, 10);
+            return currentIsAscending ? cellA - cellB : cellB - cellA;
           })
           .forEach(tr => tableElement.querySelector('tbody').appendChild(tr));
 
