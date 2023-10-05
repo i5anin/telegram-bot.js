@@ -17,12 +17,14 @@ function initCronJobs(currentDateTime, instanceNumber) {
         console.log('Running oplataNotification()')
     })
 
-
-    cron.schedule('0 8 * * *', async () => {
-        await metricsNotification();
-        console.log('Running metricsNotification()')
-    });
-
+    if (!METRICS_REPORT_ACTIVE) {
+        return
+    } else {
+        cron.schedule('0 8 * * *', async () => {
+            await metricsNotification()
+            console.log('Running metricsNotification()')
+        })
+    }
 
     if (MODE === 'build') {
         // Проверка экземпляра
