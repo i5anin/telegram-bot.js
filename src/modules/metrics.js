@@ -31,6 +31,8 @@ function formatPercentage(number, maxCharacters) {
 
 
 async function metricsNotification(ctx = null, index = 0) {
+    if (!METRICS_REPORT_ACTIVE) return
+
     try {
         const metrics = await fetchMetrics()
         if (metrics.length === 0 || !metrics[index]) {

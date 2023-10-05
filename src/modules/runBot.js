@@ -19,7 +19,9 @@ function runBot(instanceNumber, currentDateTime) {
 
     // Теперь мы можем использовать formattedDateTime здесь
     console.log(`! Running instance number : ${instanceNumber}\n! Start-up time ${formattedDateTime}`)
-    console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE, '\nMODE =', MODE)
+    console.log('\nMODE =', MODE)
+    console.log('\nOPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
+    console.log('\nMETRICS_REPORT_ACTIVE =', METRICS_REPORT_ACTIVE)
 
     if (MODE === 'build') {
         bot.telegram.sendMessage(LOG_CHANNEL_ID, emoji.bot + `Запуск бота!\nКлюч запущенного экземпляра: <code>${instanceNumber}</code>\nВремя запуска: <code>${format(currentDateTime, 'HH:mm:ss dd.MM.yyyy')}</code>`, { parse_mode: 'HTML' })

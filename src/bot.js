@@ -53,6 +53,8 @@ global.DIR_METRIC = process.env.DIR_METRIC
 global.DIR_TEST_GROUP = process.env.DIR_TEST_GROUP
 
 global.OPLATA_REPORT_ACTIVE = process.env.OPLATA_REPORT_ACTIVE //OPLATA_REPORT_ACTIVE = true;
+global.METRICS_REPORT_ACTIVE = process.env.METRICS_REPORT_ACTIVE //METRICS_REPORT_ACTIVE = true;
+
 
 global.MODE = process.env.NODE_ENV || 'development'  // Если NODE_ENV не определен, по умолчанию используется 'development'
 global.emoji = {
