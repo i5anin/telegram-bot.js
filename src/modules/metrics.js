@@ -52,8 +52,8 @@ async function metricsNotification(ctx = null, index = 0) {
         message += `Согласование: <b>${formatNumber(latestMetrics.prod_price_sogl)}</b> ₽\n`
         message += `\nИтого внутреннего производства: <b>${formatNumber(latestMetrics.prod_price)}</b> ₽\n`
         message += `Ожидаемая предоплата с НДС: <b>${formatNumber(latestMetrics.predoplata)}</b> ₽\n`
-        message += `Итого внутреннего производства: <b>${formatNumber(latestMetrics.total_price)}</b> ₽\n`
-        message += `Готовая продукция на складе: <b>${formatNumber(latestMetrics.total_sklad_gp)}</b> ₽\n`
+        message += `Итого внутреннего производства с НДС: <b>${formatNumber(latestMetrics.total_price)}</b> ₽\n`
+        message += `Готовая продукция на складе с НДС: <b>${formatNumber(latestMetrics.total_sklad_gp)}</b> ₽\n`
         message += `\n<u>Отклонение от плана</u>\n`
         message += `<code>${formatPercentage(latestMetrics.cumulative_sklad_month, maxCharacters)}</code> Производство\n`
         message += `<code>${formatPercentage(latestMetrics.cumulative_brak_month, maxCharacters)}</code> Брак\n`
@@ -64,7 +64,7 @@ async function metricsNotification(ctx = null, index = 0) {
         message += `<code>${formatPercentage(latestMetrics.otk, maxCharacters)}</code> ОТК\n`
         message += `<code>${formatPercentage(latestMetrics.upk, maxCharacters)}</code> Упаковка\n`
         message += `\nПродуктивность: <b>${formatNumber(latestMetrics.productivity)}</b> ₽/час\n`
-        message += `Отгрузка: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b> ₽\n`
+        message += `Отгрузка с НДС: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b> ₽\n`
 
         if (index === 1) {
             await sendToLog(ctx)
