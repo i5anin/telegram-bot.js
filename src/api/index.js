@@ -3,123 +3,73 @@ const axios = require('axios')
 const SECRET_KEY = process.env.SECRET_KEY
 const WEB_API = process.env.WEB_API
 
-async function performRequest(url, method = 'get', data = {}, params = {}) {
+// Define endpoints
+const ENDPOINTS = {
+    FETCH_METRICS: 'metrics/get.php',
+    CHECK_BOT_DATA: 'bot/check.php',
+    UPDATE_BOT_DATA: 'bot/update.php',
+    GET_ALL_USERS: 'users/get_all_fio.php',
+    CHECK_USER: 'users/check.php',
+    ADD_USER: 'users/add.php',
+    GET_ALL_COMMENTS: 'comment/get_all.php',
+    UPDATE_COMMENT: 'comment/update.php',
+    GET_ALL_PAYMENTS: 'oplata/get_all.php',
+    UPDATE_PAYMENTS: 'oplata/update.php',
+}
+
+// Generic request function
+async function request(endpoint, method = 'GET', data = {}, params = {}) {
+    const url = `${WEB_API}/${endpoint}`
     try {
-        const response = await axios({ method, url, data, params })
+        const response = await axios({
+            method,
+            url,
+            data,
+            params,
+            headers: { 'Authorization': `Bearer ${SECRET_KEY}` },
+        })
         return response.data
     } catch (error) {
-        console.error(`Error in performing request to ${url}: ${error.message}`)
+        console.error(`Error performing ${method} request to ${url}:`, error)
+        throw error // Re-throw error for further handling
     }
 }
 
-async function fetchMetrics() {
-    try {
-        const url = `${WEB_API}/metrics/get.php`
-        const params = { key: SECRET_KEY }
-        const response = await axios.get(url, { params })
-        return response.data.metrics || []
-    } catch (error) {
-        throw new Error(`Failed to fetch metrics: ${error.message}`)
-    }
+// Function implementations using the generic request function
+const api = {
+    fetchMetrics: () => request(ENDPOINTS.FETCH_METRICS),
+
+    checkBotData: (formattedDateTime, instanceNumber) =>
+        request(ENDPOINTS.CHECK_BOT_DATA, 'GET', {}, { date: formattedDateTime, random_key: instanceNumber }),
+
+    updateBotData: (formattedDateTime, instanceNumber) =>
+        request(ENDPOINTS.UPDATE_BOT_DATA, 'GET', {}, { date: formattedDateTime, random_key: instanceNumber }),
+
+    getAllUsers: () => request(ENDPOINTS.GET_ALL_USERS),
+
+    checkUser: (chatId) => request(ENDPOINTS.CHECK_USER, 'GET', {}, { id: chatId }),
+
+    addUser: (userId, cleanedText, username) =>
+        request(ENDPOINTS.ADD_USER, 'POST', { id: userId, fio: cleanedText, username, active: 1 }),
+
+    getAllComments: () => request(ENDPOINTS.GET_ALL_COMMENTS, 'GET', {}, { key: SECRET_KEY }),
+
+    updateComment: (taskID, commentText = null) =>
+        request(ENDPOINTS.UPDATE_COMMENT, 'GET', {}, {
+            id_task: taskID,
+            access_key: SECRET_KEY, ...(commentText ? { comments_op: commentText } : { sent: 1 }),
+        }),
+
+    getAllPayments: () => {
+        const basePath = process.env.NODE_ENV === 'build' ? ENDPOINTS.GET_ALL_PAYMENTS : ENDPOINTS.GET_ALL_PAYMENTS.replace('.php', '_test.php')
+        return request(basePath, 'GET', {}, { key: SECRET_KEY })
+    },
+
+    updatePayments: (sentIds) => {
+        const basePath = process.env.NODE_ENV === 'build' ? ENDPOINTS.UPDATE_PAYMENTS : ENDPOINTS.UPDATE_PAYMENTS.replace('.php', '_test.php')
+        return request(basePath, 'GET', {}, { key: SECRET_KEY, sent_ids: sentIds.join(',') })
+    },
 }
 
-// Bot
-async function checkBotData(formattedDateTime, instanceNumber) {
-    const url = `${WEB_API}/bot/check.php`
-    const params = {
-        key: SECRET_KEY,
-        date: formattedDateTime,
-        random_key: instanceNumber,
-    }
-    return performRequest(url, 'get', {}, params)
-}
+module.exports = api
 
-async function updateBotData(formattedDateTime, instanceNumber) {
-    const url = `${WEB_API}/bot/update.php`
-    const params = {
-        key: SECRET_KEY,
-        date: formattedDateTime,
-        random_key: instanceNumber,
-    }
-    return performRequest(url, 'get', {}, params)
-}
-
-// Users
-async function getAllUsers() { // TODO: SECRET_KEY
-    const url = `${WEB_API}/users/get_all_fio.php`
-    const result = await performRequest(url)
-    return result.users_data
-}
-
-async function checkUser(chatId) { // TODO: SECRET_KEY
-    const url = `${WEB_API}/users/check.php`
-    const params = {
-        id: chatId,
-    }
-    return performRequest(url, 'get', {}, params)
-}
-
-async function addUser(userId, cleanedText, username) { // TODO: SECRET_KEY
-    const url = `${WEB_API}/users/add.php`
-    const data = {
-        id: userId,
-        fio: cleanedText,
-        username: username,
-        active: 1,
-    }
-    return performRequest(url, 'post', data)
-}
-
-// Comments
-async function getAllComments() {
-    const url = `${WEB_API}/comment/get_all.php`
-    const params = {
-        key: SECRET_KEY,
-    }
-    return performRequest(url, 'get', {}, params)
-}
-
-async function updateComment(taskID, commentText = null) {
-    const url = `${WEB_API}/comment/update.php`
-    const params = {
-        id_task: taskID,
-        access_key: SECRET_KEY,
-        ...(commentText ? { comments_op: commentText } : { sent: 1 }),
-    }
-    return performRequest(url, 'get', {}, params)
-}
-
-
-// Payments
-async function getAllPayments() {
-    const basePath = process.env.NODE_ENV === 'build' ? 'get_all.php' : 'get_all_test.php'
-    const url = `${WEB_API}/oplata/${basePath}`
-    const params = {
-        key: SECRET_KEY,
-    }
-    return performRequest(url, 'get', {}, params)
-}
-
-
-async function updatePayments(sentIds) {
-    const basePath = process.env.NODE_ENV === 'build' ? 'update.php' : 'update_test.php'
-    const url = `${WEB_API}/oplata/${basePath}`
-    const params = {
-        key: SECRET_KEY,
-        sent_ids: sentIds.join(','),
-    }
-    return performRequest(url, 'get', {}, params)
-}
-
-module.exports = {
-    checkBotData,
-    updateBotData,
-    getAllUsers,
-    checkUser,
-    addUser,
-    getAllComments,
-    updateComment,
-    getAllPayments,
-    updatePayments,
-    fetchMetrics
-}
