@@ -10,7 +10,7 @@ function sleep(ms) {
 
 // Асинхронная функция для отправки сообщений
 async function sendMessage(chatId, message) {
-    await sleep(500)
+    await sleep(250)
     try {
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
         return true
