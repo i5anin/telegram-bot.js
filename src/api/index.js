@@ -5,12 +5,17 @@ const WEB_API = process.env.WEB_API
 
 async function performRequest(url, method = 'get', data = {}, params = {}) {
     try {
-        const response = await axios({ method, url, data, params })
-        return response.data
+        console.log(`Request: ${method.toUpperCase()} ${url}`, { data, params });  // Log request data
+        const response = await axios({ method, url, data, params });
+        console.log(`Response from ${url}:`, response.data);  // Log response data
+        return response.data;
     } catch (error) {
-        console.error(`Error in performing request to ${url}: ${error.message}`)
+        console.error(`Error in performing request to ${url}: ${error.message}`);
+        console.error(error.response ? error.response.data : error);  // Log error data
     }
 }
+
+
 
 async function fetchMetrics() {
     try {
@@ -55,19 +60,23 @@ async function checkUser(chatId) { // TODO: SECRET_KEY
     const url = `${WEB_API}/users/check.php`
     const params = {
         id: chatId,
+        key: WEB_API
     }
     return performRequest(url, 'get', {}, params)
 }
 
-async function addUser(userId, cleanedText, username) { // TODO: SECRET_KEY
-    const url = `${WEB_API}/users/add.php`
-    const data = {
+async function addUser(userId, cleanedText, username) {
+    const params = new URLSearchParams({
         id: userId,
         fio: cleanedText,
         username: username,
         active: 1,
-    }
-    return performRequest(url, 'post', data)
+        // key: SECRET_KEY, // раскомментируйте эту строку, когда у вас будет SECRET_KEY
+    });
+
+    const url = `${WEB_API}/users/add.php?${params.toString()}`;
+    console.log(url)
+    return performRequest(url, 'get');
 }
 
 // Comments
