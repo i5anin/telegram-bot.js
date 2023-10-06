@@ -9,15 +9,10 @@ async function getUserInfo(userId) {
         // Запрашиваем данные всех пользователей
         const response = await getAllUsers()
         // Ищем пользователя с заданным userId в полученных данных
-        const user = response.users_data.find(u => u.user_id === userId)
-        if (user) {
-            // Если пользователь найден, возвращаем его данные
-            return {
-                userId: user.user_id,
-                fio: user.fio,
-            }
-        } else {
-            // Если пользователь не найден, выбрасываем ошибку или возвращаем undefined/null
+        const user = response.find(u => u.user_id === userId)  // Изменили response.users_data на response
+        if (user) {// Если пользователь найден, возвращаем его данные
+            return { userId: user.user_id, fio: user.fio }
+        } else {// Если пользователь не найден, выбрасываем ошибку или возвращаем undefined/null
             throw new Error('User not found')
         }
     } catch (error) {
@@ -25,6 +20,7 @@ async function getUserInfo(userId) {
         throw error
     }
 }
+
 
 async function handleHelpCommand(ctx) {
     await sendToLog(ctx)
@@ -52,7 +48,7 @@ async function handleHelpCommand(ctx) {
             } else {
                 // Если это другой тип ошибки, выводим ее в консоль и отправляем сообщение о неизвестной ошибке
                 console.error('Error sending help to user:', err)
-                await ctx.reply('Произошла неизвестная ошибка.\n<code>${err}</code>')
+                await ctx.reply(`Произошла неизвестная ошибка.\n<code>${err}</code>`, { parse_mode: 'HTML' })
             }
         }
     } else if (!userId) {
