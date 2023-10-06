@@ -48,11 +48,12 @@ function insert_into_user($id, $fio, $username, $active)
 }
 
 // Получение данных из GET-запроса
-$fio = ($_GET["fio"] === '') ? null : $_GET["fio"];
-$username = ($_GET["username"] === '') ? null : $_GET["username"];
-$active = $_GET["active"];
+$fio = isset($_GET["fio"]) && $_GET["fio"] !== '' ? $_GET["fio"] : null;
+$username = isset($_GET["username"]) && $_GET["username"] !== '' ? $_GET["username"] : null;
+$active = isset($_GET["active"]) ? $_GET["active"] : null;
+$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
-$res = insert_into_user($_GET["id"], $fio, $username, $active);
+$res = insert_into_user($id, $fio, $username, $active);
 
 if ($res === "duplicate") {
     http_response_code(208);

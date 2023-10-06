@@ -25,20 +25,37 @@ async function handleTextCommand(ctx) {
         const cleanedText = text.replace(/ë/g, 'ё').replace(/Ë/g, 'Ё').replace(/\. /g, '.')
         const userId = chat.id
 
-        // Запрос на добавление пользователя
-        const dataAddUser = await addUser(userId, cleanedText, from.username)
-        ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
-        const defMsg = `\nID: <code>${userId}</code>` +
-            `\nfio: <code>${cleanedText}</code>`
+        try {
+            // Запрос на добавление пользователя
+            const dataAddUser = await addUser(userId, cleanedText, from.username)
+            console.log('dataAddUser=', dataAddUser)
+            if (dataAddUser && dataAddUser.status === 'OK') {
+                ctx.reply('Вы успешно зарегистрированы', { parse_mode: 'HTML' })
+                const defMsg = `\nID: <code>${userId}</code>` +
+                    `\nfio: <code>${cleanedText}</code>`
 
-        await bot.telegram.sendMessage(
-            LOG_CHANNEL_ID, dataAddUser ? `${emoji.star}Пользователь добавлен.${defMsg}` : `⚠️Ошибка регистрации${defMsg}`,
-            { parse_mode: 'HTML' },
-        )
+                await bot.telegram.sendMessage(
+                    LOG_CHANNEL_ID, `${emoji.star}Пользователь добавлен.${defMsg}`,
+                    { parse_mode: 'HTML' },
+                )
+                await notifyUsers(ctx)
+            } else {
+                throw new Error(dataAddUser ? dataAddUser.message : '\nНеизвестная ошибка при добавлении пользователя.')
+            }
+        } catch (error) {
+            console.error('Ошибка при добавлении пользователя:', error.message);
+            ctx.reply(`Ошибка регистрации: ${error.message}`, { parse_mode: 'HTML' });
+            const defMsg = `\nID: <code>${userId}</code>` +
+                `\nfio: <code>${cleanedText}</code>`
 
-        await notifyUsers(ctx)
+            await bot.telegram.sendMessage(
+                LOG_CHANNEL_ID, `⚠️Ошибка регистрации${defMsg}`,
+                { parse_mode: 'HTML' },
+            )
+        }
         ctx.session.isAwaitFio = false
     }
+
 
     // --------- Обработка ожидания комментария ---------
     if (ctx.message.reply_to_message) {
