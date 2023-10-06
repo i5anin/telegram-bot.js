@@ -60,15 +60,10 @@ async function checkUser(chatId) { // TODO: SECRET_KEY
 }
 
 async function addUser(userId, cleanedText, username) { // TODO: SECRET_KEY
-    const url = `${WEB_API}/users/add.php`
-    const data = {
-        id: userId,
-        fio: cleanedText,
-        username: username,
-        active: 1,
-    }
-    return performRequest(url, 'post', data)
+    const url = `${WEB_API}/users/add.php?id=${userId}&fio=${encodeURIComponent(cleanedText)}&username=${username}&active=1`;
+    return performRequest(url, 'get');
 }
+
 
 // Comments
 async function getAllComments() {

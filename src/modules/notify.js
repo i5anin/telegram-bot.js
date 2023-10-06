@@ -1,4 +1,11 @@
-const { resetFlags, formatPaymentDate, getUserName, getDescription, getDefectType, getControlType } = require('#src/utils/helpers')
+const {
+    resetFlags,
+    formatPaymentDate,
+    getUserName,
+    getDescription,
+    getDefectType,
+    getControlType,
+} = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
 const { updateComment } = require('#src/api/index')
@@ -38,8 +45,8 @@ function formatMessage(comment, total) {
     const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment
     const typeString = getDescription(type)
     const { formattedDate } = formatPaymentDate({ date: comment.date })
-    const controlDescription = getControlType(type[0]);
-    const defectDescription = getDefectType(type[1]);
+    const controlDescription = getControlType(type[0])
+    const defectDescription = getDefectType(type[1])
     return `<b>Пожалуйста, прокомментируйте на следующих деталях:</b><code>(1/${total})</code>\n\n` +
         formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate) +
         `task_ID: <code>${id_task}</code>\n\n` +
@@ -67,8 +74,8 @@ function formatMasterMessage(comment, chatId, userName) {
     const { det_name, kolvo_brak, type, comments_otk, specs_nom_id } = comment
     const typeString = getDescription(type)
     const { formattedDate } = formatPaymentDate({ date: comment.date })
-    const controlDescription = getControlType(type[0]);
-    const defectDescription = getDefectType(type[1]);
+    const controlDescription = getControlType(type[0])
+    const defectDescription = getDefectType(type[1])
     return `<b>Мастер, Вам уведомление</b>\n` +
         formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate)
 }
@@ -78,7 +85,8 @@ async function notifyAllUsers() {
     const allComments = await fetchComments()
     const user_ids = [...new Set(allComments.map(comment => comment.user_id))]
 
-    for (const chatId of user_ids) {
+    for (let chatId of user_ids) {
+        if (chatId == 0) chatId = ADMIN_DB //ADMIN_DB const chatId
         const userName = await getUserName(chatId) // Перемещено сюда
         const userComments =
             allComments.filter(comment => comment.user_id === chatId && comment.sent === 0)
