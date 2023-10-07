@@ -13,14 +13,12 @@ async function performRequest(url, method = 'get', data = {}, params = {}) {
 }
 
 async function fetchMetrics() {
-    try {
-        const url = `${WEB_API}/metrics/get.php`
-        const params = { key: SECRET_KEY }
-        const response = await axios.get(url, { params })
-        return response.data.metrics || []
-    } catch (error) {
-        throw new Error(`Failed to fetch metrics: ${error.message}`)
-    }
+    const url = `${WEB_API}/metrics/get.php`;
+    const params = {
+        key: SECRET_KEY,
+    };
+    const result = await performRequest(url, 'get', {}, params);
+    return result.metrics || [];
 }
 
 // Bot
@@ -45,23 +43,35 @@ async function updateBotData(formattedDateTime, instanceNumber) {
 }
 
 // Users
-async function getAllUsers() { // TODO: SECRET_KEY
+async function getAllUsers() { // TODO: +
     const url = `${WEB_API}/users/get_all_fio.php`
-    const result = await performRequest(url)
+    const params = {
+        key: SECRET_KEY,  // Добавлен секретный ключ
+    }
+    const result = await performRequest(url, 'get', {}, params)
     return result.users_data
 }
 
-async function checkUser(chatId) { // TODO: SECRET_KEY
+
+async function checkUser(chatId) { // TODO: +
     const url = `${WEB_API}/users/check.php`
     const params = {
         id: chatId,
+        key: SECRET_KEY,
     }
     return performRequest(url, 'get', {}, params)
 }
 
-async function addUser(userId, cleanedText, username) { // TODO: SECRET_KEY
-    const url = `${WEB_API}/users/add.php?id=${userId}&fio=${encodeURIComponent(cleanedText)}&username=${username}&active=1`;
-    return performRequest(url, 'get');
+async function addUser(userId, cleanedText, username) { // TODO: +
+    const url = `${WEB_API}/users/add.php`
+    const params = {
+        id: userId,
+        fio: encodeURIComponent(cleanedText),
+        username: username,
+        active: 1,
+        key: SECRET_KEY,
+    }
+    return performRequest(url, 'get', {}, params)
 }
 
 
@@ -116,5 +126,5 @@ module.exports = {
     updateComment,
     getAllPayments,
     updatePayments,
-    fetchMetrics
+    fetchMetrics,
 }
