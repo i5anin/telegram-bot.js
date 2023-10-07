@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 
 $dbConfig = require 'sql_config.php';
 
-$key = $_GET["access_key"] ?? null;
+$key = $_GET["key"] ?? null;
 
 if ($key !== $dbConfig['key']) {
     http_response_code(403);
