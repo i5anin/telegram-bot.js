@@ -66,10 +66,11 @@ async function addUser(userId, cleanedText, username) { // TODO: + key
     const url = `${WEB_API}/users/add.php`
     const params = {
         id: userId,
-        fio: encodeURIComponent(cleanedText),
+        // fio: encodeURIComponent(cleanedText),
+        fio: cleanedText,
         username: username,
         active: 1,
-        key: SECRET_KEY,
+        // key: SECRET_KEY,
     }
     return performRequest(url, 'get', {}, params)
 }
