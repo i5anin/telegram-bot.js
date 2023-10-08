@@ -1,5 +1,4 @@
 const fs = require('fs')
-const axios = require('axios')
 const { sendToLog } = require('#src/utils/log')
 const { getAllUsers } = require('#src/api/index')
 const { Markup } = require('telegraf');
@@ -33,8 +32,7 @@ async function handleHelpCommand(ctx) {
     // Проверяем, является ли отправитель администратором и был ли предоставлен аргумент
     if (userId && String(ctx.from.id) === GRAND_ADMIN) {
         try {
-            const userChatId = userId
-            await sendHelpToUser(ctx, userChatId)
+            await sendHelpToUser(ctx, userId)
 
             // Получаем информацию о пользователе с помощью функции getUserInfo
             const user = await getUserInfo(userId)
