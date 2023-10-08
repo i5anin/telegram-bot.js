@@ -43,7 +43,7 @@ async function updateBotData(formattedDateTime, instanceNumber) {
 }
 
 // Users
-async function getAllUsers() { // TODO: +
+async function getAllUsers() { // TODO: + key 
     const url = `${WEB_API}/users/get_all_fio.php`
     const params = {
         key: SECRET_KEY,  // Добавлен секретный ключ
@@ -53,7 +53,7 @@ async function getAllUsers() { // TODO: +
 }
 
 
-async function checkUser(chatId) { // TODO: +
+async function checkUser(chatId) { // TODO: + key
     const url = `${WEB_API}/users/check.php`
     const params = {
         id: chatId,
@@ -62,7 +62,7 @@ async function checkUser(chatId) { // TODO: +
     return performRequest(url, 'get', {}, params)
 }
 
-async function addUser(userId, cleanedText, username) { // TODO: +
+async function addUser(userId, cleanedText, username) { // TODO: + key
     const url = `${WEB_API}/users/add.php`
     const params = {
         id: userId,
