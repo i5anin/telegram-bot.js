@@ -15,7 +15,7 @@ module.exports = {
     userNotFound: (userId) => `Пользователь\nID: <code>${userId}</code>\n<b>не зарегистрирован в системе</b>`,
     errorAPI: 'Ошибка при получении данных с внешнего API:',
     error: 'Произошла ошибка при выполнении команды',
-    formatSKMessage: (det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate, commentText) =>
+    formatSKMessage: (det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate) =>
         `· <b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
         `· <b>Количество:</b> <code>${kolvo_brak}шт.</code>\n` +
         `· <b>Контроль:</b> <code>${controlDescription}</code>\n` +
