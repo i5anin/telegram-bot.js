@@ -49,7 +49,7 @@ function formatMessage(comment, total) {
     const defectDescription = getDefectType(type[1])
     return `<b>Пожалуйста, прокомментируйте операции(ю) на следующих деталях:</b>\n\n` +
         formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate) +
-        `<i>Прокомментировать через "ответить" на это сообщение.\nПодробнее /help.\n\n</i>`+
+        `<i>Прокомментировать через "ответить" на это сообщение.\nПодробнее /help.\n\n</i>` +
         `task_ID: ${id_task} <b>(1/${total})</b>\n`
 }
 
@@ -114,6 +114,7 @@ async function notifyUsers(ctx) {
         await processUserComments(userUnansweredComments, userName)
     } else {
         await sendMessage(chatId, 'Пустые комментарии не найдены.')
+        await sendMessage(LOG_CHANNEL_ID, `<code>${ chatId }</code> Пустые комментарии не найдены.`)
     }
 }
 
