@@ -9,7 +9,7 @@ const { checkUser } = require('#src/api/index')
 // Функция для проверки, зарегистрирован ли пользователь на сервере
 async function checkRegistration(chatId) {
     try {
-        const response = checkUser()
+        const response = await checkUser(chatId) // Добавьте `await` здесь
         return {
             exists: response.exists === true,
             fio: response.fio,
@@ -20,6 +20,7 @@ async function checkRegistration(chatId) {
     }
 }
 
+
 // Асинхронная функция для обработки команды регистрации
 async function handleRegComment(ctx) {
     await sendToLog(ctx)
@@ -28,20 +29,25 @@ async function handleRegComment(ctx) {
     const chatId = ctx.message.chat.id
     const { chat } = ctx.message
 
-    const registrationData = await checkRegistration(chatId)
-    const isRegistered = registrationData.exists
-    const fio = registrationData.fio
+    try {
+        const registrationData = await checkRegistration(chatId)
+        const isRegistered = registrationData.exists
+        const fio = registrationData.fio
 
-    let textToReply
-    if (isRegistered && fio) {
-        textToReply = `<code>${fio}</code> <b>Вы уже зарегистрированы!</b>`
-    } else {
-        textToReply = ruLang.notRegistered
+        let textToReply
+        if (isRegistered && fio) {
+            textToReply = `<code>${fio}</code> <b>Вы уже зарегистрированы!</b>`
+        } else {
+            textToReply = ruLang.notRegistered
+        }
+        ctx.session.isAwaitFio = !isRegistered
+
+        // Отправляем сообщение
+        ctx.reply(textToReply, { parse_mode: 'HTML' })
+    } catch (error) {
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `reg <code>${error}</code>`, { parse_mode: 'HTML' })
+        ctx.reply('Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.')
     }
-    ctx.session.isAwaitFio = !isRegistered
-
-    // Отправляем сообщение
-    ctx.reply(textToReply, { parse_mode: 'HTML' })
 }
 
 module.exports = { handleRegComment }
