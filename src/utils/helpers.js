@@ -1,6 +1,4 @@
 // Функция для выполнения GET-запросов
-const axios = require('axios')
-const ruLang = require('#src/utils/ru_lang')
 const { getAllUsers } = require('#src/api/index')
 
 
@@ -42,7 +40,7 @@ async function getUserName(userId) {
         let usersData = await getAllUsers() || []
         const user = usersData.find(u => u.user_id === userId)
         return user ? user.fio : '<code>Неизвестный пользователь</code>'
-        return user
+        // return user
     } catch (error) {
         console.error('Failed to fetch users data:', error)
     }

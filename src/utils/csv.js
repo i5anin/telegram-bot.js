@@ -1,5 +1,4 @@
 const fs = require('fs');
-const axios = require('axios');
 const { getAllUsers } = require('#src/api/index')
 
 const getExternalUsers = async () => {
@@ -39,7 +38,6 @@ async function generateReport(ctx, chatId) {
             const telegramUser = await ctx.telegram.getChatMember(chatId, user.user_id)
             const status = telegramUser.status  // Здесь хранится статус пользователя
 
-            const username = telegramUser.user.username ? '@' + telegramUser.user.username : 'N/A'
 
             // Добавляем информацию в CSV отчет
             const userInfoCsv = `${telegramUser.user.username || 'N/A'};${telegramUser.user.id};${telegramUser.user.first_name};${telegramUser.user.last_name || 'N/A'};${user.fio};${status}`

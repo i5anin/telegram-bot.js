@@ -1,5 +1,5 @@
 const { getAllComments, updateComment } = require('#src/api/index')
-const { formatPaymentDate, getDescription, getUserName, getControlType, getDefectType } = require('#src/utils/helpers')
+const { formatPaymentDate, getUserName, getControlType, getDefectType } = require('#src/utils/helpers')
 const { formatSKMessage } = require('#src/utils/ru_lang')
 
 
