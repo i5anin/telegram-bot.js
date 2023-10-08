@@ -1,10 +1,20 @@
 <?php
 // Получаем конфигурацию из файла 'sql_config.php'
+$dbConfig = require 'sql_config.php';
 
+// Извлекаем SECRET_KEY из конфигурации
+$SECRET_KEY = $dbConfig['key'] ?? null;
+
+if ($SECRET_KEY === null) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Secret key not configured']);
+    exit;
+}
 
 function get_users_data()
 {
-    $dbConfig = require 'sql_config.php';
+    global $dbConfig; // Используем глобальную переменную для конфигурации
+
     $server = $dbConfig['server'];
     $user = $dbConfig['user'];
     $pass = $dbConfig['pass'];
@@ -43,6 +53,7 @@ if ($users_data) {
     // Если нет ошибок и массив не пуст, преобразуем его в JSON
     echo json_encode(['users_data' => $users_data]);
 } else {
-    // Если произошла ошибка или массив пуст, возвращаем JSON с сообщением об ошибке
-    echo json_encode(['error' => 'ОШИБКА!']);
+// Если произошла ошибка или массив пуст, возвращаем JSON с сообщением об ошибке
+echo json_encode(['error' => 'Произошла ошибка при получении данных пользователей или массив пуст.']);
 }
+
