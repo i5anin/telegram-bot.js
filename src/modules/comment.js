@@ -61,7 +61,7 @@ async function handleAddComment(ctx) {
 
         if (response && response.status === 'OK') {
             await ctx.reply(
-                `Комментарий:\n<code>${ctx.message.text}</code>\nДля:\n<code>${ctx.session.userComments.det_name}</code>\nдобавлен успешно.`,
+                emoji.ok + `<b>Ваш комментарий:</b>\n<code>${ctx.message.text}</code>\n\n<b>· Для:</b>\n<code>${ctx.session.userComments.det_name}</code>\n\n<b>· Добавлен успешно!</b>`,
                 { parse_mode: 'HTML' },
             )
             await bot.telegram.sendMessage(
@@ -78,9 +78,9 @@ async function handleAddComment(ctx) {
             const { formattedDate } = formatPaymentDate({ date: comment.date })
             const userName = await getUserName(chatId)
             const master_msg =
-                `<b>Мастер, Вам уведомление</b>\n<b>Оператор прокомментировал</b> <code>${userName}</code>\n\n`
+                `<b>Мастер, Вам уведомление.</b>\n<b>Оператор прокомментировал</b> <code>${userName}</code>\n\n`
+                + `<b>Комментарий:</b> <code>${commentText}</code>\n\n`
                 + formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate)
-                + `<b>Комментарий:</b> <code>${commentText}</code>`
 
             // Если user_id_master существует, отправляем сообщение мастеру
             if (comment.user_id_master) await bot.telegram.sendMessage(comment.user_id_master, master_msg, { parse_mode: 'HTML' })

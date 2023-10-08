@@ -47,10 +47,10 @@ function formatMessage(comment, total) {
     const { formattedDate } = formatPaymentDate({ date: comment.date })
     const controlDescription = getControlType(type[0])
     const defectDescription = getDefectType(type[1])
-    return `<b>Пожалуйста, прокомментируйте на следующих деталях:</b><code>(1/${total})</code>\n\n` +
+    return `<b>Пожалуйста, прокомментируйте операции(ю) на следующих деталях:</b>\n\n` +
         formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate) +
-        `task_ID: <code>${id_task}</code>\n\n` +
-        `<i>необходимо прокомментировать через "ответить" на это сообщение</i>`
+        `<i>Прокомментировать через "ответить" на это сообщение.\nПодробнее /help.\n\n</i>`+
+        `task_ID: ${id_task} <b>(1/${total})</b>\n`
 }
 
 // Обработка комментариев пользователя
@@ -76,7 +76,7 @@ function formatMasterMessage(comment, chatId, userName) {
     const { formattedDate } = formatPaymentDate({ date: comment.date })
     const controlDescription = getControlType(type[0])
     const defectDescription = getDefectType(type[1])
-    return `<b>Мастер, Вам уведомление</b>\n` +
+    return `<b>Мастер, Вам уведомление.</b>\n<b>Оператору</b> <code>${userName}</code> <b>отправлено уведомление.</b>\n\n` +
         formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate)
 }
 
