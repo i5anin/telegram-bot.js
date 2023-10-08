@@ -2,6 +2,7 @@ const fs = require('fs')
 const axios = require('axios')
 const { sendToLog } = require('#src/utils/log')
 const { getAllUsers } = require('#src/api/index')
+const { Markup } = require('telegraf');
 
 
 async function getUserInfo(userId) {
@@ -85,10 +86,12 @@ async function sendHelpToUser(ctx, chatId) {
 }
 
 async function handleDocsCommand(ctx) {
-    ctx.reply('Вот несколько полезных ссылок:\n' +
-        '· [Общая Штатная папка](https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW)\n' +
-        '· [Должностная папка оператора](https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V)',
-        { parse_mode: 'Markdown' })
+    const keyboard = Markup.inlineKeyboard([
+        [Markup.button.url('Общая Штатная папка', 'https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW')],
+        [Markup.button.url('Должностная папка оператора', 'https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V')]
+    ]);
+
+    await ctx.reply('Вот несколько полезных ссылок:', keyboard);
 }
 
 module.exports = { handleHelpCommand, handleDocsCommand }
