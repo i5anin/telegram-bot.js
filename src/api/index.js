@@ -69,7 +69,7 @@ async function addUser(userId, cleanedText, username) { // TODO: + key
         // fio: encodeURIComponent(cleanedText),
         fio: cleanedText,
         username: username,
-        active: 1,
+        active: 0,
         // key: SECRET_KEY,
     }
     return performRequest(url, 'get', {}, params)
