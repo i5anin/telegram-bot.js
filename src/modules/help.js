@@ -86,8 +86,8 @@ async function sendHelpToUser(ctx, chatId) {
 
 async function handleDocsCommand(ctx) {
     ctx.reply('Вот несколько полезных ссылок:\n' +
-        '- [Общая Штатная папка](https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW)\n' +
-        '- [Должностная папка оператора](https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V)',
+        '· [Общая Штатная папка](https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW)\n' +
+        '· [Должностная папка оператора](https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V)',
         { parse_mode: 'Markdown' })
 }
 
