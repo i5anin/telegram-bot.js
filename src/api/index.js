@@ -43,13 +43,12 @@ async function updateBotData(formattedDateTime, instanceNumber) {
 }
 
 // Users
-async function getAllUsers() { // TODO: + key 
+async function getAllUsers() {
     const url = `${WEB_API}/users/get_all_fio.php`
     const params = {
         key: SECRET_KEY,  // Добавлен секретный ключ
     }
-    const result = await performRequest(url, 'get', {}, params)
-    return result.users_data
+    return performRequest(url, 'get', {}, params)
 }
 
 
@@ -66,11 +65,10 @@ async function addUser(userId, cleanedText, username) { // TODO: + key
     const url = `${WEB_API}/users/add.php`
     const params = {
         id: userId,
-        // fio: encodeURIComponent(cleanedText),
         fio: cleanedText,
         username: username,
         active: 0,
-        // key: SECRET_KEY,
+        key: SECRET_KEY,
     }
     return performRequest(url, 'get', {}, params)
 }
