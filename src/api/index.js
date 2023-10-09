@@ -89,7 +89,7 @@ async function updateComment(taskID, commentText = null) {
     const url = `${WEB_API}/comment/update.php`
     const params = {
         id_task: taskID,
-        access_key: SECRET_KEY, // TODO: access_key -> key
+        key: SECRET_KEY,
         ...(commentText ? { comments_op: commentText } : { sent: 1 }),
     }
     return performRequest(url, 'get', {}, params)
