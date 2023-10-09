@@ -1,6 +1,6 @@
 {
   "name": "pfforum_tg_bot",
-  "version": "2.1.0",
+  "version": "2.1.6",
   "description": "",
   "main": "index.js",
   "scripts": {
