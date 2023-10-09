@@ -15,12 +15,18 @@ async function logNewChatMembers(ctx) {
         const usersData = await getAllUsers();
         const user = usersData.find(u => u.user_id === userId);
 
-        const message = `${emoji.ok} Добавили в группу <code>${chatTitle}</code>\n\n` + logMessage(userId, user.fio, username, fullName)
+        if (user) {
+            // Если пользователь существует, создайте сообщение
+            const message = `${emoji.ok} Добавили в группу <code>${chatTitle}</code>\n\n` + logMessage(userId, user.fio, username, fullName);
 
-        // Имя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>
-        await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
+            await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
+        } else {
+            // Если пользователь не найден, можно выполнить какие-либо другие действия или отправить соответствующее сообщение.
+            console.log(`Пользователь с ID ${userId} не найден.`);
+        }
     }
 }
+
 
 // Отслеживаем событие удаления пользователя из чата
 async function logLeftChatMember(ctx) {
