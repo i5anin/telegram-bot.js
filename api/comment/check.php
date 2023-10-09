@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json');  // Устанавливаем заголовок для ответа в формате JSON
 $dbConfig = require 'sql_config.php';
 $server = $dbConfig['server'];
 $user = $dbConfig['user'];

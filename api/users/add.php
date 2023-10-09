@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');  // Устанавливаем заголовок для ответа в формате JSON
-
+// Функция для вставки данных пользователя
 function insert_into_user($id, $fio, $username, $active)
 {
     if (!is_numeric($id)) return false;
@@ -45,6 +45,25 @@ function insert_into_user($id, $fio, $username, $active)
     mysqli_stmt_close($stmt);
     mysqli_close($mysqli);
     return true;
+}
+
+// Проверяем наличие параметра key в GET-запросе
+if (!isset($_GET['key'])) {
+    echo json_encode(['status' => 'Error', 'message' => 'Key not provided']);
+    http_response_code(400);
+    exit;
+}
+
+$provided_key = $_GET['key'];
+
+// Получаем секретный ключ из конфигурации
+$dbConfig = require 'sql_config.php';
+$SECRET_KEY = $dbConfig['key'] ?? null;
+
+if ($provided_key !== $SECRET_KEY) {
+    echo json_encode(['status' => 'Error', 'message' => 'Invalid secret key']);
+    http_response_code(403);
+    exit;
 }
 
 // Получение данных из GET-запроса

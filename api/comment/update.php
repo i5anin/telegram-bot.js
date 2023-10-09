@@ -1,5 +1,4 @@
 <?php
-
 header('Content-Type: application/json');
 
 $dbConfig = require 'sql_config.php';
