@@ -53,4 +53,19 @@ function formatPaymentDate(payment) {
     return { formattedDate }
 }
 
-module.exports = { resetFlags, formatPaymentDate, getDescription, getUserName, getDefectType, getControlType }
+function formatNumber(number) {
+    return parseFloat(number).toLocaleString('ru-RU', {
+        minimumFractionDigits: 2, maximumFractionDigits: 2,
+    }).replace(/,00$/, '')  // Убираем ,00 для целых чисел
+}
+
+function formatPercentage(number, maxCharacters) {
+    let formattedNumber = formatNumber(number) + '%'  // Добавьте знак процента здесь
+    let currentCharacters = formattedNumber.length
+    let spacesNeeded = maxCharacters - currentCharacters
+    spacesNeeded = Math.max(0, spacesNeeded)  // Убедитесь, что spacesNeeded неотрицательное
+    let spaces = ' '.repeat(spacesNeeded)
+    return spaces + formattedNumber
+}
+
+module.exports = { formatPercentage, formatNumber, resetFlags, formatPaymentDate, getDescription, getUserName, getDefectType, getControlType }
