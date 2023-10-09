@@ -1,5 +1,7 @@
 // Отслеживаем событие добавления нового пользователя в чат
 const { checkUser } = require('#src/api/index')
+const { logMessage } = require('#src/utils/ru_lang')
+const { getAllUsers } = require('#src/api')
 
 async function logNewChatMembers(ctx) {
     const chatTitle = ctx.chat.title || 'Неназванный чат'
@@ -10,7 +12,12 @@ async function logNewChatMembers(ctx) {
         const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim()
         const userId = user.id
 
-        const message = `${emoji.ok} Добавили в группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`
+        const usersData = await getAllUsers();
+        const user = usersData.find(u => u.user_id === userId);
+
+        const message = `${emoji.ok} Добавили в группу <code>${chatTitle}</code>\n\n` + logMessage(userId, user.fio, username, fullName)
+
+        // Имя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>
         await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
     }
 }
@@ -57,21 +64,17 @@ async function logLeftChatMember(ctx) {
 
 
 async function sendToLog(ctx) {
-    const { chat, from, text } = ctx.message;
-    const userData = await checkUser(chat.id);
-    const fio = userData?.fio || 'N/A';  // Предполагая, что ФИО хранится в свойстве 'fio'
-    const username = from.username ? '@' + from.username : '<code>N/A</code>';
+    const { chat, from, text } = ctx.message
+    const userData = await checkUser(chat.id)
+    const fio = userData?.fio || 'N/A'  // Предполагая, что ФИО хранится в свойстве 'fio'
+    const fullName = (from.first_name ? from.first_name + ' ' : '') + (from.last_name ? from.last_name : '')
+    const username = from.username || ''
     await bot.telegram.sendMessage(
         LOG_CHANNEL_ID,
-        `ID:\u00A0<code>${chat.id}</code> ` +
-        `fio:\u00A0<code>${fio}</code>\n` +  // Добавлено ФИО
-        `username: ${username} ` +
-        `name: <code>${from.first_name || 'N/A'}\u00A0${from.last_name || 'N/A'}</code>\n` +
-        `msg: <code>${text}</code>`,
+        `<b>msg:</b> <code>${text}</code>\n\n` + logMessage(chat.id, fio, username, fullName),
         { parse_mode: 'HTML' },
-    );
+    )
 }
-
 
 
 module.exports = {
