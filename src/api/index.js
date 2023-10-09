@@ -52,7 +52,7 @@ async function getAllUsers() {
 }
 
 
-async function checkUser(chatId) { // TODO: + key
+async function checkUser(chatId) {
     const url = `${WEB_API}/users/check.php`
     const params = {
         id: chatId,
@@ -61,7 +61,7 @@ async function checkUser(chatId) { // TODO: + key
     return performRequest(url, 'get', {}, params)
 }
 
-async function addUser(userId, cleanedText, username) { // TODO: + key
+async function addUser(userId, cleanedText, username) { 
     const url = `${WEB_API}/users/add.php`
     const params = {
         id: userId,
