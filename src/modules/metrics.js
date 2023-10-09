@@ -3,6 +3,7 @@ const { checkUser } = require('#src/api/index')
 const { fetchMetrics } = require('#src/api/index')
 const { sendToLog } = require('#src/utils/log')
 const { formatMetricsMessage } = require('#src/utils/ru_lang')
+const { formatNumber } = require('#src/utils/helpers')
 
 
 function getMaxCharacters(latestMetrics) {
