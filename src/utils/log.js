@@ -1,47 +1,53 @@
 // Отслеживаем событие добавления нового пользователя в чат
 const { checkUser } = require('#src/api/index')
 const { logMessage } = require('#src/utils/ru_lang')
-const { getAllUsers } = require('#src/api')
+const { getAllUsers } = require('#src/api/index')
 
 async function logNewChatMembers(ctx) {
     const chatTitle = ctx.chat.title || 'Неназванный чат'
     const addedUsers = ctx.message.new_chat_members
 
-    for (const user of addedUsers) {
-        const username = user.username || 'N/A'
-        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim()
-        const userId = user.id
+    for (const newUser of addedUsers) {
+        const username = newUser.username || 'N/A'
+        const fullName = `${newUser.first_name || ''} ${newUser.last_name || ''}`.trim()
+        const userId = newUser.id
 
         const usersData = await getAllUsers();
         const user = usersData.find(u => u.user_id === userId);
 
-        if (user) {
-            // Если пользователь существует, создайте сообщение
-            const message = `${emoji.ok} Добавили в группу <code>${chatTitle}</code>\n\n` + logMessage(userId, user.fio, username, fullName);
+        // Создайте сообщение, независимо от наличия пользователя в базе данных
+        const message = `${emoji.ok} Добавили в группу <code>${chatTitle}</code>\n\n` + logMessage(userId, user ? user.fio : 'N/A', username, fullName);
 
-            await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
-        } else {
-            // Если пользователь не найден, можно выполнить какие-либо другие действия или отправить соответствующее сообщение.
-            console.log(`Пользователь с ID ${userId} не найден.`);
-        }
+        await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
     }
 }
 
 
+
 // Отслеживаем событие удаления пользователя из чата
 async function logLeftChatMember(ctx) {
-    const chatTitle = ctx.chat.title || 'Неназванный чат'
-    const leftMember = ctx.message.left_chat_member
+    const chatTitle = ctx.chat.title || 'Неназванный чат';
+    const leftUser = ctx.message.left_chat_member;
 
-    // Информация о пользователе
-    const username = leftMember.username || 'N/A'
-    const fullName = `${leftMember.first_name || ''} ${leftMember.last_name || ''}`.trim()
-    const userId = leftMember.id
+    if (leftUser) {
+        const username = leftUser.username || 'N/A';
+        const fullName = `${leftUser.first_name || ''} ${leftUser.last_name || ''}`.trim();
+        const userId = leftUser.id;
 
-    const message = `${emoji.x} Пользователь покинул группу <code>${chatTitle}</code>\nИмя: <code>${fullName}</code>\nID: <code>${userId}</code>\nUsername: <code>${username}</code>`
+        const usersData = await getAllUsers();
+        const user = usersData.find(u => u.user_id === userId);
 
-    await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
+        const message = `${emoji.x} Покинул группу <code>${chatTitle}</code>\n\n` + logMessage(userId, user ? user.fio : 'N/A', username, fullName);
+
+        await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
+    } else {
+        // Обработка случая, когда объект leftUser не существует (например, пользователь покинул чат до обработки события)
+        console.log('Объект leftUser не существует.');
+    }
 }
+
+
+
 
 // // Отслеживаем новые сообщения на канале
 // bot.on('channel_post', async (ctx) => {
