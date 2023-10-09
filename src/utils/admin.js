@@ -15,7 +15,7 @@ async function handleMsgCommand(ctx) {
             await bot.telegram.sendMessage(userId, message)
             ctx.reply('Сообщение успешно отправлено.')
         } catch (error) {
-            ctx.reply(`Ошибка при отправке сообщения: ${error}`)
+            ctx.reply(`Ошибка при отправке сообщения:\n<code>${error}</code>`,{ parse_mode: 'HTML' })
         }
     }
 }
