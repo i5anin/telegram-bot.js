@@ -49,7 +49,7 @@ async function whoCommand(ctx) { // /who
         if (user) {
             // Если пользователь найден, отправляем информацию о нем
             const fullName = `${firstName || ''} ${lastName || ''}`.trim()
-            await ctx.reply(`<b>Пользователь</b>\n` + logMessage(userId, user.fio, username, fullName), { parse_mode: 'HTML' })
+            await ctx.reply(`<b>Пользователь</b>\n` + logMessage(userId, user.fio), { parse_mode: 'HTML' })
         } else {
             // Если пользователь не найден, отправляем сообщение об ошибке
             await ctx.reply(msg.userNotFound(userId), { parse_mode: 'HTML' })

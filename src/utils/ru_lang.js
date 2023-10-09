@@ -49,6 +49,6 @@ module.exports = {
 
     logMessage: (chatId, fio, username, fullName) =>
         `<b>fio:</b> <code>${fio}</code>\n` +
-        `<b>ID:</b> <code>${chatId}</code>\n` +
-        `<b>TG:</b> <code>${fullName}</code> (@${username || ''})\n`
+        `<b>ID:</b> <code>${chatId}</code>` +
+        (fullName ? `\n<b>TG:</b> <code>${fullName}</code> (@${username || ''})` : '')
 }
