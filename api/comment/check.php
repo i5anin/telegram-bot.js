@@ -1,6 +1,25 @@
 <?php
 header('Content-Type: application/json');  // Устанавливаем заголовок для ответа в формате JSON
+
+// Проверяем наличие параметра key в GET-запросе
+if (!isset($_GET['key'])) {
+    echo json_encode(['error' => 'Key not provided']);
+    http_response_code(400);
+    exit;
+}
+
+$provided_key = $_GET['key'];
+
+// Получаем секретный ключ из конфигурации
 $dbConfig = require 'sql_config.php';
+$SECRET_KEY = $dbConfig['key'] ?? null;
+
+if ($provided_key !== $SECRET_KEY) {
+    echo json_encode(['error' => 'Invalid secret key']);
+    http_response_code(403);
+    exit;
+}
+
 $server = $dbConfig['server'];
 $user = $dbConfig['user'];
 $pass = $dbConfig['pass'];
