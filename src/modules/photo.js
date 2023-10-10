@@ -27,7 +27,7 @@ async function handlePhoto(ctx) {
 
     const currentDate = new Date().toISOString().replace(/:/g, '_').replace(/\.\d+Z$/, '')
     const fileName = `${currentDate}_${ctx.from.id}.jpg`
-    const filePath = path.join('D:', 'db_photo', fileName)
+    const filePath = path.join('D:', 'bot', 'db_photo', fileName)
     ctx.session.filePath = filePath
     const url = `https://api.telegram.org/file/bot${BOT_TOKEN}/${photoInfo.file_path}`
 

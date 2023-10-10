@@ -47,6 +47,10 @@ async function handleFio(ctx, text, chat, from) {
 
 async function photoParty(ctx, text) {
     console.log('photoParty function called with text:', text)
+    if (isNaN(Number(text))) {
+        ctx.reply('Введенный номер партии не является числом. Пожалуйста, укажите корректный номер партии.');
+        return; // выход из функции
+    }
     ctx.session.batchNumber = text
     ctx.reply(`Вы ввели номер партии: <code>${ctx.session.batchNumber}</code>.\nПожалуйста, введите комментарий.`, { parse_mode: 'HTML' })
     ctx.session.photoParty = false
@@ -57,13 +61,13 @@ async function photoMessageComment(ctx) {
     console.log('photoMessageComment function called')
     const { text } = ctx.message
     ctx.session.photoComment = text
-    ctx.reply(`Спасибо!\nНомер партии: <code>${ctx.session.batchNumber}</code>\nВаш комментарий к фотографии: <code>${ctx.session.photoComment}</code>\n`, { parse_mode: 'HTML' })
+    ctx.reply(`Фото успешно добавлено!\nНомер партии: <code>${ctx.session.batchNumber}</code>\nВаш комментарий к фотографии: <code>${ctx.session.photoComment}</code>\n`, { parse_mode: 'HTML' })
 
     try {
         const response = await addPhotoData(ctx.from.id, ctx.session.batchNumber, ctx.session.photoComment, ctx.session.filePath)
 
         if (response && response.status === 'OK') {
-            ctx.reply(`Фото успешно добавлено!`, { parse_mode: 'HTML' })
+            // ctx.reply(`Фото успешно добавлено!`, { parse_mode: 'HTML' })
         } else {
             ctx.reply(`Ошибка при добавлении фото: ${response.message}`, { parse_mode: 'HTML' })
         }

@@ -21,6 +21,7 @@ async function sendMessage(chatId, message) {
     await sleep(250)
     try {
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID,`Пользователю <code>${chatId}</code> отправлено\n\n`+ message, { parse_mode: 'HTML' })
         return true
     } catch (error) {
         console.error(`Notify. Ошибка при отправке сообщения chatId: ${chatId}`, error)
