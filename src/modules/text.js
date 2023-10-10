@@ -3,7 +3,7 @@ const ruLang = require('#src/utils/ru_lang')
 const { handleAddComment } = require('#src/modules/comment')
 const { notifyUsers } = require('#src/modules/notify')
 const { sendToLog } = require('#src/utils/log')
-const { addUser } = require('#src/api/index')
+const { addUser, addPhotoData } = require('#src/api/index')
 
 async function handleFio(ctx, text, chat, from) {
     console.log('ctx.session.isAwaitFio=', ctx.session.isAwaitFio)
@@ -59,6 +59,11 @@ async function photoMessageComment(ctx) {
     ctx.session.photoComment = text
     ctx.reply(`Спасибо!\nНомер партии: <code>${ctx.session.batchNumber}</code>\nВаш комментарий к фотографии: <code>${ctx.session.photoComment}</code>\n`, { parse_mode: 'HTML' })
     // TODO: ОТПРАВКА ДАННЫХ НА СЕРВЕР
+    try {
+        await addPhotoData(ctx.from.id, ctx.session.batchNumber, ctx.session.photoComment, ctx.session.filePath)
+    } catch (err) {
+        console.error('Ошибка при добавлении данных о фото:', err)
+    }
     console.log('TODO: ОТПРАВКА ДАННЫХ НА СЕРВЕР')
     ctx.session.step = ''
     ctx.session.photoMessage = false

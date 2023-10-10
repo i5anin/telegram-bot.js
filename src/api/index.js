@@ -115,13 +115,14 @@ async function updatePayments(sentIds) {
     return performRequest(url, 'get', {}, params)
 }
 
-async function addPhotoData(user_id, comments_otk, location) {
-    const url = `${WEB_API}/photo_otk/add.php`
+async function addPhotoData(user_id, party, comments_otk, location) {
+    const url = `${WEB_API}/photo/add.php`
     const params = {
-        key: SECRET_KEY,
+        party,
         user_id,
         comments_otk,
         location,
+        key: SECRET_KEY,
     }
     return performRequest(url, 'get', {}, params)
 }

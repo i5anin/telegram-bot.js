@@ -1,4 +1,4 @@
-const { checkUser } = require('#src/api/index')
+const { checkUser, addPhotoData } = require('#src/api/index') // Предположим, что ваша функция для добавления фото называется addPhotoData
 const path = require('path')
 const fs = require('fs')
 const axios = require('axios')
@@ -28,6 +28,7 @@ async function handlePhoto(ctx) {
     const currentDate = new Date().toISOString().replace(/:/g, '_').replace(/\.\d+Z$/, '')
     const fileName = `${currentDate}_${ctx.from.id}.jpg`
     const filePath = path.join('D:', 'db_photo', fileName)
+    ctx.session.filePath = filePath
     const url = `https://api.telegram.org/file/bot${BOT_TOKEN}/${photoInfo.file_path}`
 
     // Ensure the directory exists
