@@ -48,7 +48,7 @@ async function handleFio(ctx, text, chat, from) {
 async function photoParty(ctx, text) {
     console.log('photoParty function called with text:', text)
     ctx.session.batchNumber = text
-    ctx.reply(`Вы ввели номер партии: <code>${ctx.session.batchNumber}</code>. Пожалуйста, введите комментарий.`, { parse_mode: 'HTML' })
+    ctx.reply(`Вы ввели номер партии: <code>${ctx.session.batchNumber}</code>.\nПожалуйста, введите комментарий.`, { parse_mode: 'HTML' })
     ctx.session.photoParty = false
     ctx.session.photoMessage = true
 }
@@ -57,8 +57,9 @@ async function photoMessageComment(ctx) {
     console.log('photoMessageComment function called')
     const { text } = ctx.message
     ctx.session.photoComment = text
-    ctx.reply(`Спасибо! Ваш комментарий к фотографии: <code>${ctx.session.photoComment}</code> номер партии: <code>${ctx.session.batchNumber}</code>`, { parse_mode: 'HTML' })
+    ctx.reply(`Спасибо!\nНомер партии: <code>${ctx.session.batchNumber}</code>\nВаш комментарий к фотографии: <code>${ctx.session.photoComment}</code>\n`, { parse_mode: 'HTML' })
     // TODO: ОТПРАВКА ДАННЫХ НА СЕРВЕР
+    console.log('TODO: ОТПРАВКА ДАННЫХ НА СЕРВЕР')
     ctx.session.step = ''
     ctx.session.photoMessage = false
 }
