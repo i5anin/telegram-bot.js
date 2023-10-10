@@ -13,12 +13,12 @@ async function performRequest(url, method = 'get', data = {}, params = {}) {
 }
 
 async function fetchMetrics() {
-    const url = `${WEB_API}/metrics/get.php`;
+    const url = `${WEB_API}/metrics/get.php`
     const params = {
         key: SECRET_KEY,
-    };
-    const result = await performRequest(url, 'get', {}, params);
-    return result.metrics || [];
+    }
+    const result = await performRequest(url, 'get', {}, params)
+    return result.metrics || []
 }
 
 // Bot
@@ -61,7 +61,7 @@ async function checkUser(chatId) {
     return performRequest(url, 'get', {}, params)
 }
 
-async function addUser(userId, cleanedText, username) { 
+async function addUser(userId, cleanedText, username) {
     const url = `${WEB_API}/users/add.php`
     const params = {
         id: userId,
@@ -115,6 +115,17 @@ async function updatePayments(sentIds) {
     return performRequest(url, 'get', {}, params)
 }
 
+async function addPhotoData(user_id, comments_otk, location) {
+    const url = `${WEB_API}/photo_otk/add.php`
+    const params = {
+        key: SECRET_KEY,
+        user_id,
+        comments_otk,
+        location,
+    }
+    return performRequest(url, 'get', {}, params)
+}
+
 module.exports = {
     checkBotData,
     updateBotData,
@@ -126,4 +137,5 @@ module.exports = {
     getAllPayments,
     updatePayments,
     fetchMetrics,
+    addPhotoData,
 }
