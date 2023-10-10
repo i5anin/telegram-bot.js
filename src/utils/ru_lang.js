@@ -45,10 +45,11 @@ module.exports = {
         `<code>${formatPercentage(latestMetrics.otk, maxCharacters)}</code> ОТК\n` +
         `<code>${formatPercentage(latestMetrics.upk, maxCharacters)}</code> Упаковка\n\n` +
         `Продуктивность: <b>${formatNumber(latestMetrics.productivity)}</b> ₽/час\n` +
+        `Отгрузка М/О: <b>${formatNumber(latestMetrics.get_sum_otgr_prod)}</b> ₽\n` +
         `Отгрузка с НДС: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b> ₽\n`,
 
     logMessage: (chatId, fio, username, fullName) =>
         `<b>fio:</b> <code>${fio}</code>\n` +
         `<b>ID:</b> <code>${chatId}</code>` +
-        (fullName ? `\n<b>TG:</b> <code>${fullName}</code> (@${username || ''})` : '')
+        (fullName ? `\n<b>TG:</b> <code>${fullName}</code> (@${username || ''})` : ''),
 }
