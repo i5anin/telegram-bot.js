@@ -58,11 +58,19 @@ async function photoMessageComment(ctx) {
     const { text } = ctx.message
     ctx.session.photoComment = text
     ctx.reply(`Спасибо!\nНомер партии: <code>${ctx.session.batchNumber}</code>\nВаш комментарий к фотографии: <code>${ctx.session.photoComment}</code>\n`, { parse_mode: 'HTML' })
-    // TODO: ОТПРАВКА ДАННЫХ НА СЕРВЕР
+
     try {
-        await addPhotoData(ctx.from.id, ctx.session.batchNumber, ctx.session.photoComment, ctx.session.filePath)
+        const response = await addPhotoData(ctx.from.id, ctx.session.batchNumber, ctx.session.photoComment, ctx.session.filePath)
+
+        if (response && response.status === 'OK') {
+            ctx.reply(`Фото успешно добавлено!`, { parse_mode: 'HTML' })
+        } else {
+            ctx.reply(`Ошибка при добавлении фото: ${response.message}`, { parse_mode: 'HTML' })
+        }
+
     } catch (err) {
         console.error('Ошибка при добавлении данных о фото:', err)
+        ctx.reply('Произошла ошибка при добавлении фото. Пожалуйста, попробуйте позже.', { parse_mode: 'HTML' })
     }
     console.log('TODO: ОТПРАВКА ДАННЫХ НА СЕРВЕР')
     ctx.session.step = ''
