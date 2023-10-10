@@ -76,7 +76,6 @@ async function photoMessageComment(ctx) {
         console.error('Ошибка при добавлении данных о фото:', err)
         ctx.reply('Произошла ошибка при добавлении фото. Пожалуйста, попробуйте позже.', { parse_mode: 'HTML' })
     }
-    console.log('TODO: ОТПРАВКА ДАННЫХ НА СЕРВЕР')
     ctx.session.step = ''
     ctx.session.photoMessage = false
 }
