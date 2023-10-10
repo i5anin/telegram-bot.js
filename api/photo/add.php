@@ -33,14 +33,14 @@ function insert_into_photo_otk($user_id, $party, $comments_otk, $location)
     return true;
 }
 
-// Проверяем наличие параметра key в POST-запросе
-if (!isset($_POST['key'])) {
+// Проверяем наличие параметра key в GET-запросе
+if (!isset($_GET['key'])) {
     echo json_encode(['status' => 'Error', 'message' => 'Key not provided']);
     http_response_code(400);
     exit;
 }
 
-$provided_key = $_POST['key'];
+$provided_key = $_GET['key'];
 
 // Получаем секретный ключ из конфигурации
 $dbConfig = require 'sql_config.php';
@@ -52,11 +52,11 @@ if ($provided_key !== $SECRET_KEY) {
     exit;
 }
 
-// Получение данных из POST-запроса
-$user_id = isset($_POST["user_id"]) ? $_POST["user_id"] : null;
-$party = isset($_POST["party"]) ? $_POST["party"] : null; // party
-$comments_otk = isset($_POST["comments_otk"]) ? $_POST["comments_otk"] : null;
-$location = isset($_POST["location"]) ? $_POST["location"] : null;
+// Получение данных из GET-запроса
+$user_id = isset($_GET["user_id"]) ? $_GET["user_id"] : null;
+$party = isset($_GET["party"]) ? $_GET["party"] : null; // party
+$comments_otk = isset($_GET["comments_otk"]) ? $_GET["comments_otk"] : null;
+$location = isset($_GET["location"]) ? $_GET["location"] : null;
 
 $res = insert_into_photo_otk($user_id, $party, $comments_otk, $location); // передача party
 
