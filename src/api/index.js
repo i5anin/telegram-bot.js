@@ -4,6 +4,33 @@ const SECRET_KEY = process.env.SECRET_KEY
 const BOT_TOKEN = process.env.BOT_TOKEN
 const WEB_API = process.env.WEB_API
 
+const getChatMembersCount = async (chatId) => {
+    try {
+        const response = await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/getChatMemberCount`, {
+            params: {
+                chat_id: chatId
+            }
+        });
+        return response.data.result;
+    } catch (error) {
+        console.error('Ошибка при получении количества участников:', error);
+        throw error;
+    }
+}
+
+const getChatAdministrators = async (chatId) => {
+    try {
+        const response = await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/getChatAdministrators`, {
+            params: {
+                chat_id: chatId
+            }
+        });
+        return response.data.result;
+    } catch (error) {
+        console.error('Ошибка при получении списка администраторов:', error);
+        throw error;
+    }
+}
 
 async function getChatInfo(chatId) {
     try {
@@ -156,4 +183,6 @@ module.exports = {
     fetchMetrics,
     addPhotoData,
     getChatInfo,
+    getChatMembersCount,
+    getChatAdministrators
 }

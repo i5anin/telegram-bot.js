@@ -1,6 +1,7 @@
-const { getAllUsers, getChatInfo } = require('#src/api/index')
+const { getAllUsers, getChatInfo, getChatAdministrators, getChatMembersCount } = require('#src/api/index')
 const msg = require('#src/utils/ru_lang')
 const { logMessage } = require('#src/utils/ru_lang')
+
 
 
 const handleForwardedMessage = async (ctx) => {
@@ -30,51 +31,61 @@ const handleForwardedMessage = async (ctx) => {
 
 
 async function whoCommand(ctx) {
-    let targetId
-    const input = ctx.message.text.split(' ')
+    let targetId = ctx.message.text.split(' ')[1] ? parseInt(ctx.message.text.split(' ')[1]) : ctx.from.id;
 
-    if (input[1]) {
-        targetId = parseInt(input[1])
-    } else {
-        targetId = ctx.from.id
-    }
+    const chatInfo = await getChatInfo(targetId);
 
-    try {
-        if (targetId < 0) {
-            const chatInfo = await getChatInfo(targetId)
+    switch (chatInfo.type) {
+        case 'private':
+            if (targetId > 0) {
+                // Проверяем пользователя
+                const usersData = await getAllUsers();
+                const user = usersData.find(u => u.user_id === targetId);
 
-            if (chatInfo.type === 'channel') {
-                await ctx.reply(`Название канала: <code>${chatInfo.title}</code>\nОписание: ${chatInfo.description}`, { parse_mode: 'HTML' })
-            } else if (chatInfo.type === 'private') {
-                await ctx.reply('Это приватный чат, информация недоступна.')
+                if (user) {
+                    await ctx.reply(`<b>Пользователь</b>\n` + logMessage(targetId, user.fio), { parse_mode: 'HTML' });
+                } else {
+                    await ctx.reply(msg.userNotFound(targetId), { parse_mode: 'HTML' });
+                }
             } else {
-                const membersCount = await ctx.getChatMembersCount(targetId)
-                const administrators = await ctx.getChatAdministrators(targetId)
+                await ctx.reply('Это приватный чат, информация недоступна.');
+            }
+            break;
 
+        case 'channel':
+            await ctx.reply(`Название канала: <code>${chatInfo.title}</code>\nОписание: ${chatInfo.description}`, { parse_mode: 'HTML' });
+            break;
+
+        case 'group':
+        case 'supergroup':
+            let membersCount;
+            try {
+                membersCount = await getChatMembersCount(targetId);
+            } catch (error) {
+                membersCount = 'Неизвестно';
+            }
+
+            let replyMessage = `Название группы: <code>${chatInfo.title}</code>\nКоличество участников: <code>${membersCount}</code>\n`;
+
+            try {
+                const administrators = await getChatAdministrators(targetId);
                 const adminNames = administrators.map(admin =>
-                    admin.user.first_name + (admin.user.last_name ? ' ' + admin.user.last_name : ''),
-                ).join(', ')
+                    `· ${admin.user.first_name}${admin.user.last_name ? ' ' + admin.user.last_name : ''} (<code>${admin.user.id}</code>)\n`
+                ).join('');
 
-                await ctx.reply(`Название группы: ${chatInfo.title}\n` +
-                    `Количество участников: ${membersCount}\n` +
-                    `Админы: ${adminNames}`)
+                replyMessage += `Админы:\n${adminNames}`;
+            } catch (err) {
+                replyMessage += 'Не удалось получить список администраторов.';
             }
-        } else {
-            // Проверяем пользователя
-            const usersData = await getAllUsers()
-            const user = usersData.find(u => u.user_id === targetId)
 
-            if (user) {
-                await ctx.reply(`<b>Пользователь</b>\n` + logMessage(targetId, user.fio), { parse_mode: 'HTML' })
-            } else {
-                await ctx.reply(msg.userNotFound(targetId), { parse_mode: 'HTML' })
-            }
-        }
-    } catch (error) {
-        console.error(msg.errorAPI, error)
-        await ctx.reply(msg.error)
+            await ctx.reply(replyMessage, { parse_mode: 'HTML' });
+            break;
+
+        default:
+            await ctx.reply('Неизвестный тип чата.');
     }
 }
+
 
 
 module.exports = { handleForwardedMessage, whoCommand }
