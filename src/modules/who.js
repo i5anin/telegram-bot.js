@@ -1,6 +1,7 @@
-const { getAllUsers } = require('#src/api/index')
+const { getAllUsers, getChatInfo } = require('#src/api/index')
 const msg = require('#src/utils/ru_lang')
 const { logMessage } = require('#src/utils/ru_lang')
+
 
 const handleForwardedMessage = async (ctx) => {
     if (!ctx.message.forward_from) return
@@ -29,54 +30,49 @@ const handleForwardedMessage = async (ctx) => {
 
 
 async function whoCommand(ctx) {
-    let targetId;
-    const input = ctx.message.text.split(' ');
+    let targetId
+    const input = ctx.message.text.split(' ')
 
     if (input[1]) {
-        targetId = parseInt(input[1]);
+        targetId = parseInt(input[1])
     } else {
-        targetId = ctx.from.id; // Если ID не предоставлен, используем ID отправителя
+        targetId = ctx.from.id
     }
 
     try {
-        if (targetId < 0) {  // Проверка для группы или канала (отрицательный ID)
-            const chatInfo = await ctx.getChat(targetId);
+        if (targetId < 0) {
+            const chatInfo = await getChatInfo(targetId)
 
-            switch(chatInfo.type) {
-                case 'channel':
-                    await ctx.reply(`Название канала: ${chatInfo.title}\nОписание: ${chatInfo.description}`);
-                    return;
-                case 'private':
-                    await ctx.reply('Это приватный чат, информация недоступна.');
-                    return;
-                default:
-                    const membersCount = await ctx.getChatMembersCount(targetId);
-                    const administrators = await ctx.getChatAdministrators(targetId);
-                    const adminNames = administrators.map(admin =>
-                        admin.user.first_name + (admin.user.last_name ? ' ' + admin.user.last_name : '')
-                    ).join(', ');
+            if (chatInfo.type === 'channel') {
+                await ctx.reply(`Название канала: <code>${chatInfo.title}</code>\nОписание: ${chatInfo.description}`, { parse_mode: 'HTML' })
+            } else if (chatInfo.type === 'private') {
+                await ctx.reply('Это приватный чат, информация недоступна.')
+            } else {
+                const membersCount = await ctx.getChatMembersCount(targetId)
+                const administrators = await ctx.getChatAdministrators(targetId)
 
-                    await ctx.reply(`Название группы: ${chatInfo.title}\n` +
-                        `Количество участников: ${membersCount}\n` +
-                        `Админы: ${adminNames}`);
-                    return;
+                const adminNames = administrators.map(admin =>
+                    admin.user.first_name + (admin.user.last_name ? ' ' + admin.user.last_name : ''),
+                ).join(', ')
+
+                await ctx.reply(`Название группы: ${chatInfo.title}\n` +
+                    `Количество участников: ${membersCount}\n` +
+                    `Админы: ${adminNames}`)
             }
         } else {
-            // Если это не группа или канал, то ищем пользователя в вашей системе:
-            const usersData = await getAllUsers();
-            const user = usersData.find(u => u.user_id === targetId);
+            // Проверяем пользователя
+            const usersData = await getAllUsers()
+            const user = usersData.find(u => u.user_id === targetId)
 
             if (user) {
-                await ctx.reply(`<b>Пользователь</b>\n` + logMessage(targetId, user.fio), { parse_mode: 'HTML' });
+                await ctx.reply(`<b>Пользователь</b>\n` + logMessage(targetId, user.fio), { parse_mode: 'HTML' })
             } else {
-                await ctx.reply(msg.userNotFound(targetId), { parse_mode: 'HTML' });
+                await ctx.reply(msg.userNotFound(targetId), { parse_mode: 'HTML' })
             }
-            return;
         }
-
     } catch (error) {
-        console.error(msg.errorAPI, error);
-        await ctx.reply(msg.error);
+        console.error(msg.errorAPI, error)
+        await ctx.reply(msg.error)
     }
 }
 

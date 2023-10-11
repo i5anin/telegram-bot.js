@@ -1,7 +1,23 @@
 const axios = require('axios')
 
 const SECRET_KEY = process.env.SECRET_KEY
+const BOT_TOKEN = process.env.BOT_TOKEN
 const WEB_API = process.env.WEB_API
+
+
+async function getChatInfo(chatId) {
+    try {
+        const response = await axios.get('https://api.telegram.org/bot' + BOT_TOKEN + '/getChat', {
+            params: {
+                chat_id: chatId,
+            },
+        })
+        return response.data.result
+    } catch (error) {
+        console.error('Error fetching chat info', error)
+        throw error
+    }
+}
 
 async function performRequest(url, method = 'get', data = {}, params = {}) {
     try {
@@ -139,4 +155,5 @@ module.exports = {
     updatePayments,
     fetchMetrics,
     addPhotoData,
+    getChatInfo,
 }
