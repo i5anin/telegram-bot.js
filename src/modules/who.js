@@ -29,47 +29,30 @@ const handleForwardedMessage = async (ctx) => {
 
 
 async function whoCommand(ctx) { // /who
-    let targetId
+    let userId
+    let username
+    let firstName
+    let lastName
+
+    // Инициализация input
     const input = ctx.message.text.split(' ')
 
-    if (input[1]) {
-        targetId = parseInt(input[1])
-    } else {
-        targetId = ctx.from.id // Если ID не предоставлен, используем ID отправителя
-    }
+    userId = input[1] ? parseInt(input[1]) : ctx.from.id
+    username = ctx.from.username
+    firstName = ctx.from.first_name
+    lastName = ctx.from.last_name
 
     try {
-        // Проверяем группу или канал (отрицательный ID)
-        if (targetId < 0) {
-            const chatInfo = await ctx.getChat(targetId)
-            if (chatInfo.type !== 'private') {
-                const membersCount = await ctx.getChatMembersCount(targetId)
-                const administrators = await ctx.getChatAdministrators(targetId)
-
-                const adminNames = administrators.map(admin =>
-                    admin.user.first_name + (admin.user.last_name ? ' ' + admin.user.last_name : '')
-                ).join(', ')
-
-                await ctx.reply(`Название группы/канала: ${chatInfo.title}\n` +
-                    `Количество участников: ${membersCount}\n` +
-                    `Админы: ${adminNames}`)
-                return
-            } else {
-                await ctx.reply("Это приватный чат, информация недоступна.")
-                return
-            }
-        }
-
-        // Проверяем пользователя
-        const usersData = await getAllUsers()
-        const user = usersData.find(u => u.user_id === targetId)
+        const usersData = await getAllUsers();
+        const user = usersData.find(u => u.user_id === userId);
 
         if (user) {
             // Если пользователь найден, отправляем информацию о нем
-            await ctx.reply(`<b>Пользователь</b>\n` + logMessage(targetId, user.fio), { parse_mode: 'HTML' })
+            const fullName = `${firstName || ''} ${lastName || ''}`.trim()
+            await ctx.reply(`<b>Пользователь</b>\n` + logMessage(userId, user.fio), { parse_mode: 'HTML' })
         } else {
             // Если пользователь не найден, отправляем сообщение об ошибке
-            await ctx.reply(msg.userNotFound(targetId), { parse_mode: 'HTML' })
+            await ctx.reply(msg.userNotFound(userId), { parse_mode: 'HTML' })
         }
     } catch (error) {
         console.error(msg.errorAPI, error)
