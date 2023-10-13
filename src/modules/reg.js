@@ -50,4 +50,4 @@ async function handleRegComment(ctx) {
     }
 }
 
-module.exports = { handleRegComment }
+module.exports = { handleRegComment, checkRegistration }

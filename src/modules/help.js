@@ -2,6 +2,7 @@ const fs = require('fs')
 const { sendToLog } = require('#src/utils/log')
 const { getAllUsers } = require('#src/api/index')
 const { Markup } = require('telegraf');
+const { checkRegistration } = require('#src/modules/reg')
 
 
 async function getUserInfo(userId) {
@@ -84,12 +85,25 @@ async function sendHelpToUser(ctx, chatId) {
 }
 
 async function handleDocsCommand(ctx) {
-    const keyboard = Markup.inlineKeyboard([
-        [Markup.button.url('Общая Штатная папка', 'https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW')],
-        [Markup.button.url('Должностная папка оператора', 'https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V')]
-    ]);
+    const chatId = ctx.message.chat.id;  // Получение chatId из контекста ctx
+    try {
+        const registrationData = await checkRegistration(chatId);  // Проверка регистрации
+        const isRegistered = registrationData.exists;
 
-    await ctx.reply('Вот несколько полезных ссылок:', keyboard);
+        if (isRegistered) {  // Если пользователь зарегистрирован
+            const keyboard = Markup.inlineKeyboard([
+                [Markup.button.url('Общая Штатная папка', 'https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW')],
+                [Markup.button.url('Должностная папка оператора', 'https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V')]
+            ]);
+
+            await ctx.reply('Вот несколько полезных ссылок:', keyboard);
+        } else {  // Если пользователь не зарегистрирован
+            await ctx.reply('Доступ закрыт.\nВы должны зарегистрироваться, чтобы получить доступ к этим ресурсам.');
+        }
+    } catch (error) {
+        console.error('Ошибка при проверке регистрации:', error);
+        await ctx.reply('Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.');
+    }
 }
 
 module.exports = { handleHelpCommand, handleDocsCommand }
