@@ -21,7 +21,7 @@ async function sendMessage(chatId, message) {
     await sleep(250)
     try {
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
-        await bot.telegram.sendMessage(LOG_CHANNEL_ID,`Пользователю <code>${chatId}</code> отправлено\n\n`+ message, { parse_mode: 'HTML' })
+        if (chatId > 0) await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Пользователю <code>${chatId}</code> отправлено\n\n` + message, { parse_mode: 'HTML' })
         return true
     } catch (error) {
         console.error(`Notify. Ошибка при отправке сообщения chatId: ${chatId}`, error)
@@ -73,7 +73,7 @@ async function processUserComments(userComments, userName) {
 // Форматирование сообщения для мастера
 function formatMasterMessage(comment, chatId, userName) {
     const { det_name, kolvo_brak, type, comments_otk, specs_nom_id } = comment
-    const typeString = getDescription(type)
+    // const typeString = getDescription(type)
     const { formattedDate } = formatPaymentDate({ date: comment.date })
     const controlDescription = getControlType(type[0])
     const defectDescription = getDefectType(type[1])
@@ -87,7 +87,7 @@ async function notifyAllUsers() {
     const user_ids = [...new Set(allComments.map(comment => comment.user_id))]
 
     for (let chatId of user_ids) {
-        if (chatId == 0) chatId = ADMIN_DB //ADMIN_DB const chatId
+        if (chatId === 0) chatId = ADMIN_DB //ADMIN_DB const chatId
         const userName = await getUserName(chatId) // Перемещено сюда
         const userComments =
             allComments.filter(comment => comment.user_id === chatId && comment.sent === 0)
@@ -115,7 +115,7 @@ async function notifyUsers(ctx) {
         await processUserComments(userUnansweredComments, userName)
     } else {
         await sendMessage(chatId, 'Пустые комментарии не найдены.')
-        await sendMessage(LOG_CHANNEL_ID, `<code>${ chatId }</code> Пустые комментарии не найдены.`)
+        // await sendMessage(LOG_CHANNEL_ID, `<code>${chatId}</code> Пустые комментарии не найдены.`)
     }
 }
 
