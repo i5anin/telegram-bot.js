@@ -5,6 +5,7 @@ const axios = require('axios')
 const BOT_TOKEN = process.env.BOT_TOKEN
 
 async function handlePhoto(ctx) {
+    if (ctx.chat.type !== 'private') return
     const photos = ctx.message.photo
 
     // Check if photos are present
