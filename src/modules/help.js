@@ -1,8 +1,9 @@
 const fs = require('fs')
 const { sendToLog } = require('#src/utils/log')
 const { getAllUsers } = require('#src/api/index')
-const { Markup } = require('telegraf');
+const { Markup } = require('telegraf')
 const { checkRegistration } = require('#src/modules/reg')
+const { logMessage } = require('#src/utils/ru_lang')
 
 
 async function getUserInfo(userId) {
@@ -85,24 +86,26 @@ async function sendHelpToUser(ctx, chatId) {
 }
 
 async function handleDocsCommand(ctx) {
-    const chatId = ctx.message.chat.id;  // Получение chatId из контекста ctx
+    await sendToLog(ctx)
+    const chatId = ctx.message.chat.id  // Получение chatId из контекста ctx
     try {
-        const registrationData = await checkRegistration(chatId);  // Проверка регистрации
-        const isRegistered = registrationData.exists;
+        const registrationData = await checkRegistration(chatId)  // Проверка регистрации
+        const isRegistered = registrationData.exists
 
         if (isRegistered) {  // Если пользователь зарегистрирован
             const keyboard = Markup.inlineKeyboard([
                 [Markup.button.url('Общая Штатная папка', 'https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW')],
-                [Markup.button.url('Должностная папка оператора', 'https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V')]
-            ]);
+                [Markup.button.url('Должностная папка оператора', 'https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V')],
+                [Markup.button.url('СОФТ (Локально)', 'http://eml.pfforum/')],
+            ])
 
-            await ctx.reply('Вот несколько полезных ссылок:', keyboard);
+            await ctx.reply('Вот несколько полезных ссылок:', keyboard)
         } else {  // Если пользователь не зарегистрирован
-            await ctx.reply('Доступ закрыт.\nВы должны зарегистрироваться, чтобы получить доступ к этим ресурсам.');
+            await ctx.reply('Доступ закрыт.\nВы должны зарегистрироваться, чтобы получить доступ к этим ресурсам.')
         }
     } catch (error) {
-        console.error('Ошибка при проверке регистрации:', error);
-        await ctx.reply('Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.');
+        console.error('Ошибка при проверке регистрации:', error)
+        await ctx.reply('Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.')
     }
 }
 
