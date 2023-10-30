@@ -95,14 +95,17 @@ stateCounter.instanceNumber = instanceNumber //для метрики
 bot.use((ctx, next) => {
     if (ctx.message) {
         if (ctx.message.forward_from) {
-            handleForwardedMessage(ctx, ctx.message.forward_from.id); // Если сообщение переслано и sender разрешил связывание
+            handleForwardedMessage(ctx, ctx.message.forward_from.id);  // Если сообщение переслано и sender разрешил связывание
+            return;
         } else if (ctx.message.forward_sender_name) {
-            handleForwardedMessage(ctx, ctx.message.forward_sender_name); // Если сообщение переслано, но sender запретил связывание
+            handleForwardedMessage(ctx, ctx.message.forward_sender_name);  // Если сообщение переслано, но sender запретил связывание
+            return;
         }
-        return;
     }
-    return next(); // Если сообщение не переслано или не содержит команды, передаем обработку следующему middleware
+    return next();  // Если сообщение не переслано или не содержит команды, передаем обработку следующему middleware
 });
+
+
 
 
 runBot(instanceNumber, currentDateTime)
