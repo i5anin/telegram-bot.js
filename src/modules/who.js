@@ -3,41 +3,31 @@ const msg = require('#src/utils/ru_lang')
 const { logMessage } = require('#src/utils/ru_lang')
 
 
-const handleForwardedMessage = async (ctx) => {
-    let userId;
-    let username;
-    let firstName;
-    let lastName;
 
-    if (ctx.message.forward_from) {
-        userId = ctx.message.forward_from.id;
-        username = ctx.message.forward_from.username;
-        firstName = ctx.message.forward_from.first_name;
-        lastName = ctx.message.forward_from.last_name;
-    } else if (ctx.message.forward_sender_name) {
-        // Если информация о пользователе недоступна, используется фиктивный ID
-        userId = 'Скрыт настройками конфиденциальности';
-    } else {
-        // Если сообщение не переслано или информация о пользователе недоступна, прекратить выполнение функции
-        return;
-    }
+const handleForwardedMessage = async (ctx) => {
+    if (!ctx.message.forward_from) return
+
+    const res = ctx.message
+    const userId = res.forward_from.id
+    const username = res.forward_from.username
+    const firstName = res.forward_from.first_name
+    const lastName = res.forward_from.last_name
 
     try {
-        const usersData = await getAllUsers();
-        const user = userId !== 'Скрыт настройками конфиденциальности' ? usersData.find(u => u.user_id === userId) : null;
+        const usersData = await getAllUsers()
+        const user = usersData.find(u => u.user_id === userId)
 
         if (user) {
-            const fullName = `${firstName || ''} ${lastName || ''}`.trim();
-            await ctx.reply(`<b>Пользователь</b>\n` + logMessage(userId, user.fio, username, fullName), { parse_mode: 'HTML' });
+            const fullName = `${firstName || ''} ${lastName || ''}`.trim()
+            await ctx.reply(`<b>Пользователь</b>\n` + logMessage(userId, user.fio, username, fullName), { parse_mode: 'HTML' })
         } else {
-            await ctx.reply(msg.userNotFound(userId), { parse_mode: 'HTML' });  // В случае отсутствия userId, используется фиктивный ID
+            await ctx.reply(msg.userNotFound(userId), { parse_mode: 'HTML' })
         }
     } catch (error) {
-        console.error(msg.errorAPI, error);
-        await ctx.reply(msg.error);
+        console.error(msg.errorAPI, error)
+        await ctx.reply(msg.error)
     }
-};
-
+}
 
 
 async function whoCommand(ctx) {
