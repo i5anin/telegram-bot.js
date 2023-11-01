@@ -97,6 +97,7 @@ async function handleDocsCommand(ctx) {
                 [Markup.button.url('Общая Штатная папка', 'https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW')],
                 [Markup.button.url('Должностная папка оператора', 'https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V')],
                 [Markup.button.url('СОФТ (Локально)', 'http://eml.pfforum/')],
+                [Markup.button.url('Архив собраний', 'https://disk.yandex.ru/d/ajVEHCmS5s2T2A')],
             ])
 
             await ctx.reply('Вот несколько полезных ссылок:', keyboard)

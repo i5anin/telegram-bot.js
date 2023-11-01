@@ -1,8 +1,17 @@
 const axios = require('axios')
+const https = require('https');
 
 const SECRET_KEY = process.env.SECRET_KEY
 const BOT_TOKEN = process.env.BOT_TOKEN
 const WEB_API = process.env.WEB_API
+
+
+const agent = new https.Agent({
+    rejectUnauthorized: false
+});
+
+
+
 
 const getChatMembersCount = async (chatId) => {
     try {
@@ -48,10 +57,16 @@ async function getChatInfo(chatId) {
 
 async function performRequest(url, method = 'get', data = {}, params = {}) {
     try {
-        const response = await axios({ method, url, data, params })
-        return response.data
+        const response = await axios({
+            method,
+            url,
+            data,
+            params,
+            httpsAgent: agent  // добавьте эту строку в каждый запрос
+        });
+        return response.data;
     } catch (error) {
-        console.error(`Error in performing request to ${url}: ${error.message}`)
+        console.error(`Error in performing request to ${url}: ${error.message}`);
     }
 }
 
