@@ -69,7 +69,7 @@ async function handleAddComment(ctx) {
                 `${emoji.star} Успешно прокомментировал задачу\n\nПользователь с ID <code>${chatId}</code> ` +
                 `${username}` +
                 `\nИмя: <code>${firstName} ${lastName}</code>` +
-                `\nКомментарий:\n<code>${ctx.message.text}</code>`,
+                `\nmsg:<blockquote>${ctx.message.text}</blockquote>`,
                 { parse_mode: 'HTML' },
             )
             const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment
