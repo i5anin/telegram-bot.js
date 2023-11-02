@@ -1,57 +1,60 @@
 <?php
-header('Content-Type: application/json');  // Устанавливаем заголовок для ответа в формате JSON
-function check_user_id_exists($user_id)
-{
+// Включение отображения ошибок для отладки
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Устанавливаем заголовок для ответа в формате JSON
+header('Content-Type: application/json');
+
+function db_connect() {
     $dbConfig = require 'sql_config.php';
-    $server = $dbConfig['server'];
-    $user = $dbConfig['user'];
-    $pass = $dbConfig['pass'];
-    $db = $dbConfig['db'];
+    $mysqli = new mysqli($dbConfig['server'], $dbConfig['user'], $dbConfig['pass'], $dbConfig['db']);
 
-    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-    $mysqli = mysqli_connect($server, $user, $pass, $db);
-    mysqli_set_charset($mysqli, 'utf8mb4');
-
-    $stmt = mysqli_prepare($mysqli, "SELECT COUNT(*), `fio`, `role` FROM `users` WHERE `user_id` = ?");
-    mysqli_stmt_bind_param($stmt, 'i', $user_id);
-
-    if (!mysqli_stmt_execute($stmt)) {
-        return ['error' => 'Ошибка: ' . mysqli_stmt_error($stmt)];
+    if ($mysqli->connect_error) {
+        exit(json_encode(['error' => 'Database connection failed: ' . $mysqli->connect_error]));
     }
 
-    mysqli_stmt_bind_result($stmt, $count, $fio, $role);
-    mysqli_stmt_fetch($stmt);
-
-    mysqli_stmt_close($stmt);
-    mysqli_close($mysqli);
-
-    if ($count > 0) {
-        return ['exists' => true, 'fio' => $fio, 'role' => $role];
-    } else {
-        return ['exists' => false];
-    }
+    $mysqli->set_charset('utf8mb4');
+    return $mysqli;
 }
 
-// Проверяем наличие параметра id и key в GET-запросе
+function check_user_id_exists($mysqli, $user_id) {
+    $stmt = $mysqli->prepare("SELECT COUNT(*), `fio`, `role` FROM `users` WHERE `user_id` = ?");
+
+    if (!$stmt) {
+        exit(json_encode(['error' => 'Prepare failed: ' . $mysqli->error]));
+    }
+
+    $stmt->bind_param('i', $user_id);
+
+    if (!$stmt->execute()) {
+        exit(json_encode(['error' => 'Execute failed: ' . $stmt->error]));
+    }
+
+    $stmt->bind_result($count, $fio, $role);
+    $stmt->fetch();
+    $stmt->close();
+
+    return $count > 0 ? ['exists' => true, 'fio' => $fio, 'role' => $role] : ['exists' => false];
+}
+
 if (isset($_GET['id']) && isset($_GET['key'])) {
     $user_id = intval($_GET['id']);
     $provided_key = $_GET['key'];
 
-    // Получаем секретный ключ из конфигурации
     $dbConfig = require 'sql_config.php';
     $SECRET_KEY = $dbConfig['key'] ?? null;
 
     if ($provided_key === $SECRET_KEY) {
-        $result = check_user_id_exists($user_id);
-
-        if (isset($result['error'])) {
-            echo json_encode(['error' => $result['error']]);
-        } else {
-            echo json_encode($result);
-        }
+        $mysqli = db_connect();
+        $result = check_user_id_exists($mysqli, $user_id);
+        $mysqli->close();
+        echo json_encode($result);
     } else {
         echo json_encode(['error' => 'Invalid secret key']);
     }
 } else {
     echo json_encode(['error' => 'ID or key not provided']);
 }
+?>

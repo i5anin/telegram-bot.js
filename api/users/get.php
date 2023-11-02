@@ -1,5 +1,4 @@
 <?php
-header('Content-Type: application/json');  // Устанавливаем заголовок для ответа в формате JSON
 function check_user_id_exists($user_id)
 {
     $dbConfig = require 'sql_config.php';
