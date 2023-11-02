@@ -77,7 +77,7 @@ function formatMasterMessage(comment, chatId, userName) {
     const { formattedDate } = formatPaymentDate({ date: comment.date })
     const controlDescription = getControlType(type[0])
     const defectDescription = getDefectType(type[1])
-    return `<b>Мастер, Вам уведомление.</b>\n<b>Оператору</b> <code>${userName}</code> <b>отправлено.</b>\n\n` +
+    return `<b>Мастер, Вам уведомление.</b>\n<b>Оператору</b> <a href="tg://user?id=${chatId}">${userName}</a> <b>отправлено.</b>\n\n` +
         formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate)
 }
 

@@ -78,8 +78,8 @@ async function handleAddComment(ctx) {
             const { formattedDate } = formatPaymentDate({ date: comment.date })
             const userName = await getUserName(chatId)
             const master_msg =
-                `<b>Мастер, Вам уведомление.</b>\n<b>Оператор прокомментировал</b> <code>${userName}</code>\n\n`
-                + `<b>Комментарий:</b> <code>${commentText}</code>\n\n`
+                `<b>Мастер, Вам уведомление.</b>\n<b>Оператор прокомментировал</b> <a href="tg://user?id=${chatId}">${userName}</a> \n\n`
+                + `<b>Комментарий:</b> <blockquote>${commentText}</blockquote>\n\n`
                 + formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate)
 
             // Если user_id_master существует, отправляем сообщение мастеру

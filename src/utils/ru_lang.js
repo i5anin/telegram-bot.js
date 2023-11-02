@@ -49,7 +49,7 @@ module.exports = {
         `Отгрузка с НДС: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b> ₽\n`,
 
     logMessage: (chatId, fio, username, fullName) =>
-        `<b>fio:</b> <code>${fio}</code>\n` +
+        `<b>fio:</b> <a href="tg://user?id=${chatId}">${fio}</a>\n` +
         `<b>ID:</b> <code>${chatId}</code>` +
         (fullName ? `\n<b>TG:</b> <code>${fullName}</code> (@${username || ''})` : ''),
 }

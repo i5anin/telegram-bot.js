@@ -37,7 +37,7 @@ async function oplataNotification() {
                     message += `Дата: <b>${formattedDate}</b>\n`
                     message += `Имя клиента: <b>${payment.client_name}</b>\n`
                     message += `Сумма: <b>${formattedSum}\u00A0₽</b>\n`
-                    message += `Информация: ${payment.info}\n`
+                    message += `<blockquote>Информация: ${payment.info}</blockquote>\n`
                     message += '<b>--------------------</b>\n'
                     sentIds.push(payment.id)
                 })
