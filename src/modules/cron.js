@@ -6,13 +6,13 @@ const { metricsNotification } = require('#src/modules/metrics') // импорт�
 
 function initCronJobs(currentDateTime, instanceNumber) {
     // Уведомлять о сообщениях каждые 15 мин
-    cron.schedule('*/15 8-23 * * *', async () => {
+    cron.schedule('*/17 8-23 * * *', async () => {
         console.log('notifyAllUsers Running a task every 15 minutes')
         await notifyAllUsers()
     })
 
     // Уведомлять об ОПЛАТЕ каждые 8 мин
-    cron.schedule('*/8 * * * *', async () => {
+    cron.schedule('*/15 * * * *', async () => {
         await oplataNotification()
         console.log('Running oplataNotification()')
     })
@@ -28,7 +28,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
 
     if (MODE === 'build') {
         // Проверка экземпляра 12 мин
-        cron.schedule('*/12 * * * *', async () => {
+        cron.schedule('*/30 * * * *', async () => {
             stateCounter.bot_check++
 
             // Получаем текущую дату и время
