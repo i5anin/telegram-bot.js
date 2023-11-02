@@ -1,5 +1,5 @@
 <?php
-header('Content-Type: application/json');  // Устанавливаем заголовок для ответа в формате JSON
+
 // Подключаем конфигурационный файл
 $dbConfig = require 'sql_config.php';
 
@@ -42,7 +42,7 @@ $mysqli->set_charset('utf8mb4');
 $idsArray = explode(',', $sent_ids);
 
 // Санитизация ID
-$sanitizedIds = array_map(function ($id) use ($mysqli) {
+$sanitizedIds = array_map(function($id) use ($mysqli) {
     return $mysqli->real_escape_string($id);
 }, $idsArray);
 

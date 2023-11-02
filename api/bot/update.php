@@ -1,5 +1,4 @@
 <?php
-header('Content-Type: application/json');  // Устанавливаем заголовок для ответа в формате JSON
 
 // Подключаем конфигурационный файл
 $dbConfig = require 'sql_config.php';
