@@ -81,7 +81,7 @@ async function sendToLog(ctx) {
         const username = from.username || ''
         await bot.telegram.sendMessage(
             LOG_CHANNEL_ID,
-            `<b>msg:</b> <code>${text}</code>\n\n` + logMessage(chat.id, fio, username, fullName),
+            `<blockquote>${text}</blockquote>\n` + logMessage(chat.id, fio, username, fullName),
             { parse_mode: 'HTML' },
         )
     }
