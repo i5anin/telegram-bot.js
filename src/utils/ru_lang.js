@@ -18,7 +18,7 @@ module.exports = {
         `· <b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
         `· <b>Количество:</b> <code>${kolvo_brak}шт.</code>\n` +
         `· <b>Контроль:</b> <code>${controlDescription}</code>\n` +
-        `· <b>Комментарий ОТК:</b> <code>${comments_otk}</code>\n` +
+        `· <b>Комментарий ОТК:</b> <blockquote>${comments_otk}</blockquote>\n` +
         `· <b>Брак:</b> <code>${defectDescription}</code>\n` +
         `· <b>Партия:</b> <code>${specs_nom_id}</code>\n` +
         `· <b>Дата:</b> <code>${formattedDate}</code>\n\n`,

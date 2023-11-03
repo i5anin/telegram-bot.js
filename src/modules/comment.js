@@ -66,10 +66,8 @@ async function handleAddComment(ctx) {
             )
             await bot.telegram.sendMessage(
                 LOG_CHANNEL_ID,
-                `${emoji.star} Успешно прокомментировал задачу\n\nПользователь с ID <code>${chatId}</code> ` +
-                `${username}` +
-                `\nИмя: <code>${firstName} ${lastName}</code>` +
-                `\nmsg:<blockquote>${ctx.message.text}</blockquote>`,
+                `${emoji.star} Успешно прокомментировал задачу\nТекст:<blockquote>${ctx.message.text}</blockquote>Пользователь с ID <code>${chatId}</code> ` +
+                `${username}`,
                 { parse_mode: 'HTML' },
             )
             const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment
