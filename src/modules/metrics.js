@@ -19,8 +19,6 @@ function getMaxCharacters(latestMetrics) {
 }
 
 
-
-
 async function metricsNotification(ctx = null, index = 0) {
     try {
         const metrics = await fetchMetrics()
@@ -43,14 +41,16 @@ async function metricsNotification(ctx = null, index = 0) {
             await ctx.reply(message, { parse_mode: 'HTML' })
             await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Запрос метрики <code>${ctx.from.id}</code>\n` + message, { parse_mode: 'HTML' })
         } else {
-            const ADMIN_IDS = [DIR_METRIC, DIR_OPLATA, DIR_TEST_GROUP] //1164924330 - Лера
-            for (const adminId of ADMIN_IDS) {
-                try {
-                    await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' })
-                    console.log('Metrics Message sent successfully to adminId:', adminId)
-                } catch (error) {
-                    console.error('Failed to send message to adminId:', adminId, 'Error:', error)
-                    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${adminId}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
+            const usersToSend = await getUsersToSend() // Замените ADMIN_IDS на getUsersToSend
+            for (const role in usersToSend) {
+                for (const user of usersToSend[role]) {
+                    try {
+                        await bot.telegram.sendMessage(user.user_id, message, { parse_mode: 'HTML' })
+                        console.log('Metrics Message sent successfully to userId:', user.user_id)
+                    } catch (error) {
+                        console.error('Failed to send message to userId:', user.user_id, 'Error:', error)
+                        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${user.user_id}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
+                    }
                 }
             }
         }
@@ -61,4 +61,5 @@ async function metricsNotification(ctx = null, index = 0) {
 }
 
 module.exports = { metricsNotification }
+
 

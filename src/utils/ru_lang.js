@@ -48,6 +48,11 @@ module.exports = {
         `Отгрузка М/О: <b>${formatNumber(latestMetrics.get_sum_otgr_prod)}</b> ₽\n` +
         `Отгрузка с НДС: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b> ₽\n`,
 
+    formatMetricsMessageFrez: (latestMetrics, maxCharacters) =>
+        `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n`,
+    formatMetricsMessageToc: (latestMetrics, maxCharacters) =>
+        `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n`,
+
     logMessage: (chatId, fio, username, fullName) =>
         `<b>fio:</b> <a href="tg://user?id=${chatId}">${fio}</a>\n` +
         `<b>ID:</b> <code>${chatId}</code>`,

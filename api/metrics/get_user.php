@@ -19,20 +19,23 @@ $mysqli->set_charset('utf8mb4');
 if ($stmt = $mysqli->prepare("SELECT `user_id`, `fio`, `role` FROM `users` WHERE `role` IS NOT NULL AND `role` != ''")) {
     $stmt->execute(); // Выполняем запрос
     $result = $stmt->get_result(); // Получаем результат
-    $users = [];
+    $groupedUsers = [];
 
-    // Извлекаем данные пользователей
+    // Извлекаем данные пользователей и группируем их по ролям
     while ($row = $result->fetch_assoc()) {
-        $users[] = $row;
+        $role = $row['role'];
+        unset($row['role']);
+        $groupedUsers[$role][] = $row;
     }
 
     $stmt->close(); // Закрываем запрос
 
     // Возвращаем результат в формате JSON
-    if (!empty($users)) {
-        echo json_encode(['users' => $users]);
+    if (!empty($groupedUsers)) {
+        echo json_encode($groupedUsers);
     } else {
-        echo json_encode(['error' => 'No users with a role found']);
+        echo json_encode(['error' =>
+            'No users with a role found']);
     }
 } else {
     http_response_code(500);

@@ -5,6 +5,21 @@ const BOT_TOKEN = process.env.BOT_TOKEN
 const WEB_API = process.env.WEB_API
 
 
+async function getUsersToSend() {
+    const url = `${WEB_API}/metrics/get_user.php`
+    const params = {
+        key: SECRET_KEY,
+    }
+    try {
+        const response = await axios.get(url, { params })
+        return response.data.result
+    } catch (error) {
+        console.error(`Ошибка при получении списка пользователей: ${error.message}`)
+        throw error
+    }
+}
+
+
 const getChatMembersCount = async (chatId) => {
     try {
         const response = await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/getChatMemberCount`, {
