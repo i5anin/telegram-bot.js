@@ -12,7 +12,8 @@ async function getUsersToSend() {
     }
     try {
         const response = await axios.get(url, { params })
-        return response.data.result
+        console.log(response.data)
+        return response.data
     } catch (error) {
         console.error(`Ошибка при получении списка пользователей: ${error.message}`)
         throw error
@@ -201,4 +202,5 @@ module.exports = {
     getChatInfo,
     getChatMembersCount,
     getChatAdministrators,
+    getUsersToSend,
 }

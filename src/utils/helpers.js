@@ -1,5 +1,5 @@
 // Функция для выполнения GET-запросов
-const { getAllUsers } = require('#src/api/index')
+const { getAllUsers,checkUser } = require('#src/api/index')
 
 
 // Функция для сброса флагов сессии
@@ -23,6 +23,20 @@ function getDefectType(char) {
         'Н': 'Неокончательный',
     }
     return defectMapping[char] || 'N/A'
+}
+
+async function getUserLinkById(userId) {
+    try {
+        const user = await checkUser(userId); // Используйте `await` для ожидания результата
+        if (user && user.exists) {
+            return `<a href='tg://user?id=${userId}'>${user.fio}</a> <code>${userId}</code>`;
+        } else {
+            return 'Пользователь не найден.';
+        }
+    } catch (error) {
+        console.error('Ошибка при получении данных пользователя:', error);
+        return 'Ошибка при получении данных о пользователе.';
+    }
 }
 
 function getDescription(code) {
@@ -68,4 +82,14 @@ function formatPercentage(number, maxCharacters) {
     return spaces + formattedNumber
 }
 
-module.exports = { formatPercentage, formatNumber, resetFlags, formatPaymentDate, getDescription, getUserName, getDefectType, getControlType }
+module.exports = {
+    getUserLinkById,
+    formatPercentage,
+    formatNumber,
+    resetFlags,
+    formatPaymentDate,
+    getDescription,
+    getUserName,
+    getDefectType,
+    getControlType,
+}

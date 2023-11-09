@@ -49,11 +49,15 @@ module.exports = {
         `Отгрузка с НДС: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b> ₽\n`,
 
     formatMetricsMessageFrez: (latestMetrics, maxCharacters) =>
-        `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n`,
+        `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n` +
+        `<code>МЕТРИКА ДЛЯ ФРЕЗЕРА</code>`,
+    //TODO: СООБЩЕНИЕ ЕЩЕ ДОРАБАТЫВАЕТСЯ
     formatMetricsMessageToc: (latestMetrics, maxCharacters) =>
-        `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n`,
+        `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n` +
+        `<code>МЕТРИКА ДЛЯ ТОКАРЯ</code>`,
+    //TODO: СООБЩЕНИЕ ЕЩЕ ДОРАБАТЫВАЕТСЯ
 
     logMessage: (chatId, fio, username, fullName) =>
-        `<b>fio:</b> <a href="tg://user?id=${chatId}">${fio}</a>\n` +
+        `<b>fio:</b> <a href='tg://user?id=${chatId}'>${fio}</a>\n` +
         `<b>ID:</b> <code>${chatId}</code>`,
 }

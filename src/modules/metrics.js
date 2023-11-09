@@ -1,9 +1,9 @@
 // const moment = require('moment')
 const { checkUser } = require('#src/api/index')
-const { fetchMetrics } = require('#src/api/index')
+const { fetchMetrics, getUsersToSend } = require('#src/api/index')
 const { sendToLog } = require('#src/utils/log')
-const { formatMetricsMessage } = require('#src/utils/ru_lang')
-const { formatNumber } = require('#src/utils/helpers')
+const { formatMetricsMessage, formatMetricsMessageFrez, formatMetricsMessageToc } = require('#src/utils/ru_lang')
+const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
 
 
 function getMaxCharacters(latestMetrics) {
@@ -18,48 +18,54 @@ function getMaxCharacters(latestMetrics) {
     return maxCharacters
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
 
-async function metricsNotification(ctx = null, index = 0) {
+async function sendMetricsMessages(role, metricsMessageFunction, ctx = null) {
     try {
         const metrics = await fetchMetrics()
-        if (metrics.length === 0 || !metrics[index]) {
+        if (!metrics || metrics.length === 0) {
             throw new Error('No metrics data available')
         }
 
-        const latestMetrics = metrics[index]
+        // Выбор актуального набора данных в зависимости от времени запуска функции
+        const latestMetrics = metrics[metrics.length - 1]
         const maxCharacters = getMaxCharacters(latestMetrics)
-        const message = formatMetricsMessage(latestMetrics, maxCharacters)
-        if (index === 1) {
-            await sendToLog(ctx)
-            const chatId = ctx.chat.id  // Получите chatId из контекста
-            const userCheck = await checkUser(chatId)  // Проверьте пользователя
+        const message = metricsMessageFunction(latestMetrics, maxCharacters)
 
-            if (!userCheck.exists || (userCheck.role !== 'admin' && userCheck.role !== 'dir')) {
-                console.error(`User ${chatId} does not have the necessary permissions.`)
-                return  // Если у пользователя нет необходимых прав, просто возвращаемся из функции
-            }
-            await ctx.reply(message, { parse_mode: 'HTML' })
-            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Запрос метрики <code>${ctx.from.id}</code>\n` + message, { parse_mode: 'HTML' })
-        } else {
-            const usersToSend = await getUsersToSend() // Замените ADMIN_IDS на getUsersToSend
-            for (const role in usersToSend) {
-                for (const user of usersToSend[role]) {
-                    try {
-                        await bot.telegram.sendMessage(user.user_id, message, { parse_mode: 'HTML' })
-                        console.log('Metrics Message sent successfully to userId:', user.user_id)
-                    } catch (error) {
-                        console.error('Failed to send message to userId:', user.user_id, 'Error:', error)
-                        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${user.user_id}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
-                    }
+        const usersToSend = await getUsersToSend()
+
+        if (usersToSend[role]) {
+            for (const user of usersToSend[role]) {
+                await sleep(1000)
+                try {
+                    // await bot.telegram.sendMessage(user.user_id, message, { parse_mode: 'HTML' });
+                    await bot.telegram.sendMessage(LOG_CHANNEL_ID, await getUserLinkById(user.user_id) + '\n' + '<blockquote>' + message + '</blockquote>', { parse_mode: 'HTML' })
+                    console.log(`Metrics message sent successfully to ${role} userId:`, user.user_id)
+                } catch (error) {
+                    console.error(`Failed to send message to ${role} userId:`, user.user_id, 'Error:', error)
+                    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${user.user_id}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
                 }
             }
         }
     } catch (error) {
-        console.error('Error fetching or sending metrics:', error)
-        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Error fetching or sending metrics\n<code>${error}</code>`, { parse_mode: 'HTML' })
+        console.error(`Error fetching or sending ${role} metrics:`, error)
+        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Error fetching or sending ${role} metrics\n<code>${error}</code>`, { parse_mode: 'HTML' })
     }
 }
 
-module.exports = { metricsNotification }
+// Функция для отправки сообщений администраторам
+async function metricsNotification(ctx, index) {
+    await sendMetricsMessages('dir', formatMetricsMessage, ctx)
+}
+
+// Функция для отправки сообщений начальникам производства
+async function metricsNotificationProiz(ctx, index) {
+    await sendMetricsMessages('nach_frez', formatMetricsMessageFrez, ctx)
+    await sendMetricsMessages('nach_toc', formatMetricsMessageToc, ctx)
+}
+
+module.exports = { metricsNotification, metricsNotificationProiz }
 
 
