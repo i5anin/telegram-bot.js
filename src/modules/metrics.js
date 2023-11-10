@@ -39,8 +39,8 @@ async function metricsNotification(ctx = null, index = 0) {
         if (ctx && ctx.update.message.text === '/m' && '/metrics') {
             // If the command is '/m' or 'metrics', send to the user who triggered the command
             await sendMetricsToUser(ctx, message)
+            // await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Пользователю ${await getUserLinkById(ctx.from.id)} отправлено\n\n` + message, { parse_mode: 'HTML' })
         } else if (ctx && ctx.update.message.text === '/metrics_director_notification') {
-            // If the command is '/metrics_director_notification', send to all users in the list
             await sendMetricsToAllUsers(usersToSend, message)
         } else {
             console.error('Invalid command or context')
@@ -56,13 +56,13 @@ async function sendMetricsToUser(ctx, message) {
     const userCheck = await checkUser(chatId)
 
     if (!userCheck.exists) {
-        console.error(`User ${chatId} does not have the necessary permissions.`)
+        console.error(`User ${chatId} не имеет необходимых разрешений.`)
         return
     }
 
     try {
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
-        console.log(`Metrics Message sent successfully to user ${userCheck.role} userId:`, chatId)
+        console.log(`Метрики Сообщение успешно отправлено пользователю ${userCheck.role} userId:`, chatId)
     } catch (error) {
         console.error(`Failed to send message to user ${userCheck.role} userId:`, chatId, 'Error:', error)
         await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${chatId}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
@@ -94,10 +94,10 @@ async function sendMetricsToAllUsers(usersToSend, message) {
 async function metricsNotificationProiz(ctx, index) {
     // await sendMetricsMessages('nach_frez', formatMetricsMessageFrez, ctx)
     // await sendMetricsMessages('nach_toc', formatMetricsMessageToc, ctx)
-    await formatMetricsMessageMaster()
+    await formatMetricsMessageMaster(ctx, index)
 }
 
-async function formatMetricsMessageMaster() {
+async function formatMetricsMessageMaster(ctx, index) {
     try {
         const metricsMasterData = await getMetricsMaster()
 
