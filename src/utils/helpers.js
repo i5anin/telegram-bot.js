@@ -67,20 +67,33 @@ function formatPaymentDate(payment) {
     return { formattedDate }
 }
 
-function formatNumber(number) {
-    return parseFloat(number).toLocaleString('ru-RU', {
-        minimumFractionDigits: 2, maximumFractionDigits: 2,
-    }).replace(/,00$/, '')  // Убираем ,00 для целых чисел
+function formatNumber(number, maxDecimalPlaces = 0) {
+    const roundedNumber = Math.round(number);
+
+    if (roundedNumber === number) {
+        // It's a whole number
+        return roundedNumber.toLocaleString('ru-RU');
+    } else {
+        // It's a decimal number
+        const options = {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: maxDecimalPlaces,
+        };
+
+        return parseFloat(number).toLocaleString('ru-RU', options);
+    }
 }
 
-function formatPercentage(number, maxCharacters) {
-    let formattedNumber = formatNumber(number) + '%'  // Добавьте знак процента здесь
+
+function formatPercentage(number, maxCharacters, maxDecimalPlaces) {
+    let formattedNumber = formatNumber(number, maxDecimalPlaces) + '%'  // Обновлено для передачи maxDecimalPlaces
     let currentCharacters = formattedNumber.length
     let spacesNeeded = maxCharacters - currentCharacters
-    spacesNeeded = Math.max(0, spacesNeeded)  // Убедитесь, что spacesNeeded неотрицательное
+    spacesNeeded = Math.max(0, spacesNeeded)
     let spaces = ' '.repeat(spacesNeeded)
     return spaces + formattedNumber
 }
+
 
 module.exports = {
     getUserLinkById,

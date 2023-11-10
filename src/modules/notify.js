@@ -4,7 +4,7 @@ const {
     getUserName,
     getDescription,
     getDefectType,
-    getControlType,
+    getControlType, getUserLinkById,
 } = require('#src/utils/helpers')
 const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
@@ -21,7 +21,7 @@ async function sendMessage(chatId, message) {
     await sleep(250)
     try {
         await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
-        if (chatId > 0) await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Пользователю <code>${chatId}</code> отправлено\n\n` + message, { parse_mode: 'HTML' })
+        if (chatId > 0) await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Пользователю ${await getUserLinkById(chatId)} отправлено\n\n` + message, { parse_mode: 'HTML' })
         return true
     } catch (error) {
         console.error(`Notify. Ошибка при отправке сообщения chatId: ${chatId}`, error)
@@ -77,7 +77,7 @@ function formatMasterMessage(comment, chatId, userName) {
     const { formattedDate } = formatPaymentDate({ date: comment.date })
     const controlDescription = getControlType(type[0])
     const defectDescription = getDefectType(type[1])
-    return `<b>Мастер, Вам уведомление.</b>\n<b>Оператору</b> <a href="tg://user?id=${chatId}">${userName}</a> <b>отправлено.</b>\n\n` +
+    return `<b>Мастер, Вам уведомление.</b>\n<b>Оператору</b> <a href='tg://user?id=${chatId}'>${userName}</a> <b>отправлено.</b>\n\n` +
         formatSKMessage(det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate)
 }
 
