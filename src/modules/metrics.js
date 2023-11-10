@@ -33,17 +33,28 @@ async function metricsNotification(ctx = null, index = 0) {
         const latestMetrics = metrics[index]
         const maxCharacters = getMaxCharacters(latestMetrics)
         const message = formatMetricsMessage(latestMetrics, maxCharacters)
+        if (index === 1) {
+            await sendToLog(ctx)
+            const chatId = ctx.chat.id  // Получите chatId из контекста
+            const userCheck = await checkUser(chatId)  // Проверьте пользователя
 
-        const usersToSend = await getUsersToSend() // Retrieve the user IDs based on roles
-
-        if (ctx && ctx.update.message.text === '/m' && '/metrics') {
-            // If the command is '/m' or 'metrics', send to the user who triggered the command
-            await sendMetricsToUser(ctx, message)
-            // await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Пользователю ${await getUserLinkById(ctx.from.id)} отправлено\n\n` + message, { parse_mode: 'HTML' })
-        } else if (ctx && ctx.update.message.text === '/metrics_director_notification') {
-            await sendMetricsToAllUsers(usersToSend, message)
+            if (!userCheck.exists || (userCheck.role !== 'admin' && userCheck.role !== 'dir')) {
+                console.error(`User ${chatId} does not have the necessary permissions.`)
+                return  // Если у пользователя нет необходимых прав, просто возвращаемся из функции
+            }
+            await ctx.reply(message, { parse_mode: 'HTML' })
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Запрос метрики <code>${ctx.from.id}</code>\n` + message, { parse_mode: 'HTML' })
         } else {
-            console.error('Invalid command or context')
+            const ADMIN_IDS = [DIR_METRIC, DIR_OPLATA, DIR_TEST_GROUP] //1164924330 - Лера
+            for (const adminId of ADMIN_IDS) {
+                try {
+                    await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' })
+                    console.log('Metrics Message sent successfully to adminId:', adminId)
+                } catch (error) {
+                    console.error('Failed to send message to adminId:', adminId, 'Error:', error)
+                    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${adminId}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
+                }
+            }
         }
     } catch (error) {
         console.error('Error fetching or sending metrics:', error)
