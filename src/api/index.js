@@ -5,16 +5,16 @@ const BOT_TOKEN = process.env.BOT_TOKEN
 const WEB_API = process.env.WEB_API
 
 async function getMetricsNach() {
-    const url = `${WEB_API}/metrics/get_nach.php`;
-    const params = { key: SECRET_KEY };
+    const url = `${WEB_API}/metrics/get_nach.php`
+    const params = { key: SECRET_KEY }
 
     try {
-        const response = await axios.get(url, { params });
-        console.log(response.data);
-        return response.data;
+        const response = await axios.get(url, { params })
+        console.log(response.data)
+        return response.data
     } catch (error) {
-        console.error(`Ошибка при получении данных из эндпойнта /metrics/get_nach.php: ${error.message}`);
-        throw error;
+        console.error(`Ошибка при получении данных из эндпойнта /metrics/get_nach.php: ${error.message}`)
+        throw error
     }
 }
 
@@ -222,4 +222,5 @@ module.exports = {
     getChatAdministrators,
     getUsersToSend,
     getMetricsMaster,
+    getMetricsNach,
 }

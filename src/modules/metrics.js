@@ -1,10 +1,8 @@
 // const moment = require('moment')
-const { checkUser } = require('#src/api/index')
-const { fetchMetrics, getUsersToSend, getMetricsMaster } = require('#src/api/index')
+const { fetchMetrics, checkUser, getMetricsMaster, getMetricsNach } = require('#src/api/index')
 const { sendToLog } = require('#src/utils/log')
 const { formatMetricsMessage, formatMetricsMessageFrez, formatMetricsMessageToc } = require('#src/utils/ru_lang')
 const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
-const { message } = require('telegraf/filters')
 
 
 function getMaxCharacters(latestMetrics) {
@@ -62,53 +60,69 @@ async function metricsNotification(ctx = null, index = 0) {
     }
 }
 
-async function sendMetricsToUser(ctx, message) {
-    const chatId = ctx.chat.id
-    const userCheck = await checkUser(chatId)
 
-    if (!userCheck.exists) {
-        console.error(`User ${chatId} не имеет необходимых разрешений.`)
-        return
-    }
-
+async function sendMetricsMessagesNach() {
     try {
-        await bot.telegram.sendMessage(chatId, message, { parse_mode: 'HTML' })
-        console.log(`Метрики Сообщение успешно отправлено пользователю ${userCheck.role} userId:`, chatId)
-    } catch (error) {
-        console.error(`Failed to send message to user ${userCheck.role} userId:`, chatId, 'Error:', error)
-        await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${chatId}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
-    }
-}
+        const metricsNachData = await getMetricsNach();
+        console.log('Metrics nach data:', metricsNachData);
 
-async function sendMetricsToAllUsers(usersToSend, message) {
-    for (const role in usersToSend) {
-        const roleUsers = usersToSend[role]
-        for (const user of roleUsers) {
+        if (!Array.isArray(metricsNachData.metrics_nach)) {
+            throw new Error('Metrics nach data is not an array');
+        }
+
+        for (const metrics of metricsNachData.metrics_nach) {
+            const userCheck = await checkUser(metrics.user_id);  // replace 'SecretKey' with your actual secret key
+
+            if (!userCheck.exists) {
+                console.error(`User ${metrics.user_id} does not exist.`);
+                continue;
+            }
+
+            let message;
+            switch (userCheck.role) {
+                case 'nach_frez':
+                    message = `User ID: <b>${metrics.user_id}</b>\n` +
+                        `Load F Day: <code>${metrics.load_f_day}</code>\n` +
+                        `Load F Night: <code>${metrics.load_f_night}</code>\n` +
+                        `Load F Month: <code>${metrics.load_f_month}</code>`;
+                    break;
+                case 'nach_toc':
+                    message = `User ID: <b>${metrics.user_id}</b>\n` +
+                        `Load T Day: <code>${metrics.load_t_day}</code>\n` +
+                        `Load T Night: <code>${metrics.load_t_night}</code>\n` +
+                        `Load T Month: <code>${metrics.load_t_month}</code>`;
+                    break;
+                default:
+                    console.error(`User ${metrics.user_id} has an unsupported role: ${userCheck.role}`);
+                    continue;
+            }
+
+            await sleep(1000);
+
             try {
-                await bot.telegram.sendMessage(user.user_id, message, { parse_mode: 'HTML' })
-                console.log(`Metrics Message sent successfully to ${role} userId:`, user.user_id)
+                // await bot.telegram.sendMessage(metrics.user_id, message, { parse_mode: 'HTML' });
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
+                console.log(`Metrics message sent successfully to userId:`, metrics.user_id);
             } catch (error) {
-                console.error(`Failed to send message to ${role} userId:`, user.user_id, 'Error:', error)
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${user.user_id}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
+                console.error(`Failed to send message to userId:`, metrics.user_id, 'Error:', error);
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${metrics.user_id}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' });
             }
         }
+    } catch (error) {
+        console.error('Error in sendMetricsMessagesNach:', error);
+        throw error;
     }
 }
 
 
-// Функция для отправки сообщений администраторам
-// async function metricsNotification(ctx, index) {
-//     await sendMetricsMessages('dir', formatMetricsMessage, ctx)
-// }
 
 // Функция для отправки сообщений начальникам производства
-async function metricsNotificationProiz(ctx, index) {
-    // await sendMetricsMessages('nach_frez', formatMetricsMessageFrez, ctx)
-    // await sendMetricsMessages('nach_toc', formatMetricsMessageToc, ctx)
-    await formatMetricsMessageMaster(ctx, index)
+async function metricsNotificationProiz() {
+    await sendMetricsMessagesNach()
+    await formatMetricsMessageMaster()
 }
 
-async function formatMetricsMessageMaster(ctx, index) {
+async function formatMetricsMessageMaster() {
     try {
         const metricsMasterData = await getMetricsMaster()
 
