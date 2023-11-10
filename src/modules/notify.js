@@ -2,7 +2,6 @@ const {
     resetFlags,
     formatPaymentDate,
     getUserName,
-    getDescription,
     getDefectType,
     getControlType, getUserLinkById,
 } = require('#src/utils/helpers')
@@ -44,7 +43,6 @@ async function updateTaskStatus(id_task) {
 
 function formatMessage(comment, total) {
     const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment
-    const typeString = getDescription(type)
     const { formattedDate } = formatPaymentDate({ date: comment.date })
     const controlDescription = getControlType(type[0])
     const defectDescription = getDefectType(type[1])
