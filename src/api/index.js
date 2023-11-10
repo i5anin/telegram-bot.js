@@ -5,11 +5,22 @@ const BOT_TOKEN = process.env.BOT_TOKEN
 const WEB_API = process.env.WEB_API
 
 
+async function getMetricsMaster() {
+    const url = `${WEB_API}/metrics/get_master.php`
+    const params = { key: SECRET_KEY }
+    try {
+        const response = await axios.get(url, { params })
+        console.log(response.data)
+        return response.data
+    } catch (error) {
+        console.error(`Помилка при отриманні даних з ендпойнта /metrics/get_master.php: ${error.message}`)
+        throw error
+    }
+}
+
 async function getUsersToSend() {
     const url = `${WEB_API}/metrics/get_user.php`
-    const params = {
-        key: SECRET_KEY,
-    }
+    const params = { key: SECRET_KEY }
     try {
         const response = await axios.get(url, { params })
         console.log(response.data)
@@ -23,11 +34,10 @@ async function getUsersToSend() {
 
 const getChatMembersCount = async (chatId) => {
     try {
-        const response = await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/getChatMemberCount`, {
-            params: {
-                chat_id: chatId,
-            },
-        })
+        const response =
+            await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/getChatMemberCount`, {
+                params: { chat_id: chatId },
+            })
         return response.data.result
     } catch (error) {
         console.error('Ошибка при получении количества участников:', error)
@@ -37,11 +47,10 @@ const getChatMembersCount = async (chatId) => {
 
 const getChatAdministrators = async (chatId) => {
     try {
-        const response = await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/getChatAdministrators`, {
-            params: {
-                chat_id: chatId,
-            },
-        })
+        const response =
+            await axios.get(`https://api.telegram.org/bot${BOT_TOKEN}/getChatAdministrators`, {
+                params: { chat_id: chatId },
+            })
         return response.data.result
     } catch (error) {
         console.error('Ошибка при получении списка администраторов:', error)
@@ -51,11 +60,10 @@ const getChatAdministrators = async (chatId) => {
 
 async function getChatInfo(chatId) {
     try {
-        const response = await axios.get('https://api.telegram.org/bot' + BOT_TOKEN + '/getChat', {
-            params: {
-                chat_id: chatId,
-            },
-        })
+        const response =
+            await axios.get('https://api.telegram.org/bot' + BOT_TOKEN + '/getChat', {
+                params: { chat_id: chatId },
+            })
         return response.data.result
     } catch (error) {
         console.error('Error fetching chat info', error)
@@ -65,7 +73,8 @@ async function getChatInfo(chatId) {
 
 async function performRequest(url, method = 'get', data = {}, params = {}) {
     try {
-        const response = await axios({ method, url, data, params })
+        const response =
+            await axios({ method, url, data, params })
         return response.data
     } catch (error) {
         console.error(`Error in performing request to ${url}: ${error.message}`)
@@ -105,9 +114,7 @@ async function updateBotData(formattedDateTime, instanceNumber) {
 // Users
 async function getAllUsers() {
     const url = `${WEB_API}/users/get_all_fio.php`
-    const params = {
-        key: SECRET_KEY,  // Добавлен секретный ключ
-    }
+    const params = { key: SECRET_KEY }
     return performRequest(url, 'get', {}, params)
 }
 
@@ -137,9 +144,7 @@ async function addUser(userId, cleanedText, username) {
 // Comments
 async function getAllComments() {
     const url = `${WEB_API}/comment/get_all.php`
-    const params = {
-        key: SECRET_KEY,
-    }
+    const params = { key: SECRET_KEY }
     return performRequest(url, 'get', {}, params)
 }
 
@@ -203,4 +208,5 @@ module.exports = {
     getChatMembersCount,
     getChatAdministrators,
     getUsersToSend,
+    getMetricsMaster,
 }

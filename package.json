@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "bot": "node src/bot.js",
     "start": "node src/bot.js",
     "start1": "node src/session.js",
     "prod:start": "pm2-runtime app.js"

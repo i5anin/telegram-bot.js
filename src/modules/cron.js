@@ -2,7 +2,7 @@ const cron = require('node-cron')
 const { notifyAllUsers } = require('#src/modules/notify')
 const { oplataNotification } = require('#src/modules/oplata')
 const { checkBotData } = require('#src/api/index')
-const { metricsNotification } = require('#src/modules/metrics') // импортируйте функцию format
+const { metricsNotification, metricsNotificationProiz } = require('#src/modules/metrics') // импортируйте функцию format
 
 function initCronJobs(currentDateTime, instanceNumber) {
     // Уведомлять о сообщениях каждые 15 мин
@@ -24,7 +24,13 @@ function initCronJobs(currentDateTime, instanceNumber) {
             await metricsNotification()
             console.log('Running metricsNotification()')
         })
+
+        cron.schedule('* 10 * * *', async () => {
+            await metricsNotificationProiz()
+            console.log('Running metricsNotificationMaster()')
+        })
     }
+
 
     if (MODE === 'build') {
         // Проверка экземпляра 12 мин

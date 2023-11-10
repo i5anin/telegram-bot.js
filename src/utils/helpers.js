@@ -1,5 +1,5 @@
 // Функция для выполнения GET-запросов
-const { getAllUsers,checkUser } = require('#src/api/index')
+const { getAllUsers, checkUser } = require('#src/api/index')
 
 
 // Функция для сброса флагов сессии
@@ -27,15 +27,15 @@ function getDefectType(char) {
 
 async function getUserLinkById(userId) {
     try {
-        const user = await checkUser(userId); // Используйте `await` для ожидания результата
+        const user = await checkUser(userId) // Используйте `await` для ожидания результата
         if (user && user.exists) {
-            return `<a href='tg://user?id=${userId}'>${user.fio}</a> <code>${userId}</code>`;
+            return `<a href='tg://user?id=${userId}'>${user.fio}</a> <code>${userId}</code>`
         } else {
-            return 'Пользователь не найден.';
+            return `Пользователь не найден. <code>${userId}</code>`
         }
     } catch (error) {
-        console.error('Ошибка при получении данных пользователя:', error);
-        return 'Ошибка при получении данных о пользователе.';
+        console.error('Ошибка при получении данных пользователя:', error)
+        return 'Ошибка при получении данных о пользователе.'
     }
 }
 

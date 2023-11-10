@@ -1,9 +1,10 @@
 // const moment = require('moment')
 const { checkUser } = require('#src/api/index')
-const { fetchMetrics, getUsersToSend } = require('#src/api/index')
+const { fetchMetrics, getUsersToSend, getMetricsMaster } = require('#src/api/index')
 const { sendToLog } = require('#src/utils/log')
 const { formatMetricsMessage, formatMetricsMessageFrez, formatMetricsMessageToc } = require('#src/utils/ru_lang')
 const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
+const { message } = require('telegraf/filters')
 
 
 function getMaxCharacters(latestMetrics) {
@@ -62,9 +63,44 @@ async function metricsNotification(ctx, index) {
 
 // Функция для отправки сообщений начальникам производства
 async function metricsNotificationProiz(ctx, index) {
-    await sendMetricsMessages('nach_frez', formatMetricsMessageFrez, ctx)
-    await sendMetricsMessages('nach_toc', formatMetricsMessageToc, ctx)
+    // await sendMetricsMessages('nach_frez', formatMetricsMessageFrez, ctx)
+    // await sendMetricsMessages('nach_toc', formatMetricsMessageToc, ctx)
+    await formatMetricsMessageMaster(ctx, index)
 }
+
+async function formatMetricsMessageMaster(ctx, index) {
+    try {
+        const metricsMasterData = await getMetricsMaster()
+
+        console.log('Metrics master data:', metricsMasterData)
+
+        if (!Array.isArray(metricsMasterData.metrics_master)) {
+            throw new Error('Metrics master data is not an array')
+        }
+
+        for (const metrics of metricsMasterData.metrics_master) {
+            const brakInfo = metrics.kpi_brak !== 0 ? `<b>Брак:</b> <code>${metrics.kpi_brak.toFixed(2)}</code>` : ''
+
+            const message =
+                `${emoji.star} Смена: ${metrics.smena} ` +
+                `<u><b>Место в рейтинге: ${metrics.rating_pos}</b></u>\n` +
+                `<b>ЦКП:</b> <code>${metrics.kpi.toFixed(2)}</code>\n` +
+                `${brakInfo}`
+
+            await sleep(1000)
+
+
+            await bot.telegram.sendMessage(metrics.user_id, message, { parse_mode: 'HTML' })
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, await getUserLinkById(metrics.user_id) + '\n' + message, { parse_mode: 'HTML' })
+
+            console.log(`Metrics message sent successfully to userId:`, metrics.user_id)
+        }
+    } catch (error) {
+        console.error('Error formatting metrics master message:', error)
+        return 'Error formatting metrics master message'
+    }
+}
+
 
 module.exports = { metricsNotification, metricsNotificationProiz }
 
