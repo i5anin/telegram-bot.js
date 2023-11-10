@@ -1,5 +1,6 @@
 <?php
-header('Content-Type: application/json');  // Устанавливаем заголовок для ответа в формате JSON
+header('Content-Type: application/json');
+
 // Подключаем конфигурационный файл
 $dbConfig = require 'sql_config.php';
 
@@ -92,34 +93,34 @@ if ($stmt = $mysqli->prepare("SELECT
     while ($stmt->fetch()) {
         $metrics[] = [
             'date' => $date,
-            'prod_price_mzp' => $prod_price_mzp,
-            'prod_price_sles' => $prod_price_sles,
-            'prod_price_otk' => $prod_price_otk,
-            'prod_price_upk' => $prod_price_upk,
-            'prod_price_dorabotka' => $prod_price_dorabotka,
-            'prod_price_dorabotka_sles' => $prod_price_dorabotka_sles,
-            'prod_price_sogl' => $prod_price_sogl,
-            'prod_price' => $prod_price,
-            'prod' => $prod,
-            'sles' => $sles,
-            'otk' => $otk,
-            'upk' => $upk,
-            'cumulative_brak_month' => $cumulative_brak_month,
-            'cumulative_sklad_month' => $cumulative_sklad_month,
-            'cumulative_manager_month' => $cumulative_manager_month,
-            'productivity' => $productivity,
-            'get_sum_otgr' => $get_sum_otgr,
-            'get_sum_otgr_prod' => $get_sum_otgr_prod,
-            'predoplata' => $predoplata,
-            'total_price' => $total_price,
-            'total_sklad_gp' => $total_sklad_gp,
+            'prod_price_mzp' => round($prod_price_mzp, 2),
+            'prod_price_sles' => round($prod_price_sles, 2),
+            'prod_price_otk' => round($prod_price_otk, 2),
+            'prod_price_upk' => round($prod_price_upk, 2),
+            'prod_price_dorabotka' => round($prod_price_dorabotka, 2),
+            'prod_price_dorabotka_sles' => round($prod_price_dorabotka_sles, 2),
+            'prod_price_sogl' => round($prod_price_sogl, 2),
+            'prod_price' => round($prod_price, 2),
+            'prod' => round($prod, 2),
+            'sles' => round($sles, 2),
+            'otk' => round($otk, 2),
+            'upk' => round($upk, 2),
+            'cumulative_brak_month' => round($cumulative_brak_month, 2),
+            'cumulative_sklad_month' => round($cumulative_sklad_month, 2),
+            'cumulative_manager_month' => round($cumulative_manager_month, 2),
+            'productivity' => round($productivity, 2),
+            'get_sum_otgr' => round($get_sum_otgr, 2),
+            'get_sum_otgr_prod' => round($get_sum_otgr_prod, 2),
+            'predoplata' => round($predoplata, 2),
+            'total_price' => round($total_price, 2),
+            'total_sklad_gp' => round($total_sklad_gp, 2),
         ];
     }
 
     $stmt->close();
 
     if (!empty($metrics)) {
-        echo json_encode(['metrics' => $metrics]);
+        echo json_encode(['metrics' => $metrics], JSON_NUMERIC_CHECK);
     } else {
         echo json_encode(['error' => 'Data not found']);
     }
@@ -129,3 +130,4 @@ if ($stmt = $mysqli->prepare("SELECT
 }
 
 $mysqli->close();
+?>
