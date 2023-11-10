@@ -44,7 +44,7 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-if ($stmt = $mysqli->prepare("SELECT kpi, kpi_brak, rating_pos, user_id, smena FROM metrics_master")) {
+if ($stmt = $mysqli->prepare("SELECT kpi, kpi_brak, rating_pos, user_id, smena FROM metrics_master ORDER BY rating_pos ASC")) {
     $stmt->execute();
     $stmt->bind_result($kpi, $kpi_brak, $rating_pos, $user_id, $smena);
 
