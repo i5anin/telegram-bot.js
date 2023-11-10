@@ -22,12 +22,13 @@ function initCronJobs(currentDateTime, instanceNumber) {
     } else {
         cron.schedule('30 7 * * *', async () => {
             await metricsNotification()
-            console.log('Running metricsNotification()')
+            console.log('Running metricsNotification() at 7:30 AM every day ')
+
         })
 
         cron.schedule('0 10 * * *', async () => {
             await metricsNotificationProiz()
-            console.log('Running metricsNotificationMaster()')
+            console.log('Running metricsNotificationProiz() at 10:00 AM every day')
         })
     }
 
