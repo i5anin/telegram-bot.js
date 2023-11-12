@@ -21,7 +21,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-async function metricsNotification(ctx = null, index = 0) {
+async function metricsNotificationDirector(ctx = null, index = 0) {
     try {
         const metrics = await fetchMetrics()
         if (metrics.length === 0 || !metrics[index]) {
@@ -63,57 +63,56 @@ async function metricsNotification(ctx = null, index = 0) {
 
 async function sendMetricsMessagesNach() {
     try {
-        const metricsNachData = await getMetricsNach();
-        console.log('Metrics nach data:', metricsNachData);
+        const metricsNachData = await getMetricsNach()
+        console.log('Metrics nach data:', metricsNachData)
 
         if (!Array.isArray(metricsNachData.metrics_nach)) {
-            throw new Error('Metrics nach data is not an array');
+            throw new Error('Metrics nach data is not an array')
         }
 
         for (const metrics of metricsNachData.metrics_nach) {
-            const userCheck = await checkUser(metrics.user_id);  // replace 'SecretKey' with your actual secret key
+            const userCheck = await checkUser(metrics.user_id)  // replace 'SecretKey' with your actual secret key
 
             if (!userCheck.exists) {
-                console.error(`User ${metrics.user_id} does not exist.`);
-                continue;
+                console.error(`User ${metrics.user_id} does not exist.`)
+                continue
             }
 
-            let message;
+            let message
             switch (userCheck.role) {
                 case 'nach_frez':
                     message = `User ID: <b>${metrics.user_id}</b>\n` +
                         `Load F Day: <code>${metrics.load_f_day}</code>\n` +
                         `Load F Night: <code>${metrics.load_f_night}</code>\n` +
-                        `Load F Month: <code>${metrics.load_f_month}</code>`;
-                    break;
+                        `Load F Month: <code>${metrics.load_f_month}</code>`
+                    break
                 case 'nach_toc':
                     message = `User ID: <b>${metrics.user_id}</b>\n` +
                         `Load T Day: <code>${metrics.load_t_day}</code>\n` +
                         `Load T Night: <code>${metrics.load_t_night}</code>\n` +
-                        `Load T Month: <code>${metrics.load_t_month}</code>`;
-                    break;
+                        `Load T Month: <code>${metrics.load_t_month}</code>`
+                    break
                 default:
-                    console.error(`User ${metrics.user_id} has an unsupported role: ${userCheck.role}`);
-                    continue;
+                    console.error(`User ${metrics.user_id} has an unsupported role: ${userCheck.role}`)
+                    continue
             }
 
-            await sleep(1000);
+            await sleep(1000)
 
             try {
                 // await bot.telegram.sendMessage(metrics.user_id, message, { parse_mode: 'HTML' });
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
-                console.log(`Metrics message sent successfully to userId:`, metrics.user_id);
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
+                console.log(`Metrics message sent successfully to userId:`, metrics.user_id)
             } catch (error) {
-                console.error(`Failed to send message to userId:`, metrics.user_id, 'Error:', error);
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${metrics.user_id}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' });
+                console.error(`Failed to send message to userId:`, metrics.user_id, 'Error:', error)
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${metrics.user_id}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
             }
         }
     } catch (error) {
-        console.error('Error in sendMetricsMessagesNach:', error);
-        throw error;
+        console.error('Error in sendMetricsMessagesNach:', error)
+        throw error
     }
 }
-
 
 
 // Функция для отправки сообщений начальникам производства
@@ -156,6 +155,6 @@ async function formatMetricsMessageMaster() {
 }
 
 
-module.exports = { metricsNotification, metricsNotificationProiz }
+module.exports = { metricsNotificationDirector, metricsNotificationProiz }
 
 
