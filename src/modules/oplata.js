@@ -30,7 +30,7 @@ async function oplataNotification() {
             for (let batch of batches) {
                 console.log('Processing batch:', batch)
                 let sentIds = []
-                let message = '<b>--------------------</b>\n'
+                let message = '\n'
                 batch.forEach((payment) => {
                     const formattedSum = Number(payment.sum).toLocaleString('ru-RU')
                     const { formattedDate } = formatPaymentDate(payment)
@@ -38,23 +38,23 @@ async function oplataNotification() {
                     message += `Имя клиента: <b>${payment.client_name}</b>\n`
                     message += `Сумма: <b>${formattedSum}\u00A0₽</b>\n`
                     message += `<blockquote>Информация: ${payment.info}</blockquote>\n`
-                    message += '<b>--------------------</b>\n'
+                    message += '\n'
                     sentIds.push(payment.id)
                 })
 
                 for (const adminId of ADMIN_IDS) {
-                    i_ADMIN_IDS = adminId;
-                    console.log('Sending message to adminId:', adminId);
+                    i_ADMIN_IDS = adminId
+                    console.log('Sending message to adminId:', adminId)
                     try {
-                        await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' });
-                        console.log('OPLATA Message sent successfully to adminId:', adminId);
+                        await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' })
+                        console.log('OPLATA Message sent successfully to adminId:', adminId)
                     } catch (error) {
-                        console.error('Failed to send message to adminId:', adminId, 'Error:', error);
+                        console.error('Failed to send message to adminId:', adminId, 'Error:', error)
                         await bot.telegram.sendMessage(
                             LOG_CHANNEL_ID,
                             `Не удалось отправить сообщение <code>${i_ADMIN_IDS}</code> оплата \n<code>${error}</code>`,
                             { parse_mode: 'HTML' },
-                        );
+                        )
                     }
                 }
                 if (sentIds.length > 0) {

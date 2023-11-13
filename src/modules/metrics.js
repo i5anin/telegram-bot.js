@@ -132,9 +132,14 @@ async function formatMetricsMessageMaster() {
         }
 
         for (const metrics of metricsMasterData.metrics_master) {
-            const brakInfo = metrics.kpi_brak !== 0 ? `<b>Брак:</b> <code>${metrics.kpi_brak.toFixed(2)}</code>` : ''
+            const brakInfo = metrics.kpi_brak !== 0
+                ? `${metrics.kpi_brak.toFixed(2)}`
+                : 'отсутствует'
 
-            const message = `${emoji.star} Смена: ${metrics.smena} ` + `<u><b>Место в рейтинге: ${metrics.rating_pos}</b></u>\n` + `<b>ЦКП:</b> <code>${metrics.kpi.toFixed(2)}</code>\n` + `${brakInfo}`
+            const message = `Смена: ${metrics.smena}\n` +
+                `${emoji.star} <u><b>Место в рейтинге: ${metrics.rating_pos}</b></u>\n` +
+                `<b>ЦКП:</b> <code>${metrics.kpi.toFixed(2)}</code>\n` +
+                `<b>Брак:</b> <code>${brakInfo}</code>`
 
             await sleep(1000)
 
