@@ -135,7 +135,7 @@ async function formatMetricsMessageMaster() {
             let brakInfo = ''
             if (metrics.kpi_brak === 0) {
                 brakInfo = 'отсутствует'
-            } else if (metrics.kpi_brak > 0 && metrics.kpi_brak <= 0.01) {
+            } else if (metrics.kpi_brak > 0 && metrics.kpi_brak < 0.01) {
                 brakInfo = 'ничтожно мал'
             } else {
                 brakInfo = `${metrics.kpi_brak.toFixed(2)}`
