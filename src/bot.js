@@ -21,7 +21,9 @@ const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 const { runBot } = require('#src/modules/runBot')
 const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
 const { createMetric } = require('#src/utils/metricPM2')
-const { metricsNotification, metricsNotificationProiz, metricsNotificationDirector } = require('#src/modules/metrics')
+const { metricsNotification, metricsNotificationProiz, metricsNotificationDirector, formatMetricsMessageMaster,
+    sendMetricsMessagesNach
+} = require('#src/modules/metrics')
 const { handlePhoto } = require('#src/modules/photo')
 
 // Конфигурационные переменные
@@ -66,7 +68,8 @@ global.emoji = {
     warning: '&#x26A0;',
     bot: '&#129302;',
     star: '&#11088;',
-}   //❌ //✅ //❗ //⚠ //🤖 //⭐
+    tech: '&#9881;',
+}   //❌ //✅ //❗ //⚠ //🤖 //⭐ //⚙️
 
 global.bot = bot
 global.stateCounter = {
@@ -124,7 +127,8 @@ bot.command('get_group_info', (ctx) => handleGetGroupInfoCommand(ctx))
 bot.command('who', (ctx) => whoCommand(ctx))
 bot.command(['m', 'metrics'], (ctx) => metricsNotificationDirector(ctx, 1))
 bot.command('metrics_director_notification', (ctx) => metricsNotificationDirector(ctx, 0))
-bot.command('metrics_proizvotstvo_notification', (ctx) => metricsNotificationProiz(null, 0))
+bot.command('metrics_nachalnic_notification', (ctx) => sendMetricsMessagesNach())
+bot.command('metrics_master_notification', (ctx) => formatMetricsMessageMaster())
 // bot.command('metrics_2', (ctx) => metricsNotificationProiz(ctx, 0))
 // bot.command('metrics_old', metricsNotification)
 bot.command('docs', (ctx) => handleDocsCommand(ctx))

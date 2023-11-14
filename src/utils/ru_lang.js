@@ -35,11 +35,11 @@ module.exports = {
         `Ожидаемая предоплата с НДС: <b>${formatNumber(latestMetrics.predoplata)}</b>\u00A0₽\n` +
         `Итого внутреннего производства с НДС: <b>${formatNumber(latestMetrics.total_price)}</b>\u00A0₽\n` +
         `Готовая продукция на складе с НДС: <b>${formatNumber(latestMetrics.total_sklad_gp)}</b>\u00A0₽\n\n` +
-        `<u>Отклонение от плана</u>\n` +
+        `<b><u>Отклонение от плана</u></b>\n` +
         `<code>${formatPercentage(latestMetrics.cumulative_sklad_month, maxCharacters)}</code> Производство\n` +
         `<code>${formatPercentage(latestMetrics.cumulative_brak_month, maxCharacters)}</code> Брак\n` +
         `<code>${formatPercentage(latestMetrics.cumulative_manager_month, maxCharacters)}</code> Отдел продаж\n\n` +
-        `<u>Воронка</u>\n` +
+        `<b><u>Воронка</u></b>\n` +
         `<code>${formatPercentage(latestMetrics.prod, maxCharacters)}</code> Производство\n` +
         `<code>${formatPercentage(latestMetrics.sles, maxCharacters)}</code> Слесарный участок\n` +
         `<code>${formatPercentage(latestMetrics.otk, maxCharacters)}</code> ОТК\n` +
@@ -48,14 +48,13 @@ module.exports = {
         `Отгрузка М/О: <b>${formatNumber(latestMetrics.get_sum_otgr_prod)}</b>\u00A0₽\n` +
         `Отгрузка с НДС: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b>\u00A0₽\n`,
 
-    formatMetricsMessageFrez: (latestMetrics, maxCharacters) =>
-        `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n` +
-        `<code>МЕТРИКА ДЛЯ ФРЕЗЕРА</code>`,
-    //TODO: СООБЩЕНИЕ ЕЩЕ ДОРАБАТЫВАЕТСЯ
-    formatMetricsMessageToc: (latestMetrics, maxCharacters) =>
-        `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n` +
-        `<code>МЕТРИКА ДЛЯ ТОКАРЯ</code>`,
-    //TODO: СООБЩЕНИЕ ЕЩЕ ДОРАБАТЫВАЕТСЯ
+    formatMetricsMessageNach: (metrics, period) =>
+        `${emoji.tech} <b><u>Загрузка ${period}</u></b>\n` +
+        `• плановая: <code>${formatNumber(metrics.load_plan * 100) + '%'}</code>\n` +
+        `• фактическая: <code>${formatNumber(metrics.load_fact * 100) + '%'}</code>\n\n` +
+        `Кол-во станков: <code>${metrics.cnc_count}</code>\n` +
+        `от <code>${moment(metrics.date_from, 'YYYY-MM-DD HH:mm:ss').format('HH:mm DD.MM.YYYY')}</code>\n` +
+        `до <code>${moment(metrics.date_to, 'YYYY-MM-DD HH:mm:ss').format('HH:mm DD.MM.YYYY')}</code>`,
 
     logMessage: (chatId, fio, username, fullName) =>
         `<b>fio:</b> <a href='tg://user?id=${chatId}'>${fio}</a>\n` +

@@ -1,8 +1,14 @@
 // const moment = require('moment')
 const { fetchMetrics, checkUser, getMetricsMaster, getMetricsNach } = require('#src/api/index')
 const { sendToLog } = require('#src/utils/log')
-const { formatMetricsMessage, formatMetricsMessageFrez, formatMetricsMessageToc } = require('#src/utils/ru_lang')
+const {
+    formatMetricsMessage,
+    formatMetricsMessageFrez,
+    formatMetricsMessageToc,
+    formatMetricsMessageNach,
+} = require('#src/utils/ru_lang')
 const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
+const moment = require('moment')
 
 
 function getMaxCharacters(latestMetrics) {
@@ -61,6 +67,20 @@ async function metricsNotificationDirector(ctx = null, index = 0) {
 }
 
 
+function getPeriod(date_from, date_to) {
+    const from = moment(date_from, 'YYYY-MM-DD HH:mm:ss')
+    const to = moment(date_to, 'YYYY-MM-DD HH:mm:ss')
+
+    if (from.isSame(to, 'day')) {
+        return 'день'
+    } else if (from.isSame(to.clone().subtract(1, 'day'), 'day')) {
+        return 'ночь'
+    } else {
+        return 'месяц'
+    }
+}
+
+
 async function sendMetricsMessagesNach() {
     try {
         const metricsNachData = await getMetricsNach()
@@ -77,20 +97,13 @@ async function sendMetricsMessagesNach() {
                 console.error(`User ${metrics.user_id} does not exist.`)
                 continue
             }
-
+            // `User ID: <b>${metrics.user_id}</b>\n` +
             let message
             switch (userCheck.role) {
                 case 'nach_frez':
-                    message = `User ID: <b>${metrics.user_id}</b>\n` +
-                        `Load F Day: <code>${metrics.load_f_day}</code>\n` +
-                        `Load F Night: <code>${metrics.load_f_night}</code>\n` +
-                        `Load F Month: <code>${metrics.load_f_month}</code>`
-                    break
                 case 'nach_toc':
-                    message = `User ID: <b>${metrics.user_id}</b>\n` +
-                        `Load T Day: <code>${metrics.load_t_day}</code>\n` +
-                        `Load T Night: <code>${metrics.load_t_night}</code>\n` +
-                        `Load T Month: <code>${metrics.load_t_month}</code>`
+                    const period = getPeriod(metrics.date_from, metrics.date_to)
+                    message = formatMetricsMessageNach(metrics, period)
                     break
                 default:
                     console.error(`User ${metrics.user_id} has an unsupported role: ${userCheck.role}`)
@@ -165,6 +178,11 @@ async function formatMetricsMessageMaster() {
 }
 
 
-module.exports = { metricsNotificationDirector, metricsNotificationProiz }
+module.exports = {
+    metricsNotificationDirector,
+    metricsNotificationProiz,
+    formatMetricsMessageMaster,
+    sendMetricsMessagesNach,
+}
 
 
