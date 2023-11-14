@@ -41,20 +41,19 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-if ($stmt = $mysqli->prepare("SELECT user_id, load_t_day, load_f_day, load_t_night, load_f_night, load_t_month, load_f_month FROM metrics_nach")) {
+if ($stmt = $mysqli->prepare("SELECT user_id, cnc_count, date_from, date_to, load_plan, load_fact FROM metrics_nach")) {
     $stmt->execute();
-    $stmt->bind_result($user_id, $load_t_day, $load_f_day, $load_t_night, $load_f_night, $load_t_month, $load_f_month);
+    $stmt->bind_result($user_id, $cnc_count, $date_from, $date_to, $load_plan, $load_fact);
 
     $metricsNach = [];
     while ($stmt->fetch()) {
         $metricsNach[] = [
             'user_id' => $user_id,
-            'load_t_day' => $load_t_day,
-            'load_f_day' => $load_f_day,
-            'load_t_night' => $load_t_night,
-            'load_f_night' => $load_f_night,
-            'load_t_month' => $load_t_month,
-            'load_f_month' => $load_f_month,
+            'cnc_count' => $cnc_count,
+            'date_from' => $date_from,
+            'date_to' => $date_to,
+            'load_plan' => $load_plan,
+            'load_fact' => $load_fact,
         ];
     }
 
