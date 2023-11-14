@@ -132,9 +132,14 @@ async function formatMetricsMessageMaster() {
         }
 
         for (const metrics of metricsMasterData.metrics_master) {
-            const brakInfo = metrics.kpi_brak !== 0
-                ? `${metrics.kpi_brak.toFixed(2)}`
-                : 'отсутствует'
+            let brakInfo = ''
+            if (metrics.kpi_brak === 0) {
+                brakInfo = 'отсутствует'
+            } else if (metrics.kpi_brak > 0 && metrics.kpi_brak <= 0.01) {
+                brakInfo = 'ничтожно мал'
+            } else {
+                brakInfo = `${metrics.kpi_brak.toFixed(2)}`
+            }
 
             const message = `Смена: ${metrics.smena}\n` +
                 `${emoji.star} <u><b>Место в рейтинге: ${metrics.rating_pos}</b></u>\n` +
