@@ -5,7 +5,7 @@ const {
     formatMetricsMessage,
     formatMetricsMessageFrez,
     formatMetricsMessageToc,
-    formatMetricsMessageNach,
+    formatMetricsMessageNach, formatMetricsVoronca,
 } = require('#src/utils/ru_lang')
 const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
 const moment = require('moment')
@@ -90,35 +90,55 @@ async function sendMetricsMessagesNach() {
             throw new Error('Metrics nach data is not an array')
         }
 
-        for (const metrics of metricsNachData.metrics_nach) {
-            const userCheck = await checkUser(metrics.user_id)  // replace 'SecretKey' with your actual secret key
+        // Объединяем данные по user_id
+        const metricsById = metricsNachData.metrics_nach.reduce((acc, metrics) => {
+            if (!acc[metrics.user_id]) {
+                acc[metrics.user_id] = []
+            }
+            acc[metrics.user_id].push(metrics)
+            return acc
+        }, {})
+
+        for (const [userId, userMetrics] of Object.entries(metricsById)) {
+            const userCheck = await checkUser(userId)  // replace 'SecretKey' with your actual secret key
 
             if (!userCheck.exists) {
-                console.error(`User ${metrics.user_id} does not exist.`)
+                console.error(`User ${userId} does not exist.`)
                 continue
             }
-            // `User ID: <b>${metrics.user_id}</b>\n` +
-            let message
+
+            let messages = []
             switch (userCheck.role) {
                 case 'nach_frez':
                 case 'nach_toc':
-                    const period = getPeriod(metrics.date_from, metrics.date_to)
-                    message = formatMetricsMessageNach(metrics, period)
+                    // Обрабатываем все метрики для данного user_id
+                    for (const metrics of userMetrics) {
+                        const period = getPeriod(metrics.date_from, metrics.date_to)
+                        const message = formatMetricsMessageNach(metrics, period)
+                        messages.push(message)
+                    }
                     break
                 default:
-                    console.error(`User ${metrics.user_id} has an unsupported role: ${userCheck.role}`)
+                    console.error(`User ${userId} has an unsupported role: ${userCheck.role}`)
                     continue
             }
 
             await sleep(1000)
 
             try {
-                // await bot.telegram.sendMessage(metrics.user_id, message, { parse_mode: 'HTML' });
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
-                console.log(`Metrics message sent successfully to userId:`, metrics.user_id)
+                // Объединяем все сообщения в одно и отправляем его
+                const combinedMessage = messages.join('\n\n')
+                const metrics = await fetchMetrics()
+                if (metrics.length === 0 || !metrics[0]) throw new Error('No metrics data available')
+                const latestMetrics = metrics[0]
+                const maxCharacters = 4 // безопасный отступ для процентов
+                const message = combinedMessage + '\n\n' + formatMetricsVoronca(latestMetrics, maxCharacters)
+                await bot.telegram.sendMessage(userId, combinedMessage, { parse_mode: 'HTML' })
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, await getUserLinkById(userId) + '\n' + message, { parse_mode: 'HTML' })
+                console.log(`Metrics message sent successfully to userId:`, userId)
             } catch (error) {
-                console.error(`Failed to send message to userId:`, metrics.user_id, 'Error:', error)
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${metrics.user_id}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
+                console.error(`Failed to send message to userId:`, userId, 'Error:', error)
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${userId}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
             }
         }
     } catch (error) {

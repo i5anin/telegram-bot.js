@@ -53,8 +53,15 @@ module.exports = {
         `• плановая: <code>${formatNumber(metrics.load_plan * 100) + '%'}</code>\n` +
         `• фактическая: <code>${formatNumber(metrics.load_fact * 100) + '%'}</code>\n\n` +
         `Кол-во станков: <code>${metrics.cnc_count}</code>\n` +
-        `от <code>${moment(metrics.date_from, 'YYYY-MM-DD HH:mm:ss').format('HH:mm DD.MM.YYYY')}</code>\n` +
-        `до <code>${moment(metrics.date_to, 'YYYY-MM-DD HH:mm:ss').format('HH:mm DD.MM.YYYY')}</code>`,
+        `c <code>${moment(metrics.date_from, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}</code> ` +
+        `до <code>${moment(metrics.date_to, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}</code>`,
+
+    formatMetricsVoronca: (latestMetrics, maxCharacters) =>
+        `<b><u>Воронка</u></b>\n` +
+        `<code>${formatPercentage(latestMetrics.prod, maxCharacters)}</code> Производство\n` +
+        `<code>${formatPercentage(latestMetrics.sles, maxCharacters)}</code> Слесарный участок\n` +
+        `<code>${formatPercentage(latestMetrics.otk, maxCharacters)}</code> ОТК\n` +
+        `<code>${formatPercentage(latestMetrics.upk, maxCharacters)}</code> Упаковка\n\n`,
 
     logMessage: (chatId, fio, username, fullName) =>
         `<b>fio:</b> <a href='tg://user?id=${chatId}'>${fio}</a>\n` +
