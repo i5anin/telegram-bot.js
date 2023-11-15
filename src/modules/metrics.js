@@ -169,7 +169,7 @@ async function formatMetricsMessageMaster() {
             if (metrics.kpi_brak === 0) {
                 brakInfo = 'отсутствует'
             } else if (metrics.kpi_brak > 0 && metrics.kpi_brak < 0.01) {
-                brakInfo = 'ничтожно мал'
+                brakInfo = 'меньше 0.01'
             } else {
                 brakInfo = `${metrics.kpi_brak.toFixed(2)}`
             }
