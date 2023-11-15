@@ -53,8 +53,8 @@ module.exports = {
         `• плановая: <code>${formatNumber(metrics.load_plan * 100) + '%'}</code>\n` +
         `• фактическая: <code>${formatNumber(metrics.load_fact * 100) + '%'}</code>\n\n` +
         `Кол-во станков: <code>${metrics.cnc_count}</code>\n` +
-        `c <code>${moment(metrics.date_from, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}</code> ` +
-        `по <code>${moment(metrics.date_to, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}</code>`,
+        `<code>${moment(metrics.date_from, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}</code>\n` +
+        `<code>${moment(metrics.date_to, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}</code>`,
 
     formatMetricsVoronca: (latestMetrics, maxCharacters) =>
         `<b><u>Воронка</u></b>\n` +
