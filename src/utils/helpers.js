@@ -101,7 +101,6 @@ module.exports = {
     formatNumber,
     resetFlags,
     formatPaymentDate,
-    getDescription,
     getUserName,
     getDefectType,
     getControlType,
