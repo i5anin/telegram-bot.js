@@ -1,8 +1,14 @@
 // const moment = require('moment')
 const { fetchMetrics, checkUser, getMetricsMaster, getMetricsNach } = require('#src/api/index')
 const { sendToLog } = require('#src/utils/log')
-const { formatMetricsMessage, formatMetricsMessageFrez, formatMetricsMessageToc } = require('#src/utils/ru_lang')
+const {
+    formatMetricsMessage,
+    formatMetricsMessageFrez,
+    formatMetricsMessageToc,
+    formatMetricsMessageNach, formatMetricsVoronca,
+} = require('#src/utils/ru_lang')
 const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
+const moment = require('moment')
 
 
 function getMaxCharacters(latestMetrics) {
@@ -61,6 +67,20 @@ async function metricsNotificationDirector(ctx = null, index = 0) {
 }
 
 
+function getPeriod(date_from, date_to) {
+    const from = moment(date_from, 'YYYY-MM-DD HH:mm:ss')
+    const to = moment(date_to, 'YYYY-MM-DD HH:mm:ss')
+
+    if (from.isSame(to, 'day')) {
+        return 'день'
+    } else if (from.isSame(to.clone().subtract(1, 'day'), 'day')) {
+        return 'ночь'
+    } else {
+        return 'месяц'
+    }
+}
+
+
 async function sendMetricsMessagesNach() {
     try {
         const metricsNachData = await getMetricsNach()
@@ -70,42 +90,55 @@ async function sendMetricsMessagesNach() {
             throw new Error('Metrics nach data is not an array')
         }
 
-        for (const metrics of metricsNachData.metrics_nach) {
-            const userCheck = await checkUser(metrics.user_id)  // replace 'SecretKey' with your actual secret key
+        // Объединяем данные по user_id
+        const metricsById = metricsNachData.metrics_nach.reduce((acc, metrics) => {
+            if (!acc[metrics.user_id]) {
+                acc[metrics.user_id] = []
+            }
+            acc[metrics.user_id].push(metrics)
+            return acc
+        }, {})
+
+        for (const [userId, userMetrics] of Object.entries(metricsById)) {
+            const userCheck = await checkUser(userId)  // replace 'SecretKey' with your actual secret key
 
             if (!userCheck.exists) {
-                console.error(`User ${metrics.user_id} does not exist.`)
+                console.error(`User ${userId} does not exist.`)
                 continue
             }
 
-            let message
+            let messages = []
             switch (userCheck.role) {
                 case 'nach_frez':
-                    message = `User ID: <b>${metrics.user_id}</b>\n` +
-                        `Load F Day: <code>${metrics.load_f_day}</code>\n` +
-                        `Load F Night: <code>${metrics.load_f_night}</code>\n` +
-                        `Load F Month: <code>${metrics.load_f_month}</code>`
-                    break
                 case 'nach_toc':
-                    message = `User ID: <b>${metrics.user_id}</b>\n` +
-                        `Load T Day: <code>${metrics.load_t_day}</code>\n` +
-                        `Load T Night: <code>${metrics.load_t_night}</code>\n` +
-                        `Load T Month: <code>${metrics.load_t_month}</code>`
+                    // Обрабатываем все метрики для данного user_id
+                    for (const metrics of userMetrics) {
+                        const period = getPeriod(metrics.date_from, metrics.date_to)
+                        const message = formatMetricsMessageNach(metrics, period)
+                        messages.push(message)
+                    }
                     break
                 default:
-                    console.error(`User ${metrics.user_id} has an unsupported role: ${userCheck.role}`)
+                    console.error(`User ${userId} has an unsupported role: ${userCheck.role}`)
                     continue
             }
 
             await sleep(1000)
 
             try {
-                // await bot.telegram.sendMessage(metrics.user_id, message, { parse_mode: 'HTML' });
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
-                console.log(`Metrics message sent successfully to userId:`, metrics.user_id)
+                // Объединяем все сообщения в одно и отправляем его
+                const combinedMessage = messages.join('\n\n')
+                const metrics = await fetchMetrics()
+                if (metrics.length === 0 || !metrics[0]) throw new Error('No metrics data available')
+                const latestMetrics = metrics[0]
+                const maxCharacters = 4 // безопасный отступ для процентов
+                const message = combinedMessage + '\n\n' + formatMetricsVoronca(latestMetrics, maxCharacters)
+                await bot.telegram.sendMessage(userId, combinedMessage, { parse_mode: 'HTML' })
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, await getUserLinkById(userId) + '\n' + message, { parse_mode: 'HTML' })
+                console.log(`Metrics message sent successfully to userId:`, userId)
             } catch (error) {
-                console.error(`Failed to send message to userId:`, metrics.user_id, 'Error:', error)
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${metrics.user_id}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
+                console.error(`Failed to send message to userId:`, userId, 'Error:', error)
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${userId}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
             }
         }
     } catch (error) {
@@ -132,9 +165,19 @@ async function formatMetricsMessageMaster() {
         }
 
         for (const metrics of metricsMasterData.metrics_master) {
-            const brakInfo = metrics.kpi_brak !== 0 ? `<b>Брак:</b> <code>${metrics.kpi_brak.toFixed(2)}</code>` : ''
+            let brakInfo = ''
+            if (metrics.kpi_brak === 0) {
+                brakInfo = 'отсутствует'
+            } else if (metrics.kpi_brak > 0 && metrics.kpi_brak < 0.01) {
+                brakInfo = 'меньше 0.01'
+            } else {
+                brakInfo = `${metrics.kpi_brak.toFixed(2)}`
+            }
 
-            const message = `${emoji.star} Смена: ${metrics.smena} ` + `<u><b>Место в рейтинге: ${metrics.rating_pos}</b></u>\n` + `<b>ЦКП:</b> <code>${metrics.kpi.toFixed(2)}</code>\n` + `${brakInfo}`
+            const message = `Смена: ${metrics.smena}\n` +
+                `${emoji.star} <u><b>Место в рейтинге: ${metrics.rating_pos}</b></u>\n` +
+                `<b>ЦКП:</b> <code>${metrics.kpi.toFixed(2)}</code>\n` +
+                `<b>Брак:</b> <code>${brakInfo}</code>`
 
             await sleep(1000)
 
@@ -155,6 +198,11 @@ async function formatMetricsMessageMaster() {
 }
 
 
-module.exports = { metricsNotificationDirector, metricsNotificationProiz }
+module.exports = {
+    metricsNotificationDirector,
+    metricsNotificationProiz,
+    formatMetricsMessageMaster,
+    sendMetricsMessagesNach,
+}
 
 
