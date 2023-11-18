@@ -73,13 +73,13 @@ const getChatAdministrators = async (chatId) => {
 
 async function getChatInfo(chatId) {
     try {
-        const response =
-            await axios.get('https://api.telegram.org/bot' + BOT_TOKEN + '/getChat', {
-                params: { chat_id: chatId },
-            })
+        const response = await axios.get('https://api.telegram.org/bot' + BOT_TOKEN + '/getChat', {
+            params: { chat_id: chatId },
+        })
         return response.data.result
     } catch (error) {
-        console.error('Error fetching chat info', error)
+        console.error('Ошибка при получении информации о чате', error)
+        // Здесь вы можете добавить дополнительную обработку ошибок, если это необходимо
         throw error
     }
 }
@@ -140,6 +140,7 @@ async function checkUser(chatId) {
     }
     return performRequest(url, 'get', {}, params)
 }
+
 
 async function addUser(userId, cleanedText, username) {
     const url = `${WEB_API}/users/add.php`
@@ -220,7 +221,6 @@ module.exports = {
     getChatInfo,
     getChatMembersCount,
     getChatAdministrators,
-    getUsersToSend,
     getMetricsMaster,
     getMetricsNach,
 }
