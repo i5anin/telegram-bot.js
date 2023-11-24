@@ -15,13 +15,13 @@ module.exports = {
     errorAPI: 'Ошибка при получении данных с внешнего API:',
     error: 'Произошла ошибка при выполнении команды',
     formatSKMessage: (det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate) =>
-        `· <b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
-        `· <b>Количество:</b> <code>${kolvo_brak}шт.</code>\n` +
-        `· <b>Контроль:</b> <code>${controlDescription}</code>\n` +
-        `· <b>Комментарий ОТК:</b> <blockquote>${comments_otk}</blockquote>\n` +
-        `· <b>Брак:</b> <code>${defectDescription}</code>\n` +
-        `· <b>Партия:</b> <code>${specs_nom_id}</code>\n` +
-        `· <b>Дата:</b> <code>${formattedDate}</code>\n\n`,
+        `${emoji.min_point} <b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
+        `${emoji.min_point} <b>Количество:</b> <code>${kolvo_brak}шт.</code>\n` +
+        `${emoji.min_point} <b>Контроль:</b> <code>${controlDescription}</code>\n` +
+        `${emoji.min_point} <b>Комментарий ОТК:</b> <blockquote>${comments_otk}</blockquote>\n` +
+        `${emoji.min_point} <b>Брак:</b> <code>${defectDescription}</code>\n` +
+        `${emoji.min_point} <b>Партия:</b> <code>${specs_nom_id}</code>\n` +
+        `${emoji.min_point} <b>Дата:</b> <code>${formattedDate}</code>\n\n`,
     formatMetricsMessage: (latestMetrics, maxCharacters) =>
         `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n` +
         `Незавершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b>\u00A0₽\n` +
@@ -50,11 +50,11 @@ module.exports = {
 
     formatMetricsMessageNach: (metrics, period) =>
         `${emoji.tech} <b><u>Загрузка ${period}</u></b>\n` +
-        `• плановая: <code>${formatNumber(metrics.load_plan * 100) + '%'}</code>\n` +
-        `• фактическая: <code>${formatNumber(metrics.load_fact * 100) + '%'}</code>\n\n` +
-        `Кол-во станков: <code>${metrics.cnc_count}</code>\n` +
-        `<code>${moment(metrics.date_from, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}</code>\n` +
-        `<code>${moment(metrics.date_to, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}</code>`,
+        `${emoji.min_point} плановая: <code>${formatNumber(metrics.load_plan * 100) + '%'}</code>\n` +
+        `${emoji.min_point} фактическая: <code>${formatNumber(metrics.load_fact * 100) + '%'}</code>\n` +
+        `${emoji.min_point} кол-во станков: <code>${metrics.cnc_count}</code>` +
+        `<blockquote>${moment(metrics.date_from, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}\n` +
+        `${moment(metrics.date_to, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}</blockquote>`,
 
     formatMetricsVoronca: (latestMetrics, maxCharacters) =>
         `<b><u>Воронка</u></b>\n` +

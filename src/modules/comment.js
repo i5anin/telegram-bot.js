@@ -61,7 +61,7 @@ async function handleAddComment(ctx) {
 
         if (response && response.status === 'OK') {
             await ctx.reply(
-                emoji.ok + ` <b>Ваш комментарий:</b>\n<blockquote>${ctx.message.text}</blockquote>\n\n<b>· Для:</b>\n<code>${ctx.session.userComments.det_name}</code>\n\n<b>· Добавлен успешно!</b>`,
+                emoji.ok + ` <b>Ваш комментарий:</b>\n<blockquote>${ctx.message.text}</blockquote>\n\n<b>${emoji.min_point} Для:</b>\n<code>${ctx.session.userComments.det_name}</code>\n\n<b>${emoji.min_point} Добавлен успешно!</b>`,
                 { parse_mode: 'HTML' },
             )
             await bot.telegram.sendMessage(

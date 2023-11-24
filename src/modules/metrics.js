@@ -1,12 +1,7 @@
 // const moment = require('moment')
 const { fetchMetrics, checkUser, getMetricsMaster, getMetricsNach } = require('#src/api/index')
 const { sendToLog } = require('#src/utils/log')
-const {
-    formatMetricsMessage,
-    formatMetricsMessageFrez,
-    formatMetricsMessageToc,
-    formatMetricsMessageNach, formatMetricsVoronca,
-} = require('#src/utils/ru_lang')
+const { formatMetricsMessage, formatMetricsMessageNach, formatMetricsVoronca } = require('#src/utils/ru_lang')
 const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
 const moment = require('moment')
 
@@ -16,9 +11,7 @@ function getMaxCharacters(latestMetrics) {
     let maxCharacters = 0
     for (let value of percentageValues) {
         let characters = formatNumber(value).length + 1  // +1 для знака процента
-        if (characters > maxCharacters) {
-            maxCharacters = characters
-        }
+        if (characters > maxCharacters) maxCharacters = characters
     }
     return maxCharacters
 }
@@ -174,16 +167,18 @@ async function formatMetricsMessageMaster() {
                 brakInfo = `${metrics.kpi_brak.toFixed(2)}`
             }
 
-            const message = `Смена: ${metrics.smena}\n` +
-                `${emoji.star} <u><b>Место в рейтинге: ${metrics.rating_pos}</b></u>\n` +
-                `<b>ЦКП:</b> <code>${metrics.kpi.toFixed(2)}</code>\n` +
-                `<b>Брак:</b> <code>${brakInfo}</code>`
+            const medalEmoji = getMedalEmoji(metrics.rating_pos) // Получаем медальку
+            const message = `Смена: ${metrics.smena}\n` + `${medalEmoji} <u><b>Место в рейтинге: ${metrics.rating_pos}</b></u>\n` + // Добавляем медальку к сообщению
+                `<b>ЦКП:</b> <code>${metrics.kpi.toFixed(2)}</code>\n` + `<b>Брак:</b> <code>${brakInfo}</code>`
 
             await sleep(1000)
 
             try {
-                await bot.telegram.sendMessage(metrics.user_id, message, { parse_mode: 'HTML' })
-                await bot.telegram.sendMessage(LOG_CHANNEL_ID, await getUserLinkById(metrics.user_id) + '\n' + message, { parse_mode: 'HTML' })
+                // if (medalEmoji !== '•') await bot.telegram.sendMessage(metrics.user_id, medalEmoji, { disable_notification: true }) //user
+                await bot.telegram.sendMessage(metrics.user_id, message, { parse_mode: 'HTML' }) //user
+
+                // if (medalEmoji !== '•') await bot.telegram.sendMessage(LOG_CHANNEL_ID, medalEmoji, { disable_notification: true }) //log
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, await getUserLinkById(metrics.user_id) + '\n' + message, { parse_mode: 'HTML' }) //log
 
                 console.log(`Metrics message sent successfully to userId:`, metrics.user_id)
             } catch (error) {
@@ -198,11 +193,22 @@ async function formatMetricsMessageMaster() {
 }
 
 
+function getMedalEmoji(position) {
+    switch (position) {
+        case 1:
+            return emoji.rating_1 // Золотая медаль
+        case 2:
+            return emoji.rating_2 // Серебряная медаль
+        case 3:
+            return emoji.rating_3 // Бронзовая медаль
+        default:
+            return emoji.point   // Маркер списка
+    }
+}
+
+
 module.exports = {
-    metricsNotificationDirector,
-    metricsNotificationProiz,
-    formatMetricsMessageMaster,
-    sendMetricsMessagesNach,
+    metricsNotificationDirector, metricsNotificationProiz, formatMetricsMessageMaster, sendMetricsMessagesNach,
 }
 
 
