@@ -26,8 +26,8 @@ async function handleAddComment(ctx) {
     const chatId = ctx.message.chat.id
 
     const username = ctx.from.username ? '@' + ctx.from.username : ''
-    const firstName = ctx.from.first_name || 'N/A'
-    const lastName = ctx.from.last_name || 'N/A'
+    // const  firstName = ctx.from.first_name || 'N/A'
+    // const lastName = ctx.from.last_name || 'N/A'
 
     const taskText = ctx.message.reply_to_message.text || ''
 
@@ -70,7 +70,7 @@ async function handleAddComment(ctx) {
                 `${username}`,
                 { parse_mode: 'HTML' },
             )
-            const { id_task, kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment
+            const { kolvo_brak, det_name, type, comments_otk, specs_nom_id } = comment
             const controlDescription = getControlType(type[0])
             const defectDescription = getDefectType(type[1])
             const { formattedDate } = formatPaymentDate({ date: comment.date })

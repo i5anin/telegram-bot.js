@@ -55,7 +55,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
                     process.exit()
                 }
             } catch (error) {
-                console.error('Ошибка данных о актуальном экземляре:', error)
+                console.error('Ошибка данных о актуальном экземпляре:', error)
             }
         })
     }

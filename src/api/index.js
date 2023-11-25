@@ -13,7 +13,7 @@ async function getMetricsNach() {
         console.log(response.data)
         return response.data
     } catch (error) {
-        console.error(`Ошибка при получении данных из эндпойнта /metrics/get_nach.php: ${error.message}`)
+        console.error(`Ошибка при получении данных из endpoint /metrics/get_nach.php: ${error.message}`)
         throw error
     }
 }
@@ -31,18 +31,6 @@ async function getMetricsMaster() {
     }
 }
 
-async function getUsersToSend() {
-    const url = `${WEB_API}/metrics/get_user.php`
-    const params = { key: SECRET_KEY }
-    try {
-        const response = await axios.get(url, { params })
-        console.log(response.data)
-        return response.data
-    } catch (error) {
-        console.error(`Ошибка при получении списка пользователей: ${error.message}`)
-        throw error
-    }
-}
 
 
 const getChatMembersCount = async (chatId) => {

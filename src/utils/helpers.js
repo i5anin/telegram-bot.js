@@ -39,16 +39,6 @@ async function getUserLinkById(userId) {
     }
 }
 
-function getDescription(code) {
-    const typeMapping = {
-        'ПО': 'Пооперационный контроль окончательный',
-        'ПН': 'Пооперационный контроль неокончательный',
-        'УО': 'Контроль перед упаковкой окончательный',
-        'УН': 'Контроль перед упаковкой неокончательный',
-    }
-    return typeMapping[code] || 'Неизвестный код'
-}
-
 async function getUserName(userId) {
     try {
         let usersData = await getAllUsers() || []
