@@ -80,7 +80,7 @@ async function whoCommand(ctx) {
             try {
                 const administrators = await getChatAdministrators(targetId);
                 const adminNames = administrators.map(admin =>
-                    `${emoji.min_point} ${admin.user.first_name}${admin.user.last_name ? ' ' + admin.user.last_name : ''} (<code>${admin.user.id}</code>)\n`
+                    `${emoji.point} ${admin.user.first_name}${admin.user.last_name ? ' ' + admin.user.last_name : ''} (<code>${admin.user.id}</code>)\n`
                 ).join('');
 
                 replyMessage += `Админы:\n${adminNames}`;
