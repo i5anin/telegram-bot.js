@@ -66,7 +66,7 @@ async function sendHelpToUser(ctx, chatId) {
     const messageJpg = `Доступные команды:
 
 1. /new_comment - Получить новые комментарии
-${emoji.min_point} прокомментировать задачу через <u>ответить</u>
+${emoji.min_point} прокомментировать задачу, нажав <u>ответить</u>
 ${emoji.min_point} телефон: <u>ответить</u> - долгое нажатие на нужном сообщении
 ${emoji.min_point} пк: правой кнопкой мыши <u>ответить</u>
 
