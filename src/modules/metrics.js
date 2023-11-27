@@ -126,7 +126,7 @@ async function sendMetricsMessagesNach() {
                 const latestMetrics = metrics[0]
                 const maxCharacters = 4 // безопасный отступ для процентов
                 const message = combinedMessage + '\n\n' + formatMetricsVoronca(latestMetrics, maxCharacters)
-                await bot.telegram.sendMessage(userId, combinedMessage, { parse_mode: 'HTML' })
+                await bot.telegram.sendMessage(userId, combinedMessage, { parse_mode: 'HTML' }) // TODO: отправка пользовтелю
                 await bot.telegram.sendMessage(LOG_CHANNEL_ID, await getUserLinkById(userId) + '\n' + message, { parse_mode: 'HTML' })
                 console.log(`Metrics message sent successfully to userId:`, userId)
             } catch (error) {
@@ -175,7 +175,7 @@ async function formatMetricsMessageMaster() {
 
             try {
                 // if (medalEmoji !== '•') await bot.telegram.sendMessage(metrics.user_id, medalEmoji, { disable_notification: true }) //user
-                await bot.telegram.sendMessage(metrics.user_id, message, { parse_mode: 'HTML' }) //user
+                await bot.telegram.sendMessage(metrics.user_id, message, { parse_mode: 'HTML' })  // TODO: отправка пользовтелю
 
                 // if (medalEmoji !== '•') await bot.telegram.sendMessage(LOG_CHANNEL_ID, medalEmoji, { disable_notification: true }) //log
                 await bot.telegram.sendMessage(LOG_CHANNEL_ID, await getUserLinkById(metrics.user_id) + '\n' + message, { parse_mode: 'HTML' }) //log
