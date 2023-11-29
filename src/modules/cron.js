@@ -32,6 +32,12 @@ function initCronJobs(currentDateTime, instanceNumber) {
             console.log('Running metricsNotificationDirector() for DIR_OPLATA at 7:00 AM every day')
         })
 
+        // Schedule for KISELEV at 7:00 AM every day
+        cron.schedule('30 7 * * *', async () => {
+            await metricsNotificationDirector(null, 0, KISELEV)
+            console.log('Running metricsNotificationDirector() for KISELEV at 7:00 AM every day')
+        })
+
         cron.schedule('0 10 * * *', async () => {
             await metricsNotificationProiz()
             console.log('Running metricsNotificationProiz() at 10:00 AM every day')
