@@ -20,10 +20,16 @@ function initCronJobs(currentDateTime, instanceNumber) {
     if (!METRICS_REPORT_ACTIVE) {
         return
     } else {
+        // Schedule for DIR_METRIC at 7:30 AM every day
         cron.schedule('30 7 * * *', async () => {
-            await metricsNotificationDirector(null, 0)
-            console.log('Running metricsNotification() at 7:30 AM every day ')
+            await metricsNotificationDirector(null, 0, DIR_METRIC)
+            console.log('Running metricsNotificationDirector() for DIR_METRIC at 7:30 AM every day')
+        })
 
+        // Schedule for DIR_OPLATA at 7:00 AM every day
+        cron.schedule('0 7 * * *', async () => {
+            await metricsNotificationDirector(null, 0, DIR_OPLATA)
+            console.log('Running metricsNotificationDirector() for DIR_OPLATA at 7:00 AM every day')
         })
 
         cron.schedule('0 10 * * *', async () => {

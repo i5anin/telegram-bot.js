@@ -20,40 +20,50 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-async function metricsNotificationDirector(ctx = null, index = 0) {
-    try {
-        const metrics = await fetchMetrics()
-        if (metrics.length === 0 || !metrics[index]) {
-            throw new Error('No metrics data available')
-        }
+// DIR_METRIC 7:30
+// DIR_OPLATA 7:00
 
+async function metricsNotificationDirector(ctx = null, index = 0, userId) {
+    try {
+        // Извлеч данные метрик
+        const metrics = await fetchMetrics()
+        if (metrics.length === 0 || !metrics[index]) throw new Error('No metrics data available')
+
+
+        // Обработайте полученные показатели
         const latestMetrics = metrics[index]
         const maxCharacters = getMaxCharacters(latestMetrics)
         const message = formatMetricsMessage(latestMetrics, maxCharacters)
-        if (index === 1) {
-            await sendToLog(ctx)
-            const chatId = ctx.chat.id  // Получите chatId из контекста
-            const userCheck = await checkUser(chatId)  // Проверьте пользователя
 
+        // Логика для случаев, когда индекс равен 1
+        if (index === 1) {
+            // Send logs if necessary
+            await sendToLog(ctx)
+            const chatId = ctx.chat.id  // Retrieve chatId from the context
+            const userCheck = await checkUser(chatId)  // Check the user
+
+            // Проверка разрешений пользователя
             if (!userCheck.exists || (userCheck.role !== 'admin' && userCheck.role !== 'dir')) {
-                console.error(`User ${chatId} does not have the necessary permissions.`)
-                return  // Если у пользователя нет необходимых прав, просто возвращаемся из функции
+                console.error(`Пользователь ${chatId} не имеет необходимых разрешений.`)
+                return  // Return early if the user lacks necessary permissions
             }
+
+            // Отправьте ответ пользователю и зарегистрируйте действие
             await ctx.reply(message, { parse_mode: 'HTML' })
-            await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Запрос метрики <code>${ctx.from.id}</code>\n` + message, { parse_mode: 'HTML' })
+            await bot.telegram.sendMessage(LOG_CHANNEL_ID, await getUserLinkById(ctx.chat.id) + '\n' + message, { parse_mode: 'HTML' })
         } else {
-            const ADMIN_IDS = [DIR_METRIC, DIR_OPLATA, DIR_TEST_GROUP] //1164924330 - Лера
-            for (const adminId of ADMIN_IDS) {
-                try {
-                    await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' })
-                    console.log('Metrics Message sent successfully to adminId:', adminId)
-                } catch (error) {
-                    console.error('Failed to send message to adminId:', adminId, 'Error:', error)
-                    await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Не удалось отправить сообщение <code>${adminId}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
-                }
+            // Отправить сообщение непосредственно указанному идентификатору пользователя
+            try {
+                await bot.telegram.sendMessage(userId, message, { parse_mode: 'HTML' })
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, await getUserLinkById(userId) + '\n' + message, { parse_mode: 'HTML' })
+                console.log('Metrics Message sent successfully to userId:', userId)
+            } catch (error) {
+                console.error('Failed to send message to userId:', userId, 'Error:', error)
+                await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Failed to send message <code>${userId}</code>\n<code>${error}</code>`, { parse_mode: 'HTML' })
             }
         }
     } catch (error) {
+        // Handle any errors in the process
         console.error('Error fetching or sending metrics:', error)
         await bot.telegram.sendMessage(LOG_CHANNEL_ID, `Error fetching or sending metrics\n<code>${error}</code>`, { parse_mode: 'HTML' })
     }
