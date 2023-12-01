@@ -109,4 +109,27 @@ async function handleDocsCommand(ctx) {
     }
 }
 
-module.exports = { handleHelpCommand, handleDocsCommand }
+async function handleOperatorCommand(ctx) {
+    await sendToLog(ctx)
+    const chatId = ctx.message.chat.id  // Получение chatId из контекста ctx
+    try {
+        const registrationData = await checkRegistration(chatId)  // Проверка регистрации
+        const isRegistered = registrationData.exists
+
+        if (isRegistered) {  // Если пользователь зарегистрирован
+            const keyboard = Markup.inlineKeyboard([
+                [Markup.button.url('Главная', 'https://t.me/+Sutzh5nau-s4MWVi')],
+                [Markup.button.url('Маршрутка', 'https://t.me/+lPaHwdU2ILMzNTdi')],
+            ])
+
+            await ctx.reply('Вот несколько полезных ссылок:', keyboard)
+        } else {  // Если пользователь не зарегистрирован
+            await ctx.reply('Доступ закрыт.\nВы должны зарегистрироваться, чтобы получить доступ к этим ресурсам.')
+        }
+    } catch (error) {
+        console.error('Ошибка при проверке регистрации:', error)
+        await ctx.reply('Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.')
+    }
+}
+
+module.exports = { handleHelpCommand, handleDocsCommand, handleOperatorCommand }

@@ -12,7 +12,7 @@ io.init({ transactions: true, http: true })
 const { initCronJobs } = require('#src/modules/cron')
 const { handleRegComment } = require('#src/modules/reg')
 const { handleTextCommand } = require('#src/modules/text')
-const { handleHelpCommand, handleDocsCommand } = require('#src/modules/help')
+const { handleHelpCommand, handleDocsCommand, handleOperatorCommand } = require('#src/modules/help')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
@@ -21,8 +21,10 @@ const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 const { runBot } = require('#src/modules/runBot')
 const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
 const { createMetric } = require('#src/utils/metricPM2')
-const { metricsNotification, metricsNotificationProiz, metricsNotificationDirector, formatMetricsMessageMaster,
-    sendMetricsMessagesNach
+const {
+    metricsNotificationDirector,
+    formatMetricsMessageMaster,
+    sendMetricsMessagesNach,
 } = require('#src/modules/metrics')
 const { handlePhoto } = require('#src/modules/photo')
 
@@ -139,6 +141,7 @@ bot.command('metrics_master_notification', (ctx) => formatMetricsMessageMaster()
 // bot.command('metrics_2', (ctx) => metricsNotificationProiz(ctx, 0))
 // bot.command('metrics_old', metricsNotification)
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
+bot.command('oper', (ctx) => handleOperatorCommand(ctx))
 bot.on('message', (ctx) => handleTextCommand(ctx))
 bot.on('text', (ctx) => handleTextCommand(ctx)) // особо не нужна но пусть будет
 
