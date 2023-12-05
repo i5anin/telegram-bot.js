@@ -35,7 +35,7 @@ async function oplataNotification() {
                     const formattedSum = Number(payment.sum).toLocaleString('ru-RU')
                     const { formattedDate } = formatPaymentDate(payment)
                     message += `Дата: <b>${formattedDate}</b>\n`
-                    message += `Имя клиента: <b>${payment.client_name}</b>\n`
+                    message += `Клиент: <b>${payment.client_name}</b>\n`
                     message += `Сумма: <b>${formattedSum}\u00A0₽</b>\n`
                     message += `<blockquote>Инфо: ${payment.info}</blockquote>\n`
                     message += '\n'
