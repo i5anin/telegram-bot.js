@@ -10,13 +10,13 @@ io.init({ transactions: true, http: true })
 
 // Импорт модулей
 const { initCronJobs } = require('#src/modules/cron')
-const { handleRegComment } = require('#src/modules/reg')
+const { handleRegComment, checkRegistration } = require('#src/modules/reg')
 const { handleTextCommand } = require('#src/modules/text')
 const { handleHelpCommand, handleDocsCommand, handleOperatorCommand } = require('#src/modules/help')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
-const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
+const { logNewChatMembers, logLeftChatMember, sendToLog } = require('#src/utils/log')
 const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 const { runBot } = require('#src/modules/runBot')
 const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
@@ -138,6 +138,76 @@ bot.command(['m', 'metrics'], (ctx) => metricsNotificationDirector(ctx, 1))
 bot.command('metrics_director_notification', (ctx) => metricsNotificationDirector(ctx, 0))
 bot.command('metrics_nachalnic_notification', (ctx) => sendMetricsMessagesNach())
 bot.command('metrics_master_notification', (ctx) => formatMetricsMessageMaster())
+
+// ----------------------------------------------------------------
+// Функция для отправки блока кнопок
+function sendTwoByEightButtons(ctx) {
+    // Создание клавиатуры с кнопками, используя актуальные данные
+    const keyboard = Markup.inlineKeyboard([
+        [Markup.button.callback('Отклонение от плана', 'action_1'), Markup.button.callback('', 'action_2')],
+        [Markup.button.callback('Производство', 'action_3'), Markup.button.callback('-12%', 'action_4')],
+        [Markup.button.callback('Брак', 'action_5'), Markup.button.callback('0%', 'action_6')],
+        [Markup.button.callback('Отдел продаж', 'action_7'), Markup.button.callback('318%', 'action_8')],
+        [Markup.button.callback('Воронка', 'action_9'), Markup.button.callback('', 'action_10')],
+        [Markup.button.callback('Производство', 'action_11'), Markup.button.callback('76%', 'action_12')],
+        [Markup.button.callback('Согласование', 'action_13'), Markup.button.callback('94%', 'action_14')],
+        [Markup.button.callback('Итого вн. производства', 'action_15'), Markup.button.callback('98%', 'action_16')],
+        [Markup.button.callback('Упаковка', 'action_17'), Markup.button.callback('100%', 'action_18')],
+        [Markup.button.callback('Продуктивность', 'action_17'), Markup.button.callback('', 'action_18')],
+        [Markup.button.callback('Продуктивность', 'action_17'), Markup.button.callback(' 2 809 ₽/час', 'action_18')],
+        [Markup.button.callback('Отгрузка М/О', 'action_17'), Markup.button.callback('8 542 849 ₽', 'action_18')],
+        [Markup.button.callback('Отгрузка с НДС', 'action_17'), Markup.button.callback('14 533 900 ₽', 'action_18')],
+    ]);
+
+    // Отправка сообщения с клавиатурой
+    ctx.reply('Незавершённое по М/О: 111 849 201 ₽\n' +
+        'Слесарный участок: 8 024 380 ₽\n' +
+        'ОТК: 1 593 001 ₽\n' +
+        'Упаковка: 289 501 ₽\n' +
+        'Доработка ЧПУ: 340 165 ₽\n' +
+        'Доработка в слесарном: 198 832 ₽\n' +
+        'Согласование: 149 117 ₽\n' +
+        '\n' +
+        'Итого внутреннего производства: 122 444 197 ₽\n' +
+        'Ожидаемая предоплата с НДС: 160 868 286 ₽\n' +
+        'Итого внутреннего производства с НДС: 166 161 354 ₽\n' +
+        'Готовая продукция на складе с НДС: 24 743 555 ₽', keyboard);
+}
+
+
+// Добавление обработчика команды /btn
+bot.command('btn', sendTwoByEightButtons);
+// ----------------------------------------------------------------
+
+const { Markup } = require('telegraf');
+
+async function sendTableAsButtons(ctx) {
+    // await sendToLog(ctx)
+    const chatId = ctx.message.chat.id  // Получение chatId из контекста ctx
+    try {
+        const registrationData = await checkRegistration(chatId)  // Проверка регистрации
+        const isRegistered = registrationData.exists
+
+        if (isRegistered) {  // Если пользователь зарегистрирован
+            const keyboard = Markup.inlineKeyboard([
+                [Markup.button.url('Общая штатная папка', 'https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW')],
+                [Markup.button.url('Должностная папка оператора', 'https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V')],
+                [Markup.button.url('СОФТ (Локально)', 'http://eml.pfforum/')],
+                [Markup.button.url('Архив собраний', 'https://disk.yandex.ru/d/ajVEHCmS5s2T2A')],
+            ])
+
+            await ctx.reply('Вот несколько полезных ссылок:', keyboard)
+        } else {  // Если пользователь не зарегистрирован
+            await ctx.reply('Доступ закрыт.\nВы должны зарегистрироваться, чтобы получить доступ к этим ресурсам.')
+        }
+    } catch (error) {
+        console.error('Ошибка при проверке регистрации:', error)
+        await ctx.reply('Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.')
+    }
+}
+
+bot.command('table', (ctx) => sendTableAsButtons())
+
 // bot.command('metrics_2', (ctx) => metricsNotificationProiz(ctx, 0))
 // bot.command('metrics_old', metricsNotification)
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
