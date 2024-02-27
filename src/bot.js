@@ -10,13 +10,13 @@ io.init({ transactions: true, http: true })
 
 // Импорт модулей
 const { initCronJobs } = require('#src/modules/cron')
-const { handleRegComment, checkRegistration } = require('#src/modules/reg')
+const { handleRegComment } = require('#src/modules/reg')
 const { handleTextCommand } = require('#src/modules/text')
 const { handleHelpCommand, handleDocsCommand, handleOperatorCommand } = require('#src/modules/help')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
-const { logNewChatMembers, logLeftChatMember, sendToLog } = require('#src/utils/log')
+const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
 const { handleGetGroupInfoCommand } = require('#src/utils/csv')
 const { runBot } = require('#src/modules/runBot')
 const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
@@ -138,64 +138,6 @@ bot.command(['m', 'metrics'], (ctx) => metricsNotificationDirector(ctx, 1))
 bot.command('metrics_director_notification', (ctx) => metricsNotificationDirector(ctx, 0))
 bot.command('metrics_nachalnic_notification', (ctx) => sendMetricsMessagesNach())
 bot.command('metrics_master_notification', (ctx) => formatMetricsMessageMaster())
-
-// ----------------------------------------------------------------
-// Функция для отправки блока кнопок
-function sendTwoByEightButtons(ctx) {
-    // Создание клавиатуры с кнопками, используя актуальные данные
-    const keyboard = Markup.inlineKeyboard([
-        [Markup.button.callback('Незавершённое по М/О', 'action_1'), Markup.button.callback('111 849 201 ₽', 'action_2')],
-        [Markup.button.callback('Слесарный участок', 'action_3'), Markup.button.callback('8 024 380 ₽', 'action_4')],
-        [Markup.button.callback('ОТК', 'action_5'), Markup.button.callback('1 593 001 ₽', 'action_6')],
-        [Markup.button.callback('Упаковка', 'action_7'), Markup.button.callback('289 501 ₽', 'action_8')],
-        [Markup.button.callback('Доработка ЧПУ', 'action_9'), Markup.button.callback('340 165 ₽', 'action_10')],
-        [Markup.button.callback('Доработка в слесарном', 'action_11'), Markup.button.callback('198 832 ₽', 'action_12')],
-        [Markup.button.callback('Согласование', 'action_13'), Markup.button.callback('149 117 ₽', 'action_14')],
-        [Markup.button.callback('Итого внутреннего производства', 'action_15'), Markup.button.callback('122 444 197 ₽', 'action_16')],
-        // Добавление новых кнопок для дополнительной информации
-        [Markup.button.callback('Ожидаемая предоплата с НДС', 'action_17'), Markup.button.callback('160 868 286 ₽', 'action_18')],
-        [Markup.button.callback('Итого внутреннего производства с НДС', 'action_19'), Markup.button.callback('166 161 354 ₽', 'action_20')],
-        [Markup.button.callback('Готовая продукция на складе с НДС', 'action_21'), Markup.button.callback('24 743 555 ₽', 'action_22')],
-    ]);
-
-    // Отправка сообщения с клавиатурой
-    ctx.reply('Таблица:', keyboard);
-}
-
-
-// Добавление обработчика команды /btn
-bot.command('btn', sendTwoByEightButtons);
-// ----------------------------------------------------------------
-
-const { Markup } = require('telegraf');
-
-async function sendTableAsButtons(ctx) {
-    // await sendToLog(ctx)
-    const chatId = ctx.message.chat.id  // Получение chatId из контекста ctx
-    try {
-        const registrationData = await checkRegistration(chatId)  // Проверка регистрации
-        const isRegistered = registrationData.exists
-
-        if (isRegistered) {  // Если пользователь зарегистрирован
-            const keyboard = Markup.inlineKeyboard([
-                [Markup.button.url('Общая штатная папка', 'https://drive.google.com/drive/folders/1y5W8bLSrA6uxMKBu_sQtJp7simhDExfW')],
-                [Markup.button.url('Должностная папка оператора', 'https://drive.google.com/drive/folders/1ZmouCoENMzQ7RZxhpmAo-NeZmAanto0V')],
-                [Markup.button.url('СОФТ (Локально)', 'http://eml.pfforum/')],
-                [Markup.button.url('Архив собраний', 'https://disk.yandex.ru/d/ajVEHCmS5s2T2A')],
-            ])
-
-            await ctx.reply('Вот несколько полезных ссылок:', keyboard)
-        } else {  // Если пользователь не зарегистрирован
-            await ctx.reply('Доступ закрыт.\nВы должны зарегистрироваться, чтобы получить доступ к этим ресурсам.')
-        }
-    } catch (error) {
-        console.error('Ошибка при проверке регистрации:', error)
-        await ctx.reply('Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.')
-    }
-}
-
-bot.command('table', (ctx) => sendTableAsButtons())
-
 // bot.command('metrics_2', (ctx) => metricsNotificationProiz(ctx, 0))
 // bot.command('metrics_old', metricsNotification)
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
