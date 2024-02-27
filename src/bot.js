@@ -144,34 +144,22 @@ bot.command('metrics_master_notification', (ctx) => formatMetricsMessageMaster()
 function sendTwoByEightButtons(ctx) {
     // Создание клавиатуры с кнопками, используя актуальные данные
     const keyboard = Markup.inlineKeyboard([
-        [Markup.button.callback('Отклонение от плана', 'action_1'), Markup.button.callback('', 'action_2')],
-        [Markup.button.callback('Производство', 'action_3'), Markup.button.callback('-12%', 'action_4')],
-        [Markup.button.callback('Брак', 'action_5'), Markup.button.callback('0%', 'action_6')],
-        [Markup.button.callback('Отдел продаж', 'action_7'), Markup.button.callback('318%', 'action_8')],
-        [Markup.button.callback('Воронка', 'action_9'), Markup.button.callback('', 'action_10')],
-        [Markup.button.callback('Производство', 'action_11'), Markup.button.callback('76%', 'action_12')],
-        [Markup.button.callback('Согласование', 'action_13'), Markup.button.callback('94%', 'action_14')],
-        [Markup.button.callback('Итого вн. производства', 'action_15'), Markup.button.callback('98%', 'action_16')],
-        [Markup.button.callback('Упаковка', 'action_17'), Markup.button.callback('100%', 'action_18')],
-        [Markup.button.callback('Продуктивность', 'action_17'), Markup.button.callback('', 'action_18')],
-        [Markup.button.callback('Продуктивность', 'action_17'), Markup.button.callback(' 2 809 ₽/час', 'action_18')],
-        [Markup.button.callback('Отгрузка М/О', 'action_17'), Markup.button.callback('8 542 849 ₽', 'action_18')],
-        [Markup.button.callback('Отгрузка с НДС', 'action_17'), Markup.button.callback('14 533 900 ₽', 'action_18')],
+        [Markup.button.callback('Незавершённое по М/О', 'action_1'), Markup.button.callback('111 849 201 ₽', 'action_2')],
+        [Markup.button.callback('Слесарный участок', 'action_3'), Markup.button.callback('8 024 380 ₽', 'action_4')],
+        [Markup.button.callback('ОТК', 'action_5'), Markup.button.callback('1 593 001 ₽', 'action_6')],
+        [Markup.button.callback('Упаковка', 'action_7'), Markup.button.callback('289 501 ₽', 'action_8')],
+        [Markup.button.callback('Доработка ЧПУ', 'action_9'), Markup.button.callback('340 165 ₽', 'action_10')],
+        [Markup.button.callback('Доработка в слесарном', 'action_11'), Markup.button.callback('198 832 ₽', 'action_12')],
+        [Markup.button.callback('Согласование', 'action_13'), Markup.button.callback('149 117 ₽', 'action_14')],
+        [Markup.button.callback('Итого внутреннего производства', 'action_15'), Markup.button.callback('122 444 197 ₽', 'action_16')],
+        // Добавление новых кнопок для дополнительной информации
+        [Markup.button.callback('Ожидаемая предоплата с НДС', 'action_17'), Markup.button.callback('160 868 286 ₽', 'action_18')],
+        [Markup.button.callback('Итого внутреннего производства с НДС', 'action_19'), Markup.button.callback('166 161 354 ₽', 'action_20')],
+        [Markup.button.callback('Готовая продукция на складе с НДС', 'action_21'), Markup.button.callback('24 743 555 ₽', 'action_22')],
     ]);
 
     // Отправка сообщения с клавиатурой
-    ctx.reply('Незавершённое по М/О: 111 849 201 ₽\n' +
-        'Слесарный участок: 8 024 380 ₽\n' +
-        'ОТК: 1 593 001 ₽\n' +
-        'Упаковка: 289 501 ₽\n' +
-        'Доработка ЧПУ: 340 165 ₽\n' +
-        'Доработка в слесарном: 198 832 ₽\n' +
-        'Согласование: 149 117 ₽\n' +
-        '\n' +
-        'Итого внутреннего производства: 122 444 197 ₽\n' +
-        'Ожидаемая предоплата с НДС: 160 868 286 ₽\n' +
-        'Итого внутреннего производства с НДС: 166 161 354 ₽\n' +
-        'Готовая продукция на складе с НДС: 24 743 555 ₽', keyboard);
+    ctx.reply('Таблица:', keyboard);
 }
 
 
