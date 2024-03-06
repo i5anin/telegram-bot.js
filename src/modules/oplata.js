@@ -1,8 +1,8 @@
 const { getAllPayments, updatePayments } = require('#src/api/index') // Импортируем функции
 const { formatPaymentDate } = require('#src/utils/helpers')
+const axios = require('axios') // Убедитесь, что axios установлен в вашем проекте
 
 async function oplataNotification() {
-
     if (!OPLATA_REPORT_ACTIVE) return
 
     let i_ADMIN_IDS = null
@@ -24,9 +24,11 @@ async function oplataNotification() {
                 batches.push(sortedPayments.slice(i, i + BATCH_SIZE))
             }
 
-            const ADMIN_IDS = [DIR_OPLATA, KISELEV, DIR_TEST_GROUP]
-            console.log(ADMIN_IDS)
-
+            // Получаем ADMIN_IDS из API
+            const adminResponse = await axios.get(WEB_API + '/oplata/get_tg_id.php', {
+                params: { key: SECRET_KEY },
+            })
+            const ADMIN_IDS = adminResponse.data.user_ids || []
             for (let batch of batches) {
                 console.log('Processing batch:', batch)
                 let sentIds = []
@@ -47,7 +49,7 @@ async function oplataNotification() {
                     console.log('Sending message to adminId:', adminId)
                     try {
                         await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' })
-                        console.log('OPLATA Message sent successfully to adminId:', adminId)
+                        console.log('Message sent successfully to adminId:', adminId)
                     } catch (error) {
                         console.error('Failed to send message to adminId:', adminId, 'Error:', error)
                         await bot.telegram.sendMessage(

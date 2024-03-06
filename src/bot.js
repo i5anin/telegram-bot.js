@@ -55,6 +55,7 @@ global.LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID
 global.DIR_OPLATA = process.env.DIR_OPLATA
 global.DIR_METRIC = process.env.DIR_METRIC
 global.KISELEV = process.env.KISELEV
+global.EROFEEVA = process.env.EROFEEVA
 
 global.DIR_TEST_GROUP = process.env.DIR_TEST_GROUP
 global.ADMIN_DB = process.env.ADMIN_DB
