@@ -3,6 +3,19 @@
 const moment = require('moment')
 const { formatNumber, formatPercentage } = require('#src/utils/helpers')
 
+/**
+ * Проверяет, выходит ли значение за пределы заданного диапазона (меньше 1 700 000 или больше 3 400 000),
+ * и форматирует его, добавляя символ "❗", если значение вне диапазона.
+ *
+ * @param {number} value - Числовое значение для проверки.
+ * @returns {string} - Форматированное значение с возможным символом "❗".
+ */
+function checkWarningAndFormat(value) {
+    const isOutOfBound = value < 1700000 || value > 3400000;
+    // Изменим место добавления символа "❗" и используем обычный пробел
+    return `<b>${formatNumber(value)}</b> ₽${isOutOfBound ? ' ❗' : ''}\n`;
+}
+
 module.exports = {
     alreadyRegistered: '<b>Вы уже зарегистрированы!</b>',
     notRegistered: 'Не зарегистрированы. \nВведите данные в формате:\n<code>Иванов И.И.</code>',
@@ -25,12 +38,14 @@ module.exports = {
     formatMetricsMessage: (latestMetrics, maxCharacters) =>
         `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n` +
         `Незавершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b>\u00A0₽\n` +
-        `Слесарный участок: <b>${formatNumber(latestMetrics.prod_price_sles)}</b>\u00A0₽\n` +
-        `ОТК: <b>${formatNumber(latestMetrics.prod_price_otk)}</b>\u00A0₽\n` +
-        `Упаковка: <b>${formatNumber(latestMetrics.prod_price_upk)}</b>\u00A0₽\n` +
-        `Доработка ЧПУ: <b>${formatNumber(latestMetrics.prod_price_dorabotka)}</b>\u00A0₽\n` +
-        `Доработка в слесарном: <b>${formatNumber(latestMetrics.prod_price_dorabotka_sles)}</b>\u00A0₽\n` +
-        `Согласование: <b>${formatNumber(latestMetrics.prod_price_sogl)}</b>\u00A0₽\n\n` +
+        `<blockquote>`+
+            `Cлесарка: ${checkWarningAndFormat(latestMetrics.prod_price_sles)}` +
+            `ОТК: ${checkWarningAndFormat(latestMetrics.prod_price_otk)}` +
+            `Упаковка: ${checkWarningAndFormat(latestMetrics.prod_price_upk)}` +
+            `Доработка ЧПУ: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka)}` +
+            `Доработка слес.: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka_sles)}` +
+            `Согл.: ${checkWarningAndFormat(latestMetrics.prod_price_sogl)}` +
+        `</blockquote>`+
         `Итого внутреннего производства: <b>${formatNumber(latestMetrics.prod_price)}</b>\u00A0₽\n` +
         `Ожидаемая предоплата с НДС: <b>${formatNumber(latestMetrics.predoplata)}</b>\u00A0₽\n` +
         `Итого внутреннего производства с НДС: <b>${formatNumber(latestMetrics.total_price)}</b>\u00A0₽\n` +
