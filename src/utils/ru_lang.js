@@ -11,11 +11,15 @@ const { formatNumber, formatPercentage } = require('#src/utils/helpers')
  * @returns {string} - Форматированное значение с возможным символом "❗".
  */
 function checkWarningAndFormat(value) {
-    const isOutOfBound = value < 1700000 || value > 3400000;
-    // Изменим место добавления символа "❗" и используем обычный пробел
-    return `<b>${formatNumber(value)}</b> ₽${isOutOfBound ? ' ❗' : ''}\n`;
-}
+    let symbol = '';
+    if (value < 1700000 )
+        symbol = '❗️'; // Красный для значений вне диапазона
+    if (value >= 3400000) {
+        symbol = '\u00A0✅'; // Зеленый для значений в диапазоне
+    }
 
+    return `<b>${formatNumber(value)}</b> ₽${symbol}\n`;
+}
 module.exports = {
     alreadyRegistered: '<b>Вы уже зарегистрированы!</b>',
     notRegistered: 'Не зарегистрированы. \nВведите данные в формате:\n<code>Иванов И.И.</code>',
