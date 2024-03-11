@@ -10,16 +10,17 @@ const { formatNumber, formatPercentage } = require('#src/utils/helpers')
  * @param {number} value - Числовое значение для проверки.
  * @returns {string} - Форматированное значение с возможным символом "❗".
  */
-function checkWarningAndFormat(value) {
-    let symbol = '';
-    if (value < 1700000 )
-        symbol = '❗️'; // Красный для значений вне диапазона
-    if (value >= 3400000) {
-        symbol = '\u00A0✅'; // Зеленый для значений в диапазоне
-    }
+function checkWarningAndFormat(value, category) {
+    const isWithinLimits =
+        (category === 'Слесарка' && value <= 3400000) || ((category === 'ОТК' || category === 'Упаковка') && value <= 1700000)
 
-    return `<b>${formatNumber(value)}</b> ₽${symbol}\n`;
+    // Изменяем логику тернарного оператора, чтобы "⚠️" отображался по умолчанию
+    const symbol = isWithinLimits ? '\u00A0✓' : '\u00A0⚠️' // По умолчанию для доработок, согласований и всех остальных случаев
+
+    return `<b>${formatNumber(value)}</b> ₽${symbol}\n`
 }
+
+
 module.exports = {
     alreadyRegistered: '<b>Вы уже зарегистрированы!</b>',
     notRegistered: 'Не зарегистрированы. \nВведите данные в формате:\n<code>Иванов И.И.</code>',
@@ -42,14 +43,14 @@ module.exports = {
     formatMetricsMessage: (latestMetrics, maxCharacters) =>
         `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n` +
         `Незавершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b>\u00A0₽\n` +
-        `<blockquote>`+
-            `Cлесарка: ${checkWarningAndFormat(latestMetrics.prod_price_sles)}` +
-            `ОТК: ${checkWarningAndFormat(latestMetrics.prod_price_otk)}` +
-            `Упаковка: ${checkWarningAndFormat(latestMetrics.prod_price_upk)}` +
-            `Доработка ЧПУ: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka)}` +
-            `Доработка слес.: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka_sles)}` +
-            `Согл.: ${checkWarningAndFormat(latestMetrics.prod_price_sogl)}` +
-        `</blockquote>`+
+        `<blockquote>` +
+        `Cлесарка: ${checkWarningAndFormat(latestMetrics.prod_price_sles, 'Cлесарка')}` + //Слесарка меньше или равно 3 400 000
+        `ОТК: ${checkWarningAndFormat(latestMetrics.prod_price_otk, 'ОТК')}` + //ОТК меньше или равно 1 700 000
+        `Упаковка: ${checkWarningAndFormat(latestMetrics.prod_price_upk, 'Упаковка')}` + //Упаковка меньше или равно 1 700 000
+        `Доработка ЧПУ: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka)}` +
+        `Доработка слес.: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka_sles)}` +
+        `Согл.: ${checkWarningAndFormat(latestMetrics.prod_price_sogl)}` +
+        `</blockquote>` +
         `Итого внутреннего производства: <b>${formatNumber(latestMetrics.prod_price)}</b>\u00A0₽\n` +
         `Ожидаемая предоплата с НДС: <b>${formatNumber(latestMetrics.predoplata)}</b>\u00A0₽\n` +
         `Итого внутреннего производства с НДС: <b>${formatNumber(latestMetrics.total_price)}</b>\u00A0₽\n` +
