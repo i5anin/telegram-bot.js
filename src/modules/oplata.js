@@ -32,28 +32,24 @@ async function oplataNotification() {
             for (let batch of batches) {
                 console.log('Processing batch:', batch)
                 let sentIds = []
-                let messages = [] // Используем массив для хранения отдельных сообщений о платежах
-
+                let message = '\n'
                 batch.forEach((payment) => {
                     const formattedSum = Number(payment.sum).toLocaleString('ru-RU')
                     const { formattedDate } = formatPaymentDate(payment)
-                    let message = '' // Строим сообщение для каждого платежа отдельно
                     message += `Дата: <b>${formattedDate}</b>\n`
-                    message += `Клиент: <b>${payment.client_name.replace(/ /g, '\u00A0')}</b>\n`;
+                    message += `Клиент: <b>${payment.client_name}</b>\n`
                     message += `Сумма: <b>${formattedSum}\u00A0₽</b>\n`
-                    message += `<blockquote>${payment.info}</blockquote>` // Убираем лишний \n в конце
-                    messages.push(message) // Добавляем сформированное сообщение в массив
+                    message += `<blockquote>${payment.info}</blockquote>\n`
+                    // message += `<blockquote>Инфо: ${payment.info}</blockquote>\n`
+                    message += '\n'
                     sentIds.push(payment.id)
                 })
-
-                // Соединяем все сообщения в одно, добавляя между ними разделитель
-                let finalMessage = messages.join('\n\n') // Добавляем двойной перенос строки только между сообщениями о платежах
 
                 for (const adminId of ADMIN_IDS) {
                     i_ADMIN_IDS = adminId
                     console.log('Sending message to adminId:', adminId)
                     try {
-                        await bot.telegram.sendMessage(adminId, finalMessage, { parse_mode: 'HTML' })
+                        await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' })
                         console.log('Message sent successfully to adminId:', adminId)
                     } catch (error) {
                         console.error('Failed to send message to adminId:', adminId, 'Error:', error)
@@ -70,7 +66,6 @@ async function oplataNotification() {
                     stateCounter.oplata_get_all++
                 }
             }
-
         }
     } catch (error) {
         await bot.telegram.sendMessage(
