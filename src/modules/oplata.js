@@ -17,7 +17,7 @@ async function oplataNotification() {
             let payments = response.payments
             console.log('Payments received:', payments)
 
-            const sortedPayments = payments.sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))
+            const sortedPayments = payments.sort((a, b) => new Date(a.date) - new Date(b.date));
 
             let batches = []
             for (let i = 0; i < sortedPayments.length; i += BATCH_SIZE)
@@ -37,7 +37,7 @@ async function oplataNotification() {
                     const formattedSum = Number(payment.sum).toLocaleString('ru-RU')
                     const { formattedDate } = formatPaymentDate(payment)
                     message += `Дата: <b>${formattedDate}</b>\n`
-                    message += `Клиент: <b>${payment.client_name}</b>\n`
+                    message += `Клиент: <b>${payment.client_name.replace(/ /g, '\u00A0')}</b>\n`;
                     message += `Сумма: <b>${formattedSum}\u00A0₽</b>\n`
                     message += `<blockquote>${payment.info}</blockquote>`
                     if (index < batch.length - 1) message += '\n\n'
