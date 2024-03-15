@@ -5,7 +5,7 @@ const axios = require('axios') // Убедитесь, что axios устано�
 async function oplataNotification() {
     if (!OPLATA_REPORT_ACTIVE) return
 
-    let i_ADMIN_IDS = null
+    let failedAdminId = null
     const BATCH_SIZE = 10
 
     try {
@@ -17,45 +17,45 @@ async function oplataNotification() {
             let payments = response.payments
             console.log('Payments received:', payments)
 
-            const sortedPayments = payments.sort((a, b) => new Date(b) - new Date(a))
+            const sortedPayments = payments.sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))
 
             let batches = []
-            for (let i = 0; i < sortedPayments.length; i += BATCH_SIZE) {
+            for (let i = 0; i < sortedPayments.length; i += BATCH_SIZE)
                 batches.push(sortedPayments.slice(i, i + BATCH_SIZE))
-            }
 
-            // Получаем ADMIN_IDS из API
+
+            // Получаем adminUserIds из API
             const adminResponse = await axios.get(WEB_API + '/oplata/get_tg_id.php', {
                 params: { key: SECRET_KEY },
             })
-            const ADMIN_IDS = adminResponse.data.user_ids || []
+            const adminUserIds = adminResponse.data.user_ids || []
             for (let batch of batches) {
                 console.log('Processing batch:', batch)
                 let sentIds = []
-                let message = '\n'
-                batch.forEach((payment) => {
+                let message = ''
+                batch.forEach((payment, index) => {
                     const formattedSum = Number(payment.sum).toLocaleString('ru-RU')
                     const { formattedDate } = formatPaymentDate(payment)
                     message += `Дата: <b>${formattedDate}</b>\n`
                     message += `Клиент: <b>${payment.client_name}</b>\n`
                     message += `Сумма: <b>${formattedSum}\u00A0₽</b>\n`
-                    message += `<blockquote>${payment.info}</blockquote>\n`
-                    // message += `<blockquote>Инфо: ${payment.info}</blockquote>\n`
-                    message += '\n'
+                    message += `<blockquote>${payment.info}</blockquote>`
+                    if (index < batch.length - 1) message += '\n\n'
+
                     sentIds.push(payment.id)
                 })
 
-                for (const adminId of ADMIN_IDS) {
-                    i_ADMIN_IDS = adminId
-                    console.log('Sending message to adminId:', adminId)
+                for (const currentAdminId of adminUserIds) {
+                    failedAdminId = currentAdminId
+                    console.log('Sending message to adminId:', currentAdminId)
                     try {
-                        await bot.telegram.sendMessage(adminId, message, { parse_mode: 'HTML' })
-                        console.log('Message sent successfully to adminId:', adminId)
+                        await bot.telegram.sendMessage(currentAdminId, message, { parse_mode: 'HTML' })
+                        console.log('Message sent successfully to adminId:', currentAdminId)
                     } catch (error) {
-                        console.error('Failed to send message to adminId:', adminId, 'Error:', error)
+                        console.error('Failed to send message to adminId:', currentAdminId, 'Error:', error)
                         await bot.telegram.sendMessage(
                             LOG_CHANNEL_ID,
-                            `Не удалось отправить сообщение <code>${i_ADMIN_IDS}</code> оплата \n<code>${error}</code>`,
+                            `Не удалось отправить сообщение <code>${failedAdminId}</code> оплата \n<code>${error}</code>`,
                             { parse_mode: 'HTML' },
                         )
                     }
@@ -70,7 +70,7 @@ async function oplataNotification() {
     } catch (error) {
         await bot.telegram.sendMessage(
             LOG_CHANNEL_ID,
-            `Попытка отправить сообщение <code>${i_ADMIN_IDS}</code> оплата \n<code>${error}</code>`,
+            `Попытка отправить сообщение <code>${failedAdminId}</code> оплата \n<code>${error}</code>`,
             { parse_mode: 'HTML' },
         )
     }
