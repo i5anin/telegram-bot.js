@@ -64,7 +64,8 @@ module.exports = {
         `<code>${formatPercentage(latestMetrics.sles, maxCharacters)}</code> Слесарный участок\n` +
         `<code>${formatPercentage(latestMetrics.otk, maxCharacters)}</code> ОТК\n` +
         `<code>${formatPercentage(latestMetrics.upk, maxCharacters)}</code> Упаковка\n\n` +
-        `Продуктивность: <b>${formatNumber(latestMetrics.productivity)}</b>\u00A0₽/час\n` +
+        `Прод. оборудования: <b>${formatNumber(latestMetrics.productivity_prod)}</b>\u00A0₽/час\n` +
+        `Прод. производства: <b>${formatNumber(latestMetrics.productivity)}</b>\u00A0₽/час\n` +
         `Отгрузка М/О: <b>${formatNumber(latestMetrics.get_sum_otgr_prod)}</b>\u00A0₽\n` +
         `Отгрузка с НДС: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b>\u00A0₽\n`,
 

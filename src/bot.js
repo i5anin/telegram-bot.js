@@ -144,7 +144,7 @@ bot.command('metrics_master_notification', (ctx) => formatMetricsMessageMaster()
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
 bot.command('oper', (ctx) => handleOperatorCommand(ctx))
 
-bot.command('ping_test', pingService);
+// bot.command('ping_test', pingService);
 
 
 bot.on('message', (ctx) => handleTextCommand(ctx))

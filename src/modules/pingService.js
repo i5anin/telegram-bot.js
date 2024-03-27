@@ -1,6 +1,6 @@
 // pingService.js
 
-const ping = require('ping')
+// const ping = require('ping')
 
 
 const hosts = [
