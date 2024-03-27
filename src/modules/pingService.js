@@ -10,6 +10,7 @@ const hosts = [
     { name: 'Устройство хранения данных', ip: '192.168.0.10' },
     { name: 'Устройство хранения данных', ip: '192.168.0.97' },
     { name: 'Устройство хранения данных', ip: '192.168.0.3' },
+    { name: 'Камера', ip: '192.168.0.226' },
 ]
 
 const pingHosts = async (hosts, numOfPings = 4) => {
@@ -28,7 +29,7 @@ const pingHosts = async (hosts, numOfPings = 4) => {
             const avg = pings.reduce((a, b) => a + b, 0) / pings.length
             pingResults += `${host.name} (${host.ip})<blockquote>min: ${min}ms, avg: ${avg.toFixed(2)}ms, max: ${max}ms</blockquote>\n`
         } else {
-            pingResults += `${host.name} (${host.ip}), все запросы пинга тайм-аут.\n\n`
+            pingResults += `${host.name} (${host.ip})<blockquote>все запросы пинга тайм-аут</blockquote>\n`
         }
     }
 
