@@ -12,6 +12,7 @@ io.init({ transactions: true, http: true })
 const { initCronJobs } = require('#src/modules/cron')
 const { handleRegComment } = require('#src/modules/reg')
 const { handleTextCommand } = require('#src/modules/text')
+const { pingService } = require('#src/modules/pingService')
 const { handleHelpCommand, handleDocsCommand, handleOperatorCommand } = require('#src/modules/help')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
@@ -142,12 +143,15 @@ bot.command('metrics_master_notification', (ctx) => formatMetricsMessageMaster()
 // bot.command('metrics_old', metricsNotification)
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
 bot.command('oper', (ctx) => handleOperatorCommand(ctx))
+
+bot.command('ping_test', pingService);
+
+
 bot.on('message', (ctx) => handleTextCommand(ctx))
 bot.on('text', (ctx) => handleTextCommand(ctx)) // особо не нужна но пусть будет
 
 
 // Обработчик текстовых сообщений
-
 bot.on('new_chat_members', logNewChatMembers)
 bot.on('left_chat_member', logLeftChatMember)
 
