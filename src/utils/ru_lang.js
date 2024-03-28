@@ -52,9 +52,9 @@ module.exports = {
         `Согл.: ${checkWarningAndFormat(latestMetrics.prod_price_sogl)}` +
         `</blockquote>` +
         `Итого вн. производства: <b>${formatNumber(latestMetrics.prod_price)}</b>\u00A0₽\n` +
-        `Ожидаемая предоплата: <b>${formatNumber(latestMetrics.predoplata)}</b>\u00A0₽ <tg-spoiler>с НДС</tg-spoiler>\n` +
-        `Итого вн. производства: <b>${formatNumber(latestMetrics.total_price)}</b>\u00A0₽ <tg-spoiler>с НДС</tg-spoiler>\n` +
-        `Готовая продукция склад: <b>${formatNumber(latestMetrics.total_sklad_gp)}</b>\u00A0₽ <tg-spoiler>с НДС</tg-spoiler>\n\n` +
+        `Ожидаемая предоплата: <b>${formatNumber(latestMetrics.predoplata)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
+        `Итого вн. производства: <b>${formatNumber(latestMetrics.total_price)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
+        `Готовая продукция склад: <b>${formatNumber(latestMetrics.total_sklad_gp)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n\n` +
         `<b><u>Отклонение от плана</u></b>\n` +
         `<code>${formatPercentage(latestMetrics.cumulative_sklad_month, maxCharacters)}</code> Производство\n` +
         `<code>${formatPercentage(latestMetrics.cumulative_brak_month, maxCharacters)}</code> Брак\n` +
@@ -67,7 +67,7 @@ module.exports = {
         `Прод. оборудования: <b>${formatNumber(latestMetrics.productivity_prod)}</b>\u00A0₽/час\n` +
         `Прод. производства: <b>${formatNumber(latestMetrics.productivity)}</b>\u00A0₽/час\n` +
         `Отгрузка М/О: <b>${formatNumber(latestMetrics.get_sum_otgr_prod)}</b>\u00A0₽\n` +
-        `Отгрузка: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b>\u00A0₽ <tg-spoiler>с НДС</tg-spoiler>\n`,
+        `Отгрузка: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n`,
 
     formatMetricsMessageNach: (metrics, period) =>
         `${emoji.tech} <b><u>Загрузка ${period}</u></b>\n` +
