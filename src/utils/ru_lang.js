@@ -67,7 +67,7 @@ module.exports = {
         `Прод. оборудования: <b>${formatNumber(latestMetrics.productivity_prod)}</b>\u00A0₽/час\n` +
         `Прод. производства: <b>${formatNumber(latestMetrics.productivity)}</b>\u00A0₽/час\n` +
         `Отгрузка М/О: <b>${formatNumber(latestMetrics.get_sum_otgr_prod)}</b>\u00A0₽\n` +
-        `Отгрузка с НДС: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b>\u00A0₽\n`,
+        `Отгрузка: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b>\u00A0₽ <tg-spoiler>с НДС</tg-spoiler>\n`,
 
     formatMetricsMessageNach: (metrics, period) =>
         `${emoji.tech} <b><u>Загрузка ${period}</u></b>\n` +
