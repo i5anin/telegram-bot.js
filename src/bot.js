@@ -154,12 +154,8 @@ bot.command(['m', 'metrics'], (ctx) => metricsNotificationDirector(ctx, 1))
 bot.command('metrics_director_notification', (ctx) =>
   metricsNotificationDirector(ctx, 0)
 )
-bot.command('metrics_nachalnic_notification', (ctx) =>
-  sendMetricsMessagesNach()
-)
-bot.command('metrics_master_notification', (ctx) =>
-  formatMetricsMessageMaster()
-)
+bot.command('metrics_nachalnic_notification', () => sendMetricsMessagesNach())
+bot.command('metrics_master_notification', () => formatMetricsMessageMaster())
 // bot.command('metrics_2', (ctx) => metricsNotificationProiz(ctx, 0))
 // bot.command('metrics_old', metricsNotification)
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
