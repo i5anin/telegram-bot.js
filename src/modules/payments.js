@@ -8,7 +8,7 @@ const { checkUser } = require('#src/api/index')
 // Функция для отправки запроса в API и получения последних данных о платежах пользователя
 async function getLastPaymentForUser(userId) {
     try {
-        const response = await axios.get(`https://api.pf-forum.ru/api/payments/payments.php?user_id=${userId}`)
+        const response = await axios.get(`${WEB_API}/payments/payments.php?user_id=${userId}`)
         const payments = response.data.payments
         return payments[payments.length - 1] || null
     } catch (error) {
@@ -22,7 +22,6 @@ async function payments(ctx) {
     try {
         // Безопасное извлечение userId из ctx
         const userId = ctx?.from?.id;
-        // const userId = 6174005112
 
         if (!userId) {
             console.log('Не удалось получить userId')
