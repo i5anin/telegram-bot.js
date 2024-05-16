@@ -11,8 +11,9 @@ io.init({ transactions: true, http: true })
 // Импорт модулей
 const { initCronJobs } = require('#src/modules/cron')
 const { handleRegComment } = require('#src/modules/reg')
+const { payments } = require('#src/modules/payments')
 const { handleTextCommand } = require('#src/modules/text')
-const { pingService } = require('#src/modules/pingService')
+// const { pingService } = require('#src/modules/pingService')
 const { handleHelpCommand, handleDocsCommand, handleOperatorCommand } = require('#src/modules/help')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
@@ -126,7 +127,8 @@ runBot(instanceNumber, currentDateTime)
 bot.on('photo', (ctx) => handlePhoto(ctx))
 
 // Обработчики команд
-bot.command('reg_key', (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true)) //['start', 'reg']
+bot.command('reg', (ctx) => handleRegComment(ctx, ctx.session.isAwaitFio = true)) //['start', 'reg']
+bot.command('pay', (ctx) => payments(ctx)) //['start', 'reg']
 bot.command('new_comment', (ctx) => notifyUsers(ctx, ctx.session.isUserInitiated = true))
 bot.command('new_comment_all', notifyAllUsers)
 bot.command('help', handleHelpCommand)

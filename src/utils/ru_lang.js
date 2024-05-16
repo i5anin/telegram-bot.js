@@ -32,6 +32,16 @@ module.exports = {
     userNotFound: (userId) => `Пользователь\nID: <code>${userId}</code>\n<b>не зарегистрирован в системе</b>`,
     errorAPI: 'Ошибка при получении данных с внешнего API:',
     error: 'Произошла ошибка при выполнении команды',
+    payments: (paymentData) =>
+        `📈 Вы заработали: <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n` +
+        `<blockquote>` +
+        // `<code>${paymentData.fio}</code>\n` +
+        `На текущую дату <code>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</code> \n` +
+        `Отработанные часы  <code>${formatNumber(paymentData.work_hours)}</code> из <code>${paymentData.tabel_hours}</code>\n` +
+        `Базовая <code>${formatNumber(paymentData.base)}\u00A0₽</code>\n` +
+        `Грейд: <code>${paymentData.grade}</code></blockquote>`,
+
+
     formatSKMessage: (det_name, kolvo_brak, controlDescription, defectDescription, comments_otk, specs_nom_id, formattedDate) =>
         `${emoji.point} <b>Название и обозначение:</b>\n<code>${det_name}</code>\n` +
         `${emoji.point} <b>Количество:</b> <code>${kolvo_brak}шт.</code>\n` +
