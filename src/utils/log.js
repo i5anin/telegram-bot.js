@@ -4,47 +4,55 @@ const { logMessage } = require('#src/utils/ru_lang')
 const { getAllUsers } = require('#src/api/index')
 
 async function logNewChatMembers(ctx) {
-    const chatTitle = ctx.chat.title || 'Неназванный чат'
-    const addedUsers = ctx.message.new_chat_members
+  const chatTitle = ctx.chat.title || 'Неназванный чат'
+  const addedUsers = ctx.message.new_chat_members
 
-    for (const newUser of addedUsers) {
-        const username = newUser.username || 'N/A'
-        const fullName = `${newUser.first_name || ''} ${newUser.last_name || ''}`.trim()
-        const userId = newUser.id
+  for (const newUser of addedUsers) {
+    const username = newUser.username || 'N/A'
+    const fullName =
+      `${newUser.first_name || ''} ${newUser.last_name || ''}`.trim()
+    const userId = newUser.id
 
-        const usersData = await getAllUsers()
-        const user = usersData.find(u => u.user_id === userId)
+    const usersData = await getAllUsers()
+    const user = usersData.find((u) => u.user_id === userId)
 
-        // Создайте сообщение, независимо от наличия пользователя в базе данных
-        const message = `${emoji.ok} Добавили в группу <code>${chatTitle}</code>\n\n` + logMessage(userId, user ? user.fio : 'N/A', username, fullName)
+    // Создайте сообщение, независимо от наличия пользователя в базе данных
+    const message =
+      `${emoji.ok} Добавили в группу <code>${chatTitle}</code>\n\n` +
+      logMessage(userId, user ? user.fio : 'N/A', username, fullName)
 
-        await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
-    }
+    await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, {
+      parse_mode: 'HTML'
+    })
+  }
 }
-
 
 // Отслеживаем событие удаления пользователя из чата
 async function logLeftChatMember(ctx) {
-    const chatTitle = ctx.chat.title || 'Неназванный чат'
-    const leftUser = ctx.message.left_chat_member
+  const chatTitle = ctx.chat.title || 'Неназванный чат'
+  const leftUser = ctx.message.left_chat_member
 
-    if (leftUser) {
-        const username = leftUser.username || 'N/A'
-        const fullName = `${leftUser.first_name || ''} ${leftUser.last_name || ''}`.trim()
-        const userId = leftUser.id
+  if (leftUser) {
+    const username = leftUser.username || 'N/A'
+    const fullName =
+      `${leftUser.first_name || ''} ${leftUser.last_name || ''}`.trim()
+    const userId = leftUser.id
 
-        const usersData = await getAllUsers()
-        const user = usersData.find(u => u.user_id === userId)
+    const usersData = await getAllUsers()
+    const user = usersData.find((u) => u.user_id === userId)
 
-        const message = `${emoji.x} Покинул группу <code>${chatTitle}</code>\n\n` + logMessage(userId, user ? user.fio : 'N/A', username, fullName)
+    const message =
+      `${emoji.x} Покинул группу <code>${chatTitle}</code>\n\n` +
+      logMessage(userId, user ? user.fio : 'N/A', username, fullName)
 
-        await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' })
-    } else {
-        // Обработка случая, когда объект leftUser не существует (например, пользователь покинул чат до обработки события)
-        console.log('Объект leftUser не существует.')
-    }
+    await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, {
+      parse_mode: 'HTML'
+    })
+  } else {
+    // Обработка случая, когда объект leftUser не существует (например, пользователь покинул чат до обработки события)
+    console.log('Объект leftUser не существует.')
+  }
 }
-
 
 // // Отслеживаем новые сообщения на канале
 // bot.on('channel_post', async (ctx) => {
@@ -68,28 +76,28 @@ async function logLeftChatMember(ctx) {
 //     await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, { parse_mode: 'HTML' });
 // });
 
-
 // Функция лог в спец чат
 
-
 async function sendToLog(ctx) {
-    const { chat, from, text } = ctx.message
-    if (chat.id !== GRAND_ADMIN) {
-        const userData = await checkUser(chat.id)
-        const fio = userData?.fio || 'N/A'  // Предполагая, что ФИО хранится в свойстве 'fio'
-        const fullName = (from.first_name ? from.first_name + ' ' : '') + (from.last_name ? from.last_name : '')
-        const username = from.username || ''
-        await bot.telegram.sendMessage(
-            LOG_CHANNEL_ID,
-            `<blockquote>${text}</blockquote>\n` + logMessage(chat.id, fio, username, fullName),
-            { parse_mode: 'HTML' },
-        )
-    }
+  const { chat, from, text } = ctx.message
+  if (chat.id !== GRAND_ADMIN) {
+    const userData = await checkUser(chat.id)
+    const fio = userData?.fio || 'N/A' // Предполагая, что ФИО хранится в свойстве 'fio'
+    const fullName =
+      (from.first_name ? from.first_name + ' ' : '') +
+      (from.last_name ? from.last_name : '')
+    const username = from.username || ''
+    await bot.telegram.sendMessage(
+      LOG_CHANNEL_ID,
+      `<blockquote>${text}</blockquote>\n` +
+        logMessage(chat.id, fio, username, fullName),
+      { parse_mode: 'HTML' }
+    )
+  }
 }
 
-
 module.exports = {
-    logNewChatMembers,
-    logLeftChatMember,
-    sendToLog,
+  logNewChatMembers,
+  logLeftChatMember,
+  sendToLog
 }

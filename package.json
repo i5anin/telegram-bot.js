@@ -9,7 +9,8 @@
     "nodemon": "npx nodemon node src/bot.js",
     "start": "node src/bot.js",
     "start1": "node src/session.js",
-    "prod:start": "pm2-runtime app.js"
+    "prod:start": "pm2-runtime app.js",
+    "lint": "eslint src/*.js"
   },
   "imports": {
     "#src/*": "./src/*.js"
@@ -19,10 +20,13 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.5.7",
-    "eslint": "^8.28.0",
+    "eslint": "^8.55.0",
     "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.26.0",
-    "nodemon": "^3.0.3"
+    "eslint-plugin-prettier": "^5.0.1",
+    "nodemon": "^3.0.3",
+    "prettier": "^3.2.5"
   },
   "dependencies": {
     "@pm2/io": "^5.0.0",
