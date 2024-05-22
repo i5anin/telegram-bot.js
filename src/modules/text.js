@@ -32,7 +32,7 @@ async function handleFio(ctx, text, chat, from) {
         `${emoji.star}Пользователь добавлен.${defMsg}`,
         { parse_mode: 'HTML' }
       )
-      await notifyUsers(ctx)
+      // await notifyUsers(ctx)
     } else {
       throw new Error(
         dataAddUser
