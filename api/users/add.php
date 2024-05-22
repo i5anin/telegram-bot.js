@@ -34,10 +34,10 @@ function insert_into_user($id, $fio, $username, $active)
     mysqli_stmt_close($check_stmt);
     // Конец блока кода для проверки на дубликаты
 
-    $currentDateTime = date('Y-m-d H:i:s'); // Получаем текущую дату и время
+    $currentTimestamp = time(); // Получаем текущий timestamp
 
     $stmt = mysqli_prepare($mysqli, "INSERT INTO `users` (`user_id`, `fio`, `username`, `active`, `date_reg`) VALUES (?,?,?,?,?)");
-    mysqli_stmt_bind_param($stmt, "issi", $id, $fio, $username, $active, $currentDateTime);
+    mysqli_stmt_bind_param($stmt, "issis", $id, $fio, $username, $active, $currentTimestamp); // Добавлен 's' для $currentTimestamp
 
     if (!mysqli_stmt_execute($stmt)) {
         echo "Ошибка: " . mysqli_stmt_error($stmt);
