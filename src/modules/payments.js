@@ -42,7 +42,7 @@ async function payments(ctx) {
     console.log('paymentData=', paymentData)
     if (!paymentData) {
       await ctx.reply(
-        ruLang.paymentDataNotAvailable || 'Информация о платежах недоступна.'
+        ruLang.paymentDataNotAvailable || 'Информация о зарплате недоступна.'
       )
       return
     }
