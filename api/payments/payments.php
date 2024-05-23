@@ -33,7 +33,7 @@ if ($mysqli->connect_error) {
 $mysqli->set_charset('utf8mb4');
 
 // Подготовленный запрос для получения данных по userID за сегодняшнюю дату
-$query = "SELECT `id`, `date`, `fio`, `user_id`, `base`, `grade`, `work_hours`, `tabel_hours`, `payment`, `inn` FROM `payments` WHERE `user_id` = ? AND `date` = ?";
+$query = "SELECT * FROM `payments` WHERE `user_id` = ? AND `date` = ?";
 
 if ($stmt = $mysqli->prepare($query)) {
     $stmt->bind_param('ss', $userID, $today);
