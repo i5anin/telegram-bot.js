@@ -3,21 +3,33 @@ module.exports = {
     stateCounter: 'writable'
   },
   env: {
-    browser: true,
+    node: true,
     es2021: true
   },
-  extends: 'airbnb-base',
+  extends: [
+    'eslint:recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings'
+  ],
   parserOptions: {
     ecmaVersion: 13,
     sourceType: 'module'
   },
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [['#src', './src']],
+        extensions: ['.js', '.jsx', '.json']
+      }
+    }
+  },
   rules: {
-    semi: ['error', 'never'], // Указываем, что точки с запятой не нужны
+    semi: ['error', 'never'],
     'no-console': 'warn',
     'linebreak-style': ['error', 'unix'],
     'no-unused-vars': 'warn',
     'comma-dangle': ['error', 'never'],
     'import/order': 'off',
-    quotes: ['error', 'single'] // Указываем, что предпочитаем одинарные кавычки
+    quotes: ['error', 'single']
   }
 }
