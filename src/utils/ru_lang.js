@@ -38,6 +38,19 @@ module.exports = {
     `ФИО: <b>${paymentData.fio}</b> \n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
+    // `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +
+    // `Рейтинг Качества:  <b>${paymentData.rating_brak}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_brak}</b>\n` +
+    `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
+    `Грейд: <b>${paymentData.grade}</b>\n` +
+    `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
+    `Доля:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
+    '</blockquote>' +
+    `📈 Вы заработали "чистыми": <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
+
+  paymentsOperator: (paymentData) =>
+    `ФИО: <b>${paymentData.fio}</b> \n` +
+    `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
+    '<blockquote>' +
     `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +
     `Рейтинг Качества:  <b>${paymentData.rating_brak}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_brak}</b>\n` +
     `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
@@ -45,7 +58,7 @@ module.exports = {
     `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
     `Доля:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
     '</blockquote>' +
-    `📈 Вы заработали: <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
+    `📈 Вы заработали "чистыми": <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
 
   formatSKMessage: (
     det_name,

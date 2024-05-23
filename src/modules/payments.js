@@ -23,7 +23,8 @@ async function payments(ctx) {
     // Безопасное извлечение userId из ctx
     const userId = ctx?.from?.id
 
-    // const userId = 1793690841
+    // const userId = 5173203456 // no op
+    // const userId = 487054792 // op
 
     if (!userId) {
       console.log('Не удалось получить userId')
@@ -46,7 +47,13 @@ async function payments(ctx) {
       return
     }
 
-    const message = ruLang.payments(paymentData)
+    let message = ''
+    console.log(paymentData.operator_type)
+    if (paymentData.operator_type === null) {
+      message = ruLang.payments(paymentData) //if true
+    } else {
+      message = ruLang.paymentsOperator(paymentData) //if null false
+    }
 
     await ctx.reply(message, { parse_mode: 'HTML' })
   } catch (error) {
