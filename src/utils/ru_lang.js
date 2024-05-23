@@ -35,15 +35,15 @@ module.exports = {
   errorAPI: 'Ошибка при получении данных с внешнего API:',
   error: 'Произошла ошибка при выполнении команды',
   payments: (paymentData) =>
-    `ФИО <code>${paymentData.fio}</code> \n` +
-    `Дата <code>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</code> \n` +
+    `ФИО: <b>${paymentData.fio}</b> \n` +
+    `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
-    `Рейтинг ЦКП  <code>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</code>\n` +
-    `Рейтинг Качества  <code>${paymentData.rating_brak}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_brak}</code>\n` +
-    `Отработанные часы  <code>${formatNumber(paymentData.work_hours)}</code>\n` +
-    `Грейд: <code>${paymentData.grade}</code>\n` +
-    `ВП\u00A0\u00A0<code>${formatNumber(paymentData.vvp)}</code>\u00A0₽\n` +
-    `Доля\u00A0\u00A0<code>${formatNumber(paymentData.vvp * 0.2)}</code>\u00A0₽\n` +
+    `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +
+    `Рейтинг Качества:  <b>${paymentData.rating_brak}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_brak}</b>\n` +
+    `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
+    `Грейд: <b>${paymentData.grade}</b>\n` +
+    `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
+    `Доля:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
     '</blockquote>' +
     `📈 Вы заработали: <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
 
