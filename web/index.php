@@ -16,12 +16,23 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-$sql = "SELECT * FROM `sk_comments`";
+// Вычисляем дату начала последнего месяца
+$dateOneMonthAgo = new DateTime('-2 month');
+$dateOneMonthAgo = $dateOneMonthAgo->format('Y-m-d');
+
+// Проверяем наличие параметров в URL
+if (!isset($_GET['all'])) {
+    // Если параметр отсутствует, выбираем только строки, где sent == 0 и user_id == 0
+    $sql = "SELECT * FROM `sk_comments` WHERE (`sent` = 0 OR `user_id` = 0) AND `date` >= '".$dateOneMonthAgo."'";
+} else {
+    // Иначе выбираем все строки за последний месяц
+    $sql = "SELECT * FROM `sk_comments` WHERE `date` >= '".$dateOneMonthAgo."'";
+}
+
 $result = $mysqli->query($sql);
 
 $mysqli->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
