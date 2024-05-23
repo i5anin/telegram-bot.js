@@ -35,13 +35,17 @@ module.exports = {
   errorAPI: 'Ошибка при получении данных с внешнего API:',
   error: 'Произошла ошибка при выполнении команды',
   payments: (paymentData) =>
-    `📈 Вы заработали: <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n` +
-    `<blockquote>` +
-    // `<code>${paymentData.fio}</code>\n` +
-    `На текущую дату <code>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</code> \n` +
-    `Отработанные часы  <code>${formatNumber(paymentData.work_hours)}</code> из <code>${paymentData.tabel_hours}</code>\n` +
-    `Базовая <code>${formatNumber(paymentData.base)}\u00A0₽</code>\n` +
-    `Грейд: <code>${paymentData.grade}</code></blockquote>`,
+    `ФИО <code>${paymentData.fio}</code> \n` +
+    `Дата <code>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</code> \n` +
+    '<blockquote>' +
+    `Рейтинг ЦКП  <code>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</code>\n` +
+    `Рейтинг Качества  <code>${paymentData.rating_brak}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_brak}</code>\n` +
+    `Отработанные часы  <code>${formatNumber(paymentData.work_hours)}</code>\n` +
+    `Грейд: <code>${paymentData.grade}</code>\n` +
+    `ВП\u00A0\u00A0<code>${formatNumber(paymentData.vvp)}</code>\u00A0₽\n` +
+    `Доля\u00A0\u00A0<code>${formatNumber(paymentData.vvp * 0.2)}</code>\u00A0₽\n` +
+    '</blockquote>' +
+    `📈 Вы заработали: <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
 
   formatSKMessage: (
     det_name,
@@ -62,23 +66,23 @@ module.exports = {
   formatMetricsMessage: (latestMetrics, maxCharacters) =>
     `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n` +
     `Незавершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b>\u00A0₽\n` +
-    `<blockquote>` +
-    `Cлесарка: ${checkWarningAndFormat(latestMetrics.prod_price_sles, 'Cлесарка')}` + //Слесарка меньше или равно 3 400 000
-    `ОТК: ${checkWarningAndFormat(latestMetrics.prod_price_otk, 'ОТК')}` + //ОТК меньше или равно 1 700 000
-    `Упаковка: ${checkWarningAndFormat(latestMetrics.prod_price_upk, 'Упаковка')}` + //Упаковка меньше или равно 1 700 000
+    '<blockquote>' +
+    `Cлесарка: ${checkWarningAndFormat(latestMetrics.prod_price_sles, 'Cлесарка')}` + // Слесарка меньше или равно 3 400 000
+    `ОТК: ${checkWarningAndFormat(latestMetrics.prod_price_otk, 'ОТК')}` + // ОТК меньше или равно 1 700 000
+    `Упаковка: ${checkWarningAndFormat(latestMetrics.prod_price_upk, 'Упаковка')}` + // Упаковка меньше или равно 1 700 000
     `Доработка ЧПУ: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka)}` +
     `Доработка слес.: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka_sles)}` +
     `Согл.: ${checkWarningAndFormat(latestMetrics.prod_price_sogl)}` +
-    `</blockquote>` +
+    '</blockquote>' +
     `Итого вн. производства: <b>${formatNumber(latestMetrics.prod_price)}</b>\u00A0₽\n` +
     `Ожидаемая предоплата: <b>${formatNumber(latestMetrics.predoplata)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
     `Итого вн. производства: <b>${formatNumber(latestMetrics.total_price)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
     `Готовая продукция склад: <b>${formatNumber(latestMetrics.total_sklad_gp)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n\n` +
-    `<b><u>Отклонение от плана</u></b>\n` +
+    '<b><u>Отклонение от плана</u></b>\n' +
     `<code>${formatPercentage(latestMetrics.cumulative_sklad_month, maxCharacters)}</code> Производство\n` +
     `<code>${formatPercentage(latestMetrics.cumulative_brak_month, maxCharacters)}</code> Брак\n` +
     `<code>${formatPercentage(latestMetrics.cumulative_manager_month, maxCharacters)}</code> Отдел продаж\n\n` +
-    `<b><u>Воронка</u></b>\n` +
+    '<b><u>Воронка</u></b>\n' +
     `<code>${formatPercentage(latestMetrics.prod, maxCharacters)}</code> Производство\n` +
     `<code>${formatPercentage(latestMetrics.sles, maxCharacters)}</code> Слесарный участок\n` +
     `<code>${formatPercentage(latestMetrics.otk, maxCharacters)}</code> ОТК\n` +
@@ -90,14 +94,14 @@ module.exports = {
 
   formatMetricsMessageNach: (metrics, period) =>
     `${emoji.tech} <b><u>Загрузка ${period}</u></b>\n` +
-    `${emoji.point} плановая: <code>${formatNumber(metrics.load_plan * 100) + '%'}</code>\n` +
-    `${emoji.point} фактическая: <code>${formatNumber(metrics.load_fact * 100) + '%'}</code>\n` +
+    `${emoji.point} плановая: <code>${`${formatNumber(metrics.load_plan * 100)}%`}</code>\n` +
+    `${emoji.point} фактическая: <code>${`${formatNumber(metrics.load_fact * 100)}%`}</code>\n` +
     `${emoji.point} кол-во станков: <code>${metrics.cnc_count}</code>` +
     `<blockquote>${moment(metrics.date_from, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}\n` +
     `${moment(metrics.date_to, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm')}</blockquote>`,
 
   formatMetricsVoronca: (latestMetrics, maxCharacters) =>
-    `<b><u>Воронка</u></b>\n` +
+    '<b><u>Воронка</u></b>\n' +
     `<code>${formatPercentage(latestMetrics.prod, maxCharacters)}</code> Производство\n` +
     `<code>${formatPercentage(latestMetrics.sles, maxCharacters)}</code> Слесарный участок\n` +
     `<code>${formatPercentage(latestMetrics.otk, maxCharacters)}</code> ОТК\n` +
