@@ -25,7 +25,8 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-$sql = "SELECT * FROM `users`";
+// Обновлённый SQL запрос с сортировкой по убыванию даты регистрации
+$sql = "SELECT *, IF(`inn` <> '', 'true', 'false') AS `inn_filled` FROM `users` ORDER BY `date_reg` DESC";
 $result = $mysqli->query($sql);
 
 $mysqli->close();
@@ -33,89 +34,72 @@ $mysqli->close();
 
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Table</title>
+    <link rel="icon" type="image/png" href="assets/favicon.svg">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <style>
+      .text-cell {
+        /* Стили для ячеек текстового типа */
+      }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Users Table</title>
-  <link rel="icon" type="image/png" href="assets/favicon.svg">
-  <link href="css/bootstrap.css" rel="stylesheet">
-  <style>
-    /* Your styles go here */
-  </style>
-</head>
+      .table-non-active {
+        background-color: #f8d7da; /* Светло-красный цвет для неактивных пользователей */
+      }
 
-<body data-bs-theme="dark">
-  <div class="container">
-    <div class="table-responsive">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">user_id</th>
-            <th scope="col">fio</th>
-            <th scope="col">username</th>
-            <th scope="col">active</th>
-            <th scope="col">role</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          $rowNumber = 1;  // Counter variable for row numbers
-          while ($row = $result->fetch_assoc()) :
-            $role_class = '';
-            switch ($row['role']) {
-              case 'admin':
-                $role_class = 'table-danger';
-                break;
-              case 'test':
-                $role_class = 'table-warning';
-                break;
-              case 'dir':
-                $role_class = 'table-info';
-                break;
-            }
-          ?>
-            <tr class="<?php echo $role_class; ?>">
-              <th scope="row"><?php echo $rowNumber; ?></th>
-              <td class="text-cell"><?php echo $row['user_id']; ?></td>
-              <td class="text-cell"><?php echo $row['fio']; ?></td>
-              <td class="text-cell"><?php echo $row['username']; ?></td>
-              <td class="text-cell"><?php echo $row['active']; ?></td>
-              <td class="text-cell"><?php echo $row['role']; ?></td>
+      /* Дополнительные стили */
+    </style>
+  </head>
+
+  <body data-bs-theme="dark">
+    <div class="container">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">user_id</th>
+              <th scope="col">fio</th>
+              <th scope="col">username</th>
+              <th scope="col">active</th>
+              <th scope="col">role</th>
+              <!-- Другие колонки -->
+              <th scope="col">oplata</th>
+              <th scope="col">metrica</th>
+              <th scope="col">metrica_time</th>
+              <th scope="col">date_reg</th>
             </tr>
-          <?php
-            $rowNumber++;  // Increment the row number after each row
-          endwhile; ?>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <?php
+            $rowNumber = 1; // Номер строки для отображения
+            while ($row = $result->fetch_assoc()) :
+              $active_class = $row['active'] == 'false' ? 'table-non-active' : '';
+            ?>
+              <tr class="<?= $active_class; ?>">
+                <th scope="row"><?= $rowNumber; ?></th>
+                <td><?= $row['user_id']; ?></td>
+                <td><?= $row['fio']; ?></td>
+                <td><?= $row['username']; ?></td>
+                <td><?= $row['active']; ?></td>
+                <td><?= $row['role']; ?></td>
+                <!-- Вывод других полей -->
+                <td><?= $row['oplata']; ?></td>
+                <td><?= $row['metrica']; ?></td>
+                <td><?= $row['metrica_time']; ?></td>
+                <td><?= $row['date_reg']; ?></td>
+              </tr>
+            <?php
+              $rowNumber++;
+            endwhile;
+            ?>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-  <script>
-    document.querySelectorAll('thead th').forEach(headerCell => {
-      headerCell.addEventListener('click', () => {
-        const tableElement = headerCell.closest('table');
-        const headerIndex = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
-        const currentIsAscending = headerCell.classList.contains('ascending');
 
-        Array.from(tableElement.querySelectorAll('tbody tr'))
-          .sort((trA, trB) => {
-            const cellA = trA.children[headerIndex].textContent.trim();
-            const cellB = trB.children[headerIndex].textContent.trim();
-            if (!isNaN(cellA) && !isNaN(cellB)) {
-              // Если значения являются числами, сортировать как числа
-              return currentIsAscending ? cellA - cellB : cellB - cellA;
-            } else {
-              // Если значения являются строками, сортировать как строки
-              return currentIsAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
-            }
-          })
-          .forEach(tr => tableElement.querySelector('tbody').appendChild(tr));
-
-        headerCell.classList.toggle('ascending', !currentIsAscending);
-      });
-    });
-  </script>
-</body>
-
+    <!-- Скрипт для сортировки, если нужно -->
+  </body>
 </html>
