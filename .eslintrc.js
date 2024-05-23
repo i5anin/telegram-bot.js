@@ -24,12 +24,14 @@ module.exports = {
     }
   },
   rules: {
-    semi: ['error', 'never'],
-    'no-console': 'warn',
+    'no-console': 'off',
+    // 'no-console': 'warn',
+    'no-undef': 'off',
     'linebreak-style': ['error', 'unix'],
     'no-unused-vars': 'warn',
     'comma-dangle': ['error', 'never'],
     'import/order': 'off',
+    semi: ['error', 'never'],
     quotes: ['error', 'single']
   }
 }
