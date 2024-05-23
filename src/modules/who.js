@@ -36,7 +36,7 @@ const handleForwardedMessage = async (ctx) => {
     if (user) {
       const fullName = `${firstName || ''} ${lastName || ''}`.trim()
       await ctx.reply(
-        `<b>Пользователь</b>\n` +
+        '<b>Пользователь</b>\n' +
           logMessage(userId, user.fio, username, fullName),
         { parse_mode: 'HTML' }
       )
@@ -65,7 +65,7 @@ async function whoCommand(ctx) {
 
         if (user) {
           await ctx.reply(
-            `<b>Пользователь</b>\n` + logMessage(targetId, user.fio),
+            '<b>Пользователь</b>\n' + logMessage(targetId, user.fio),
             { parse_mode: 'HTML' }
           )
         } else {
@@ -85,30 +85,32 @@ async function whoCommand(ctx) {
 
     case 'group':
     case 'supergroup':
-      let membersCount
-      try {
-        membersCount = await getChatMembersCount(targetId)
-      } catch (error) {
-        membersCount = 'Неизвестно'
+      {
+        let membersCount
+        try {
+          membersCount = await getChatMembersCount(targetId)
+        } catch (error) {
+          membersCount = 'Неизвестно'
+        }
+
+        let replyMessage = `Название группы: <code>${chatInfo.title}</code>\nКоличество участников: <code>${membersCount}</code>\n`
+
+        try {
+          const administrators = await getChatAdministrators(targetId)
+          const adminNames = administrators
+            .map(
+              (admin) =>
+                `${emoji.point} ${admin.user.first_name}${admin.user.last_name ? ' ' + admin.user.last_name : ''} (<code>${admin.user.id}</code>)\n`
+            )
+            .join('')
+
+          replyMessage += `Админы:\n${adminNames}`
+        } catch (err) {
+          replyMessage += 'Не удалось получить список администраторов.'
+        }
+
+        await ctx.reply(replyMessage, { parse_mode: 'HTML' })
       }
-
-      let replyMessage = `Название группы: <code>${chatInfo.title}</code>\nКоличество участников: <code>${membersCount}</code>\n`
-
-      try {
-        const administrators = await getChatAdministrators(targetId)
-        const adminNames = administrators
-          .map(
-            (admin) =>
-              `${emoji.point} ${admin.user.first_name}${admin.user.last_name ? ' ' + admin.user.last_name : ''} (<code>${admin.user.id}</code>)\n`
-          )
-          .join('')
-
-        replyMessage += `Админы:\n${adminNames}`
-      } catch (err) {
-        replyMessage += 'Не удалось получить список администраторов.'
-      }
-
-      await ctx.reply(replyMessage, { parse_mode: 'HTML' })
       break
 
     default:

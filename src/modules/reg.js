@@ -1,5 +1,4 @@
 // Подключаем необходимые модули и переменные
-const axios = require('axios')
 const ruLang = require('#src/utils/ru_lang') // Локализация сообщений
 const { sendToLog } = require('#src/utils/log') // Добавление лога
 const { resetFlags } = require('#src/utils/helpers')
@@ -30,7 +29,6 @@ async function handleRegComment(ctx) {
   if (ctx.chat.type !== 'private') return
   resetFlags(ctx)
   const chatId = ctx.message.chat.id
-  const { chat } = ctx.message
 
   try {
     const registrationData = await checkRegistration(chatId)

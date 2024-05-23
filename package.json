@@ -10,7 +10,8 @@
     "start": "node src/bot.js",
     "start1": "node src/session.js",
     "prod:start": "pm2-runtime app.js",
-    "lint": "eslint src/*.js"
+    "lint": "eslint src",
+    "lint-fix": "eslint \"src/**/*.js\" --fix"
   },
   "imports": {
     "#src/*": "./src/*.js"

@@ -1,8 +1,6 @@
 // Подключаем необходимые модули и переменные
 const axios = require('axios')
 const ruLang = require('#src/utils/ru_lang') // Локализация сообщений
-const { sendToLog } = require('#src/utils/log') // Добавление лога
-const { resetFlags } = require('#src/utils/helpers')
 const { checkUser } = require('#src/api/index')
 
 // Функция для отправки запроса в API и получения последних данных о платежах пользователя
@@ -11,7 +9,7 @@ async function getLastPaymentForUser(userId) {
     const response = await axios.get(
       `${WEB_API}/payments/payments.php?user_id=${userId}`
     )
-    const payments = response.data.payments
+    const { payments } = response.data
     return payments[payments.length - 1] || null
   } catch (error) {
     console.log(`Ошибка при запросе к API: ${error}`) // Изменено на console.log для избежания асинхронности в блоке catch
@@ -24,6 +22,8 @@ async function payments(ctx) {
   try {
     // Безопасное извлечение userId из ctx
     const userId = ctx?.from?.id
+
+    // const userId = 1793690841
 
     if (!userId) {
       console.log('Не удалось получить userId')

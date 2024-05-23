@@ -1,11 +1,8 @@
 const ruLang = require('#src/utils/ru_lang')
 
 const { handleAddComment } = require('#src/modules/comment')
-const { notifyUsers } = require('#src/modules/notify')
 const { sendToLog } = require('#src/utils/log')
 const { addUser, addPhotoData } = require('#src/api/index')
-const { logMessage } = require('#src/utils/ru_lang')
-const { message } = require('telegraf/filters')
 
 async function handleFio(ctx, text, chat, from) {
   console.log('ctx.session.isAwaitFio=', ctx.session.isAwaitFio)

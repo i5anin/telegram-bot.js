@@ -1,4 +1,4 @@
-const { checkUser, addPhotoData } = require('#src/api/index') // Предположим, что ваша функция для добавления фото называется addPhotoData
+const { checkUser } = require('#src/api/index') // Предположим, что ваша функция для добавления фото называется addPhotoData
 const path = require('path')
 const fs = require('fs')
 const axios = require('axios')

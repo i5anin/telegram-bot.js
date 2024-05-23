@@ -67,7 +67,7 @@ function formatMessage(comment, total) {
   const controlDescription = getControlType(type[0])
   const defectDescription = getDefectType(type[1])
   return (
-    `<b>Пожалуйста, прокомментируйте операции(ю) на следующих деталях:</b>\n\n` +
+    '<b>Пожалуйста, прокомментируйте операции(ю) на следующих деталях:</b>\n\n' +
     formatSKMessage(
       det_name,
       kolvo_brak,
@@ -77,7 +77,7 @@ function formatMessage(comment, total) {
       specs_nom_id,
       formattedDate
     ) +
-    `<i>Прокомментировать через "ответить" на это сообщение.\nПодробнее /help.\n\n</i>` +
+    '<i>Прокомментировать через "ответить" на это сообщение.\nПодробнее /help.\n\n</i>' +
     `<b>(1/${total})</b> <tg-spoiler>task_ID: ${id_task}</tg-spoiler>\n`
   )
 }

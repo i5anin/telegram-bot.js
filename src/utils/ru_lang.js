@@ -107,7 +107,7 @@ module.exports = {
     `<code>${formatPercentage(latestMetrics.otk, maxCharacters)}</code> ОТК\n` +
     `<code>${formatPercentage(latestMetrics.upk, maxCharacters)}</code> Упаковка\n\n`,
 
-  logMessage: (chatId, fio, username, fullName) =>
+  logMessage: (chatId, fio) =>
     `<b>fio:</b> <a href='tg://user?id=${chatId}'>${fio}</a>\n` +
     `<b>ID:</b> <code>${chatId}</code>`
 }

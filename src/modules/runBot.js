@@ -1,4 +1,3 @@
-const axios = require('axios')
 const { format } = require('date-fns')
 const { updateBotData } = require('#src/api/index')
 

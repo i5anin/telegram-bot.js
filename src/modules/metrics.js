@@ -187,10 +187,10 @@ async function sendMetricsMessagesNach() {
           (await getUserLinkById(userId)) + '\n' + message,
           { parse_mode: 'HTML' }
         )
-        console.log(`Metrics message sent successfully to userId:`, userId)
+        console.log('Metrics message sent successfully to userId:', userId)
       } catch (error) {
         console.error(
-          `Failed to send message to userId:`,
+          'Failed to send message to userId:',
           userId,
           'Error:',
           error
@@ -257,12 +257,12 @@ async function formatMetricsMessageMaster() {
         ) //log
 
         console.log(
-          `Metrics message sent successfully to userId:`,
+          'Metrics message sent successfully to userId:',
           metrics.user_id
         )
       } catch (error) {
         console.error(
-          `Failed to send message to userId:`,
+          'Failed to send message to userId:',
           metrics.user_id,
           'Error:',
           error

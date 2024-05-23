@@ -32,7 +32,7 @@ async function generateReport(ctx, chatId) {
     { parse_mode: 'HTML' }
   )
 
-  let absentCounter = 0
+  // let absentCounter = 0
 
   // Обходим всех внешних пользователей
   for (const user of externalUsers) {
@@ -49,7 +49,7 @@ async function generateReport(ctx, chatId) {
       csvReport.push(userInfoCsv)
     } catch (error) {
       // Пользователь отсутствует в чате
-      absentCounter++
+      // absentCounter++
 
       // Добавляем информацию об отсутствующих пользователях в CSV отчет
       const userInfoCsv = `N/A;${user.user_id};N/A;N/A;${user.fio};left` // Статус 'left'
