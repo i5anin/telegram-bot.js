@@ -31,9 +31,8 @@ $innFilter = $_GET['inn'] ?? null;
 // Обновленный SQL запрос с учетом параметра inn и условия user_id >= 0
 $sql = "SELECT *, IF(`inn` <> '', 'true', 'false') AS `inn_filled` FROM `users` WHERE `user_id` >= 0";
 
-if ($innFilter === 'false') {
-    $sql .= " AND `inn` = ''";
-}
+if ($innFilter === 'false')     $sql .= " AND (`inn` = '' OR `inn` IS NULL)";
+
 
 $sql .= " ORDER BY `date_reg` DESC";
 $result = $mysqli->query($sql);
