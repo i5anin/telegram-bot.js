@@ -134,7 +134,7 @@ runBot(instanceNumber, currentDateTime)
 bot.on('photo', (ctx) => handlePhoto(ctx))
 
 // Обработчики команд
-bot.command('reg', (ctx) =>
+bot.command(['start', 'reg'], (ctx) =>
   handleRegComment(ctx, (ctx.session.isAwaitFio = true))
 ) // ['start', 'reg']
 bot.command('pay', (ctx) => payments(ctx)) // ['start', 'reg']
