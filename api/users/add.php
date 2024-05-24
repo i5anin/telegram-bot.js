@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');  // Устанавливаем заголовок для ответа в формате JSON
+
 // Функция для вставки данных пользователя
 function insert_into_user($id, $fio, $username, $active)
 {
@@ -22,7 +23,7 @@ function insert_into_user($id, $fio, $username, $active)
     $mysqli = mysqli_connect($server, $user, $pass, $db);
     mysqli_set_charset($mysqli, 'utf8mb4');
 
-    // Добавьте этот блок кода здесь для проверки на дубликаты
+    // Проверка на дубликаты
     $check_stmt = mysqli_prepare($mysqli, "SELECT * FROM `users` WHERE `user_id` = ?");
     mysqli_stmt_bind_param($check_stmt, "i", $id);
     mysqli_stmt_execute($check_stmt);
@@ -32,12 +33,11 @@ function insert_into_user($id, $fio, $username, $active)
         return "duplicate";
     }
     mysqli_stmt_close($check_stmt);
-    // Конец блока кода для проверки на дубликаты
 
     $currentTimestamp = time(); // Получаем текущий timestamp
 
     $stmt = mysqli_prepare($mysqli, "INSERT INTO `users` (`user_id`, `fio`, `username`, `active`, `date_reg`) VALUES (?,?,?,?,?)");
-    mysqli_stmt_bind_param($stmt, "issis", $id, $fio, $username, $active, $currentTimestamp); // Добавлен 's' для $currentTimestamp
+    mysqli_stmt_bind_param($stmt, "issii", $id, $fio, $username, $active, $currentTimestamp);
 
     if (!mysqli_stmt_execute($stmt)) {
         echo "Ошибка: " . mysqli_stmt_error($stmt);
@@ -57,11 +57,8 @@ if (!isset($_GET['key'])) {
 }
 
 $provided_key = $_GET['key'];
-
-// Получаем секретный ключ из конфигурации
 $dbConfig = require 'sql_config.php';
 $SECRET_KEY = $dbConfig['key'] ?? null;
-
 if ($provided_key !== $SECRET_KEY) {
     echo json_encode(['status' => 'Error', 'message' => 'Invalid secret key']);
     http_response_code(403);
@@ -71,18 +68,19 @@ if ($provided_key !== $SECRET_KEY) {
 // Получение данных из GET-запроса
 $fio = isset($_GET["fio"]) && $_GET["fio"] !== '' ? $_GET["fio"] : null;
 $username = isset($_GET["username"]) && $_GET["username"] !== '' ? $_GET["username"] : null;
-$active = isset($_GET["active"]) ? $_GET["active"] : null;
+$active = isset($_GET["active"]) ? $_GET["active"] : '1'; // Изменение здесь
 $id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 $res = insert_into_user($id, $fio, $username, $active);
 
 if ($res === "duplicate") {
     http_response_code(208);
-    echo json_encode(['status' => 'Error', 'message' => 'Record already exists.']); //Запись уже существует.
+    echo json_encode(['status' => 'Error', 'message' => 'Record already exists.']); // Запись уже существует.
 } elseif ($res) {
-    echo json_encode(['status' => 'OK', 'message' => 'Data successfully inserted.']); //Данные успешно вставлены
+    echo json_encode(['status' => 'OK', 'message' => 'Data successfully inserted.']); // Данные успешно вставлены
     http_response_code(200);
 } else {
     http_response_code(400);
-    echo json_encode(['status' => 'Error', 'message' => 'Failed to insert data.']); //Не удалось вставить данные.
+    echo json_encode(['status' => 'Error', 'message' => 'Failed to insert data.']); // Не удалось вставить данные.
 }
+?>
