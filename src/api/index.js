@@ -142,7 +142,7 @@ async function addUser(userId, cleanedText, username) {
     id: userId,
     fio: cleanedText,
     username: username,
-    active: 0,
+    active: 1,
     key: SECRET_KEY
   }
   return performRequest(url, 'get', {}, params)
