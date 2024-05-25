@@ -1,7 +1,7 @@
 <?php
 
 // Получаем сегодняшнюю дату
-$today = date("Y-m-d");
+// $today = date("Y-m-d"); // Закомментировано для отключения проверки даты
 
 // Извлекаем userID из параметров запроса
 $userID = $_GET['user_id'] ?? null;
@@ -33,10 +33,10 @@ if ($mysqli->connect_error) {
 $mysqli->set_charset('utf8mb4');
 
 // Подготовленный запрос для получения данных по userID за сегодняшнюю дату
-$query = "SELECT * FROM `payments` WHERE `user_id` = ? AND `date` = ?";
+$query = "SELECT * FROM `payments` WHERE `user_id` = ?"; // Изменено: Удалена проверка даты
 
 if ($stmt = $mysqli->prepare($query)) {
-    $stmt->bind_param('ss', $userID, $today);
+    $stmt->bind_param('s', $userID); // Изменено: Удалена привязка даты
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -48,11 +48,7 @@ if ($stmt = $mysqli->prepare($query)) {
     $stmt->close();
     $mysqli->close();
 
-    if (!empty($payments)) {
-        echo json_encode(['payments' => $payments]);
-    } else {
-        echo json_encode(['message' => "No payments found for user ID " . htmlspecialchars($userID) . " on " . $today]);
-    }
+    echo json_encode(['payments' => $payments]);
 } else {
     $mysqli->close();
     http_response_code(500);
