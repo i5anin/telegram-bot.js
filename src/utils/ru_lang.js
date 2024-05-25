@@ -34,8 +34,9 @@ module.exports = {
     `Пользователь\nID: <code>${userId}</code>\n<b>не зарегистрирован в системе</b>`,
   errorAPI: 'Ошибка при получении данных с внешнего API:',
   error: 'Произошла ошибка при выполнении команды',
+
   payments: (paymentData) =>
-    `ФИО: <b>${paymentData.fio}</b> \n` +
+    `🟢 <b>${paymentData.fio} Руководитель</b>\n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
     // `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +
@@ -43,12 +44,12 @@ module.exports = {
     `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
     `Грейд: <b>${paymentData.grade}</b>\n` +
     `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
-    `Доля:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
+    `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
     '</blockquote>' +
-    `📈 Вы заработали "чистыми": <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
+    `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
 
   paymentsOperator: (paymentData) =>
-    `ФИО: <b>${paymentData.fio}</b> \n` +
+    `🔵 <b>${paymentData.fio} Оператор ЧПУ Профи</b>\n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
     `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +
@@ -56,9 +57,9 @@ module.exports = {
     `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
     `Грейд: <b>${paymentData.grade}</b>\n` +
     `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
-    `Доля:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
+    `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
     '</blockquote>' +
-    `📈 Вы заработали "чистыми": <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
+    `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
 
   formatSKMessage: (
     det_name,
