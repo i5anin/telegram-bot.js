@@ -36,7 +36,7 @@ module.exports = {
   error: 'Произошла ошибка при выполнении команды',
 
   payments: (paymentData) =>
-    `🟢 <b>${paymentData.fio} Руководитель</b>\n` +
+    `<b>${paymentData.fio}</b>\n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
     // `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +
@@ -49,7 +49,7 @@ module.exports = {
     `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
 
   paymentsOperator: (paymentData) =>
-    `🔵 <b>${paymentData.fio} Оператор ЧПУ Профи</b>\n` +
+    `<b>${paymentData.fio}</b>\n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
     `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +
