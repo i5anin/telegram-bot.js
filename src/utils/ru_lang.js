@@ -46,7 +46,7 @@ module.exports = {
     `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
     `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
     '</blockquote>' +
-    `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
+    `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment * (1 - 0.13))}</b>\u00A0₽\n`,
 
   paymentsOperator: (paymentData) =>
     `<b>${paymentData.fio}</b>\n` +
@@ -59,7 +59,7 @@ module.exports = {
     `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
     `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
     '</blockquote>' +
-    `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment)}</b>\u00A0₽\n`,
+    `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment * (1 - 0.13))}</b>\u00A0₽\n`,
 
   formatSKMessage: (
     det_name,
