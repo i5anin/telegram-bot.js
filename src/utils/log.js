@@ -2,6 +2,7 @@
 const { checkUser } = require('#src/api/index')
 const { logMessage } = require('#src/utils/ru_lang')
 const { getAllUsers } = require('#src/api/index')
+const { post } = require('axios')
 
 async function logNewChatMembers(ctx) {
   const chatTitle = ctx.chat.title || 'Неназванный чат'
@@ -87,12 +88,23 @@ async function sendToLog(ctx) {
       (from.first_name ? from.first_name + ' ' : '') +
       (from.last_name ? from.last_name : '')
     const username = from.username || ''
-    await bot.telegram.sendMessage(
-      LOG_CHANNEL_ID,
+
+    const logMessageToSend =
       `<blockquote>${text}</blockquote>\n` +
-        logMessage(chat.id, fio, username, fullName),
-      { parse_mode: 'HTML' }
-    )
+      logMessage(chat.id, fio, username, fullName)
+
+    // Отправляем данные на внешний API
+    try {
+      await post('https://api.pf-forum.ru/api/log/log.php', {
+        user_id: chat.id, // или другой идентификатор в зависимости от того, что требует ваш API
+        text: logMessageToSend
+        // Дополните другими необходимыми полями в соответствии с вашей базой данных
+      })
+
+      console.log('Лог успешно отправлен')
+    } catch (error) {
+      console.error('Ошибка при отправке лога:', error)
+    }
   }
 }
 
