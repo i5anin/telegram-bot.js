@@ -12,6 +12,12 @@ $db = $dbConfig['db'];
 // Создаем соединение
 $mysqli = new mysqli($server, $user, $pass, $db);
 
+// Устанавливаем время по UTC
+date_default_timezone_set('UTC');
+
+// Получаем текущую дату и время
+$currentDateTime = date('Y-m-d H:i:s');
+
 // Проверяем соединение
 if ($mysqli->connect_error) {
     http_response_code(500);
@@ -40,11 +46,11 @@ if (!$userID || !$text || !isset($error) || !isset($ok) || !$type || !$info) {
 }
 
 // Подготавливаем SQL запрос
-$query = "INSERT INTO `log` (user_id, text, error, ok, type, info) VALUES (?, ?, ?, ?, ?, ?)";
+$query = "INSERT INTO `log` (date_time_event, user_id, text, error, ok, type, info) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 if($stmt = $mysqli->prepare($query)) {
-    // Привязываем параметры к маркерам в подготовленном запросе
-    $stmt->bind_param('isisss', $userID, $text, $error, $ok, $type, $info);
+    // Привязываем 'date_time_event' и другие параметры к маркерам в подготовленном запросе
+    $stmt->bind_param('sisssss', $currentDateTime, $userID, $text, $error, $ok, $type, $info);
 
     // Выполняем запрос
     if ($stmt->execute()) {
