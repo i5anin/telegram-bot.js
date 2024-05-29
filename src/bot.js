@@ -1,3 +1,4 @@
+//bot.js главный фаил как app или index
 // Загрузка переменных среды из .env файла
 require('dotenv').config()
 const { Telegraf } = require('telegraf')
