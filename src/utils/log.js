@@ -79,35 +79,59 @@ async function logLeftChatMember(ctx) {
 
 // Функция лог в спец чат
 
+/**
+ * Функция для отправки лога на внешний ресурс.
+ * @param {Object} logData Данные для логирования.
+ *
+ * Объект logData должен содержать следующие поля:
+ * - user_id: {Number|String} Уникальный идентификатор пользователя, событие которого логируется.
+ * - text: {String} Текстовое сообщение, которое необходимо залогировать.
+ *   Может включать в себя исходное сообщение пользователя, его имя и другие данные,
+ *   которые были получены или сгенерированы в ходе выполнения операций.
+ * - error: {Number} Флаг, указывающий на наличие ошибки (0 - без ошибок, 1 - с ошибкой).
+ * - ok: {Number} Флаг успешности операции (1 - операция успешна, 0 - операция не успешна).
+ * - type: {String} Тип события, например, 'message' для сообщений от пользователя.
+ * - info: {String} Дополнительная информация о логируемом событии, которую можно использовать для анализа.
+ *
+ * Эти поля позволяют структурированно записывать в лог информацию о различных событиях.
+ */
+async function sendLogData(logData) {
+  try {
+    await post(`${WEB_API}/log/log.php`, logData)
+    console.log('Лог успешно отправлен на внешний ресурс.')
+  } catch (error) {
+    console.error('Ошибка при отправке лога на внешний ресурс:', error)
+  }
+}
+
+// Функция для вызова отправки лога
 async function sendToLog(ctx) {
   const { chat, from, text } = ctx.message
   if (chat.id !== GRAND_ADMIN) {
+    // Предполагаем, что функция checkUser и logMessage уже описаны и доступны для использования
     const userData = await checkUser(chat.id)
-    const fio = userData?.fio || 'N/A' // Предполагая, что ФИО хранится в свойстве 'fio'
-    const fullName =
-      (from.first_name ? from.first_name + ' ' : '') +
-      (from.last_name ? from.last_name : '')
+    const fio = userData?.fio || 'N/A' // Предполагаем, что ФИО хранится в свойстве 'fio' у userData
+    const fullName = `${from.first_name ?? ''} ${from.last_name ?? ''}`.trim()
     const username = from.username || ''
 
-    const logMessageToSend =
-      `<blockquote>${text}</blockquote>\n` +
-      logMessage(chat.id, fio, username, fullName)
-
-    // Отправляем данные на внешний API
-    try {
-      console.log(chat.id)
-      await post(`${WEB_API}/log/log.php`, {
-        user_id: chat.id,
-        text: logMessageToSend,
-        error: 0,
-        ok: 1,
-        type: 'message',
-        info: 'message'
-      })
-    } catch (error) {
-      console.error('Ошибка при отправке лога:', error)
+    const logMessageToSend = {
+      user_id: chat.id,
+      text:
+        `<blockquote>${text}</blockquote>\n` +
+        logMessage(chat.id, fio, username, fullName),
+      error: 0,
+      ok: 1,
+      type: 'message',
+      info: 'message'
     }
+
+    await sendLogData(logMessageToSend)
   }
+}
+
+module.exports = {
+  sendToLog,
+  sendLogData
 }
 
 module.exports = {
