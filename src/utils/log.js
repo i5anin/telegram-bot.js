@@ -95,14 +95,10 @@ async function sendToLog(ctx) {
 
     // Отправляем данные на внешний API
     try {
-      console.log(chat.id)
-      await post(`${WEB_API}/log/log.php`, {
-        user_id: chat.id,
-        text: logMessageToSend,
-        error: 0,
-        ok: 1,
-        type: 'message',
-        info: 'message'
+      await post('https://api.pf-forum.ru/api/log/log.php', {
+        user_id: chat.id, // или другой идентификатор в зависимости от того, что требует ваш API
+        text: logMessageToSend
+        // Дополните другими необходимыми полями в соответствии с вашей базой данных
       })
 
       console.log('Лог успешно отправлен')
