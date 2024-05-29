@@ -106,5 +106,5 @@ dist
 state.db
 .idea
 
-session_db.json
+session.json
 *.csv

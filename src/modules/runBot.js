@@ -1,8 +1,18 @@
 const { format } = require('date-fns')
 const { updateBotData } = require('#src/api/index')
+const { initCronJobs } = require('#src/modules/cron')
 
-function runBot(instanceNumber, currentDateTime) {
-  // Объявляем formattedDateTime здесь, чтобы оно было доступно вне блока if
+function runBot(stateCounter) {
+  // Генерация случайного номера экземпляра и получение текущего времени
+  const instanceNumber = Math.floor(Math.random() * 9000) + 1000
+  const currentDateTime = new Date()
+
+  // Инициализация cron-заданий
+  initCronJobs(currentDateTime, instanceNumber)
+
+  // Сохранение номера экземпляра для метрик
+  stateCounter.instanceNumber = instanceNumber
+
   const formattedDateTime = format(currentDateTime, 'yyyy-MM-dd HH:mm:ss')
 
   if (MODE === 'build') {

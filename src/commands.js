@@ -22,8 +22,23 @@ const {
   sendMetricsMessagesNach
 } = require('#src/modules/metrics')
 const { handlePhoto } = require('#src/modules/photo')
+const { handleForwardedMessage } = require('#src/modules/who')
 
 function setupCommands(bot) {
+  bot.use((ctx, next) => {
+    if (ctx.message) {
+      if (ctx.message.forward_from) {
+        handleForwardedMessage(ctx, ctx.message.forward_from.id) // Если сообщение переслано и sender разрешил связывание
+        return
+      }
+      if (ctx.message.forward_sender_name) {
+        handleForwardedMessage(ctx, ctx.message.forward_sender_name) // Если сообщение переслано, но sender запретил связывание
+        return
+      }
+    }
+    return next() // Если сообщение не переслано или не содержит команды, передаем обработку следующему middleware
+  })
+
   // Обработчик для фото с подписью
   bot.on('photo', (ctx) => handlePhoto(ctx))
 

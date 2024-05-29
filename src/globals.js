@@ -1,6 +1,26 @@
 // globals.js
+const { createMetric } = require('#src/utils/metricPM2')
 require('dotenv').config()
-function setupGloal() {
+function setupGlobal() {
+  global.bot = bot
+  global.stateCounter = {
+    bot_update: 0,
+    bot_check: 0,
+
+    user_get_all: 0,
+    users_get: 0,
+    users_get_all_fio: 0,
+    users_add: 0,
+
+    comment_get_all: 0,
+    comment_update: 0,
+
+    oplata_get_all: 0,
+    oplata_update: 0,
+
+    instanceNumber: 0 // для метрики
+  }
+
   global.SECRET_KEY = process.env.SECRET_KEY
   global.WEB_API = process.env.WEB_API
 
@@ -49,8 +69,19 @@ function setupGloal() {
     MODE,
     emoji
   }
+
+  createMetric('bot_check', stateCounter, 'bot_check')
+  createMetric('user_get_all', stateCounter, 'user_get_all')
+  createMetric('users_get_all_fio', stateCounter, 'users_get_all_fio')
+  createMetric('user_add', stateCounter, 'user_add')
+  createMetric('users_get', stateCounter, 'users_get')
+  createMetric('comment_get_all', stateCounter, 'comment_get_all')
+  createMetric('comment_update', stateCounter, 'comment_update')
+  createMetric('oplata_get_all', stateCounter, 'oplata_get_all')
+  createMetric('oplata_update', stateCounter, 'oplata_update')
+  createMetric('instanceNumber', stateCounter, 'instanceNumber')
 }
 
 module.exports = {
-  setupGloal
+  setupGlobal
 }
