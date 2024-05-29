@@ -31,11 +31,9 @@ if (!$userID || !$text || $error === null || $ok === null || !$type || !$info) {
     sendJsonResponse(400, 'Отсутствуют обязательные поля');
 }
 
-// Добавьте сюда имя вашего поля timestamp вместо `timestamp`
-$query = "INSERT INTO `log` (`user_id`, `timestamp`, `text`, `error`, `ok`, `type`, `info`) VALUES (?, NOW(), ?, ?, ?, ?, ?)";
+$query = "INSERT INTO `log` (`user_id`, `text`, `error`, `ok`, `type`, `info`) VALUES (?, ?, ?, ?, ?, ?)";
 
 if ($stmt = $mysqli->prepare($query)) {
-    // В bind_param убираем timestamp, так как мы используем NOW() в SQL запросе для автоматического заполнения
     $stmt->bind_param('isisss', $userID, $text, $error, $ok, $type, $info);
     if (!$stmt->execute()) {
         sendJsonResponse(500, "Ошибка добавления записи лога: " . $stmt->error);
