@@ -1,15 +1,11 @@
 // commands.js
 // Загрузка переменных среды из .env файла
 require('dotenv').config()
-const { Telegraf } = require('telegraf')
-const LocalSession = require('telegraf-session-local')
 
 // Импорт модулей
-const { initCronJobs } = require('#src/modules/cron')
 const { handleRegComment } = require('#src/modules/reg')
 const { payments } = require('#src/modules/payments')
 const { handleTextCommand } = require('#src/modules/text')
-// const { pingService } = require('#src/modules/pingService')
 const {
   handleHelpCommand,
   handleDocsCommand,
@@ -20,9 +16,6 @@ const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
 const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
 const { handleGetGroupInfoCommand } = require('#src/utils/csv')
-const { runBot } = require('#src/modules/runBot')
-const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
-const { createMetric } = require('#src/utils/metricPM2')
 const {
   metricsNotificationDirector,
   formatMetricsMessageMaster,

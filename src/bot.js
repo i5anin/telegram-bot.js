@@ -3,7 +3,6 @@ require('dotenv').config()
 const { Telegraf } = require('telegraf')
 const LocalSession = require('telegraf-session-local')
 const { setupCommands } = require('./commands')
-const globals = require('./globals')
 const io = require('@pm2/io')
 
 // включить отслеживание транзакций
@@ -12,29 +11,13 @@ io.init({ transactions: true, http: true })
 
 // Импорт модулей
 const { initCronJobs } = require('#src/modules/cron')
-const { handleRegComment } = require('#src/modules/reg')
-const { payments } = require('#src/modules/payments')
-const { handleTextCommand } = require('#src/modules/text')
+
 // const { pingService } = require('#src/modules/pingService')
-const {
-  handleHelpCommand,
-  handleDocsCommand,
-  handleOperatorCommand
-} = require('#src/modules/help')
-const { oplataNotification } = require('#src/modules/oplata')
-const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
-const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
-const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
-const { handleGetGroupInfoCommand } = require('#src/utils/csv')
+
 const { runBot } = require('#src/modules/runBot')
-const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
+const { handleForwardedMessage } = require('#src/modules/who')
 const { createMetric } = require('#src/utils/metricPM2')
-const {
-  metricsNotificationDirector,
-  formatMetricsMessageMaster,
-  sendMetricsMessagesNach
-} = require('#src/modules/metrics')
-const { handlePhoto } = require('#src/modules/photo')
+
 const { setupGloal } = require('#src/globals')
 
 // Конфигурационные переменные
