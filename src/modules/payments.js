@@ -21,10 +21,10 @@ async function getLastPaymentForUser(userId) {
 async function payments(ctx) {
   try {
     // Безопасное извлечение userId из ctx
-    // const userId = ctx?.from?.id
+    const userId = ctx?.from?.id
 
     // const userId = 5173203456 // no op
-    const userId = 487054792 // op
+    // const userId = 487054792 // op
 
     if (!userId) {
       console.log('Не удалось получить userId')
