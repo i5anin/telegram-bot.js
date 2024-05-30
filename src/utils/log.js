@@ -130,11 +130,6 @@ async function sendToLog(ctx) {
 }
 
 module.exports = {
-  sendToLog,
-  sendLogData
-}
-
-module.exports = {
   logNewChatMembers,
   logLeftChatMember,
   sendToLog
