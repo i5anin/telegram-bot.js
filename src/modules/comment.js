@@ -1,11 +1,11 @@
-import { getAllComments, updateComment } from '#src/api/index'
-import {
+const { getAllComments, updateComment } = require('#src/api/index')
+const {
   formatPaymentDate,
   getUserName,
   getControlType,
   getDefectType
-} from '#src/utils/helpers'
-// import { formatSKMessage } from '#src/utils/ru_lang'
+} = require('#src/utils/helpers')
+const { formatSKMessage } = require('#src/utils/ru_lang')
 
 async function fetchComments() {
   try {
@@ -121,4 +121,4 @@ async function handleAddComment(ctx) {
   }
 }
 
-export { fetchComments, handleAddComment }
+module.exports = { fetchComments, handleAddComment }

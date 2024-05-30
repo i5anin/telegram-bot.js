@@ -1,7 +1,8 @@
 // Подключаем необходимые модули и переменные
-import { sendToLog } from '#src/utils/log' // Добавление лога
-import { resetFlags } from '#src/utils/helpers'
-import { checkUser } from '#src/api/index'
+const ruLang = require('#src/utils/ru_lang') // Локализация сообщений
+const { sendToLog } = require('#src/utils/log') // Добавление лога
+const { resetFlags } = require('#src/utils/helpers')
+const { checkUser } = require('#src/api/index')
 // const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
 
 // Функция для проверки, зарегистрирован ли пользователь на сервере
@@ -56,4 +57,4 @@ async function handleRegComment(ctx) {
   }
 }
 
-export { handleRegComment, checkRegistration }
+module.exports = { handleRegComment, checkRegistration }

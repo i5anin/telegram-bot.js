@@ -75,4 +75,4 @@ async function handleGetGroupInfoCommand(ctx) {
   await generateReport(ctx, chatId)
 }
 
-export { handleGetGroupInfoCommand }
+module.exports = { handleGetGroupInfoCommand }

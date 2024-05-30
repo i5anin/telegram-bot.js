@@ -34,4 +34,4 @@ async function handleStatusCommand(ctx, instanceNumber, currentDateTime) {
   )
 }
 
-export { handleStatusCommand, handleMsgCommand }
+module.exports = { handleStatusCommand, handleMsgCommand }

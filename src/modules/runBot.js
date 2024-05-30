@@ -1,7 +1,6 @@
-import { format } from 'date-fns'
-import { updateBotData } from '#src/api/index'
-import { initCronJobs } from '#src/modules/cron'
-import chalk from 'chalk'
+const { format } = require('date-fns')
+const { updateBotData } = require('#src/api/index')
+const { initCronJobs } = require('#src/modules/cron')
 
 function runBot(stateCounter) {
   // Генерация случайного номера экземпляра и получение текущего времени
@@ -31,11 +30,12 @@ function runBot(stateCounter) {
   }
 
   // Теперь мы можем использовать formattedDateTime здесь
-  console.log(chalk.green(`! Номер экземпляра : ${instanceNumber}\n!`))
-  console.log(chalk.green(`! Время запуска ${formattedDateTime}`))
-  console.log(chalk.orange('MODE = development'))
-  console.log(chalk.orange('OPLATA_REPORT_ACTIVE = false'))
-  console.log(chalk.orange('METRICS_REPORT_ACTIVE = false'))
+  console.log(
+    `! Running instance number : ${instanceNumber}\n! Start-up time ${formattedDateTime}`
+  )
+  console.log('MODE =', MODE)
+  console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
+  console.log('METRICS_REPORT_ACTIVE =', METRICS_REPORT_ACTIVE)
 
   if (MODE === 'build') {
     bot.telegram.sendMessage(
@@ -47,4 +47,4 @@ function runBot(stateCounter) {
   }
 }
 
-export { runBot }
+module.exports = { runBot }

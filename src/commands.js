@@ -80,4 +80,6 @@ function setupCommands(bot) {
   bot.on('left_chat_member', logLeftChatMember)
 }
 
-export { setupCommands }
+module.exports = {
+  setupCommands
+}

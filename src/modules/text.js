@@ -1,4 +1,4 @@
-import ruLang from '#src/utils/ru_lang'
+const ruLang = require('#src/utils/ru_lang')
 
 const { handleAddComment } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
@@ -132,4 +132,4 @@ async function handleTextCommand(ctx) {
   }
 }
 
-export { handleTextCommand }
+module.exports = { handleTextCommand }

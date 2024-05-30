@@ -1,12 +1,18 @@
-import moment from 'moment'
-import {
+// const moment = require('moment')
+const {
   fetchMetrics,
   checkUser,
   getMetricsMaster,
   getMetricsNach
-} from '#src/api/index'
-import { sendToLog } from '#src/utils/log'
-import { formatNumber, getUserLinkById } from '#src/utils/helpers'
+} = require('#src/api/index')
+const { sendToLog } = require('#src/utils/log')
+const {
+  formatMetricsMessage,
+  formatMetricsMessageNach,
+  formatMetricsVoronca
+} = require('#src/utils/ru_lang')
+const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
+const moment = require('moment')
 
 function getMaxCharacters(latestMetrics) {
   const percentageValues = [
@@ -287,7 +293,7 @@ function getMedalEmoji(position) {
   }
 }
 
-export {
+module.exports = {
   metricsNotificationDirector,
   metricsNotificationProiz,
   formatMetricsMessageMaster,

@@ -1,15 +1,11 @@
-// #src/modules/cron.mjs (make sure to use the .mjs extension)
-
-import cron from 'node-cron'
-import { notifyAllUsers } from '#src/modules/notify'
-import { oplataNotification } from '#src/modules/oplata'
-import { checkBotData } from '#src/api/index'
-import {
+const cron = require('node-cron')
+const { notifyAllUsers } = require('#src/modules/notify')
+const { oplataNotification } = require('#src/modules/oplata')
+const { checkBotData } = require('#src/api/index')
+const {
   metricsNotificationDirector,
-  metricsNotificationProiz,
-  formatMetricsMessageMaster
-} from '#src/modules/metrics'
-import { format } from 'date-fns'
+  metricsNotificationProiz
+} = require('#src/modules/metrics') // импортируйте функцию format
 
 function initCronJobs(currentDateTime, instanceNumber) {
   // Уведомлять о сообщениях каждые 15 мин
@@ -97,4 +93,4 @@ function initCronJobs(currentDateTime, instanceNumber) {
   }
 }
 
-export { initCronJobs }
+module.exports = { initCronJobs }

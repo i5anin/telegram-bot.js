@@ -1,4 +1,4 @@
-import axios from 'axios'
+const axios = require('axios')
 
 const SECRET_KEY = process.env.SECRET_KEY
 const BOT_TOKEN = process.env.BOT_TOKEN
@@ -199,7 +199,7 @@ async function addPhotoData(user_id, party, comments_otk, location) {
   return performRequest(url, 'get', {}, params)
 }
 
-export {
+module.exports = {
   checkBotData,
   updateBotData,
   getAllUsers,
