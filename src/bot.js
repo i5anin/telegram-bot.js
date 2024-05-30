@@ -30,7 +30,8 @@ bot.use((ctx, next) => {
   return next()
 })
 
-setupGlobal()
+const instanceNumber = Math.floor(Math.random() * 9000) + 1000
+setupGlobal(bot, instanceNumber)
 runBot(stateCounter)
 setupCommands(bot)
 

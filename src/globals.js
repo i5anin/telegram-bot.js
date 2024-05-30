@@ -1,7 +1,9 @@
 // globals.js
 const { createMetric } = require('#src/utils/metricPM2')
 require('dotenv').config()
-function setupGlobal() {
+function setupGlobal(bot, instanceNumber) {
+  global.bot = bot
+  global.instanceNumber = instanceNumber
   global.bot = bot
   global.stateCounter = {
     bot_update: 0,

@@ -39,11 +39,11 @@ $type = $data['type'] ?? null;
 $info = $data['info'] ?? null;
 
 // Проверяем, были ли предоставлены необходимые данные
-if (!$userID || !$text || !isset($error) || !isset($ok) || !$type || !$info) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Missing required fields']);
-    exit;
-}
+// if (!$userID || !$text || !isset($error) || !isset($ok) || !$type || !$info) {
+//     http_response_code(400);
+//     echo json_encode(['error' => 'Missing required fields']);
+//     exit;
+// }
 
 // Подготавливаем SQL запрос
 $query = "INSERT INTO `log` (date_time_event, user_id, text, error, ok, type, info) VALUES (?, ?, ?, ?, ?, ?, ?)";
