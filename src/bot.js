@@ -137,7 +137,14 @@ bot.on('photo', (ctx) => handlePhoto(ctx))
 bot.command(['start', 'reg'], (ctx) =>
   handleRegComment(ctx, (ctx.session.isAwaitFio = true))
 ) // ['start', 'reg']
-bot.command('pay', (ctx) => payments(ctx)) // ['start', 'reg']
+bot.command('pay', (ctx) => onMaintenance(ctx))
+// bot.command('pay', (ctx) => payments(ctx))
+
+function onMaintenance(ctx) {
+  // Отправляем пользователю сообщение
+  ctx.reply('❌ Функция временно недоступна и находится на доработке.')
+}
+
 bot.command('new_comment', (ctx) =>
   notifyUsers(ctx, (ctx.session.isUserInitiated = true))
 )
