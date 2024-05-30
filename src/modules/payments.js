@@ -48,7 +48,7 @@ async function payments(ctx) {
     }
 
     const paymentData = await getLastPaymentForUser(userId, dateForRequest)
-    console.log(paymentData.operator_type)
+    console.log('paymentData=', paymentData)
 
     if (!paymentData)
       return await ctx.reply('Информация о зарплате недоступна.')
