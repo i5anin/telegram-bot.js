@@ -6,7 +6,7 @@ async function oplataNotification() {
   if (!OPLATA_REPORT_ACTIVE) return
 
   let failedAdminId = null
-  const BATCH_SIZE = 10
+  const BATCH_SIZE = 15
 
   try {
     const response = await getAllPayments() // Используем функцию
