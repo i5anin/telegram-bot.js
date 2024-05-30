@@ -19,13 +19,21 @@ function runBot(instanceNumber, currentDateTime) {
       })
   }
 
-  // Теперь мы можем использовать formattedDateTime здесь
   console.log(
-    `! Running instance number : ${instanceNumber}\n! Start-up time ${formattedDateTime}`
+    '\x1b[32m%s\x1b[0m',
+    `! Номер запущенного экземпляра : ${instanceNumber}`
   )
-  console.log('MODE =', MODE)
-  console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
-  console.log('METRICS_REPORT_ACTIVE =', METRICS_REPORT_ACTIVE)
+  console.log('\x1b[34m%s\x1b[0m', `Время запуска [${currentDateTime}]`)
+  console.log(
+    '\x1b[31m%s\x1b[0m',
+    'OPLATA_REPORT_ACTIVE =',
+    OPLATA_REPORT_ACTIVE
+  )
+  console.log(
+    '\x1b[31m%s\x1b[0m',
+    'METRICS_REPORT_ACTIVE =',
+    METRICS_REPORT_ACTIVE
+  )
 
   if (MODE === 'build') {
     bot.telegram.sendMessage(
