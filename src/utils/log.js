@@ -1,8 +1,7 @@
 // Отслеживаем событие добавления нового пользователя в чат
-const { checkUser } = require('#src/api/index')
-const { logMessage } = require('#src/utils/ru_lang')
-const { getAllUsers } = require('#src/api/index')
-const { post } = require('axios')
+import { checkUser, getAllUsers } from '#src/api/index'
+// import { logMessage } from '#src/utils/ru_lang'
+import axios from 'axios'
 
 async function logNewChatMembers(ctx) {
   const chatTitle = ctx.chat.title || 'Неназванный чат'
@@ -108,8 +107,4 @@ async function sendToLog(ctx) {
   }
 }
 
-module.exports = {
-  logNewChatMembers,
-  logLeftChatMember,
-  sendToLog
-}
+export { logNewChatMembers, logLeftChatMember, sendToLog }

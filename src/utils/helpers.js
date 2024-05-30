@@ -1,5 +1,5 @@
 // Функция для выполнения GET-запросов
-const { getAllUsers, checkUser } = require('#src/api/index')
+import { getAllUsers, checkUser } from '#src/api/index'
 
 // Функция для сброса флагов сессии
 function resetFlags(ctx) {
@@ -82,7 +82,7 @@ function formatPercentage(number, maxCharacters, maxDecimalPlaces) {
   return spaces + formattedNumber
 }
 
-module.exports = {
+export {
   getUserLinkById,
   formatPercentage,
   formatNumber,

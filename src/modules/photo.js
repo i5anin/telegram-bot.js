@@ -51,4 +51,4 @@ async function handlePhoto(ctx) {
   ctx.session.photoParty = true
 }
 
-module.exports = { handlePhoto }
+export { handlePhoto }

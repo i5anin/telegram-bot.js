@@ -172,4 +172,4 @@ async function handleOperatorCommand(ctx) {
   }
 }
 
-module.exports = { handleHelpCommand, handleDocsCommand, handleOperatorCommand }
+export { handleHelpCommand, handleDocsCommand, handleOperatorCommand }

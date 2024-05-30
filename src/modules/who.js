@@ -118,4 +118,4 @@ async function whoCommand(ctx) {
   }
 }
 
-module.exports = { handleForwardedMessage, whoCommand }
+export { handleForwardedMessage, whoCommand }

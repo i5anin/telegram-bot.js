@@ -1,15 +1,15 @@
-const {
+import {
   resetFlags,
   formatPaymentDate,
   getUserName,
   getDefectType,
   getControlType,
   getUserLinkById
-} = require('#src/utils/helpers')
-const { fetchComments } = require('#src/modules/comment')
-const { sendToLog } = require('#src/utils/log')
-const { updateComment } = require('#src/api/index')
-const { formatSKMessage } = require('#src/utils/ru_lang')
+} from '#src/utils/helpers'
+import { fetchComments } from '#src/modules/comment'
+import { sendToLog } from '#src/utils/log'
+import { updateComment } from '#src/api/index'
+// import { formatSKMessage } from '#src/utils/ru_lang'
 
 // Функция задержки
 function sleep(ms) {
@@ -163,4 +163,4 @@ async function notifyUsers(ctx) {
   }
 }
 
-module.exports = { notifyUsers, notifyAllUsers }
+export { notifyUsers, notifyAllUsers }

@@ -1,7 +1,7 @@
 // messages.js
 
-const moment = require('moment')
-const { formatNumber, formatPercentage } = require('#src/utils/helpers')
+import moment from 'moment'
+import { formatNumber, formatPercentage } from '#src/utils/helpers'
 
 /**
  * Проверяет, выходит ли значение за пределы заданного диапазона (меньше 1 700 000 или больше 3 400 000),
@@ -21,7 +21,7 @@ function checkWarningAndFormat(value, category) {
   return `<b>${formatNumber(value)}</b> ₽${symbol}\n`
 }
 
-module.exports = {
+const ruLang = {
   alreadyRegistered: '<b>Вы уже зарегистрированы!</b>',
   notRegistered:
     'Не зарегистрированы. \nВведите данные в формате:\n<code>Иванов И.И.</code>',
@@ -125,3 +125,5 @@ module.exports = {
     `<b>fio:</b> <a href='tg://user?id=${chatId}'>${fio}</a>\n` +
     `<b>ID:</b> <code>${chatId}</code>`
 }
+
+export default ruLang

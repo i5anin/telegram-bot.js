@@ -9,4 +9,4 @@ function createMetric(name, counterObject, key) {
   })
 }
 
-module.exports = { createMetric }
+export { createMetric }

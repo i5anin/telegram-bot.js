@@ -1,7 +1,6 @@
 // Подключаем необходимые модули и переменные
-const axios = require('axios')
-const ruLang = require('#src/utils/ru_lang') // Локализация сообщений
-const { checkUser } = require('#src/api/index')
+import axios from 'axios'
+import { checkUser } from '#src/api/index'
 
 // Функция для отправки запроса в API и получения последних данных о платежах пользователя
 async function getLastPaymentForUser(userId) {
@@ -62,4 +61,4 @@ async function payments(ctx) {
   }
 }
 
-module.exports = { payments }
+export { payments }

@@ -1,6 +1,6 @@
-const { getAllPayments, updatePayments } = require('#src/api/index') // Импортируем функции
-const { formatPaymentDate } = require('#src/utils/helpers')
-const axios = require('axios') // Убедитесь, что axios установлен в вашем проекте
+import { getAllPayments, updatePayments } from '#src/api/index'
+import { formatPaymentDate } from '#src/utils/helpers'
+import axios from 'axios'
 
 async function oplataNotification() {
   if (!OPLATA_REPORT_ACTIVE) return
@@ -84,4 +84,4 @@ async function oplataNotification() {
   }
 }
 
-module.exports = { oplataNotification }
+export { oplataNotification }
