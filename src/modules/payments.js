@@ -1,64 +1,70 @@
-// Подключаем необходимые модули и переменные
 const axios = require('axios')
 const ruLang = require('#src/utils/ru_lang') // Локализация сообщений
 const { checkUser } = require('#src/api/index')
 
-// Функция для отправки запроса в API и получения последних данных о платежах пользователя
-async function getLastPaymentForUser(userId) {
+async function getLastPaymentForUser(userId, date) {
   try {
     const response = await axios.get(
-      `${WEB_API}/payments/payments.php?user_id=${userId}`
+      `${WEB_API}/payments/payments.php?user_id=${userId}&date=${date}`
     )
     const { payments } = response.data
     return payments[payments.length - 1] || null
   } catch (error) {
-    console.log(`Ошибка при запросе к API: ${error}`) // Изменено на console.log для избежания асинхронности в блоке catch
+    console.log(`Ошибка при запросе к API: ${error}`)
     return null
   }
 }
 
-// Функция обработчика команды `/pay`
 async function payments(ctx) {
   try {
-    // Безопасное извлечение userId из ctx
-    const userId = ctx?.from?.id
+    const userId = ctx?.from?.id //ctx?.from?.id //487054792 //5173203456
 
-    // const userId = 5173203456 // no op
-    // const userId = 487054792 // op
+    if (!userId) return console.log('Не удалось получить userId')
 
-    if (!userId) {
-      console.log('Не удалось получить userId')
-      return
-    }
-
-    // Пример использования функции проверки зарегистрированного пользователя, если понадобится в будущем
     const user = await checkUser(userId)
     if (!user || !user.exists) {
       await ctx.reply(ruLang.userNotFound)
       return
     }
 
-    const paymentData = await getLastPaymentForUser(userId)
-    console.log('paymentData=', paymentData)
-    if (!paymentData) {
-      await ctx.reply(
-        ruLang.paymentDataNotAvailable || 'Информация о зарплате недоступна.'
+    // Задаем демонстрационную дату
+    const todayStr = new Date().toISOString().slice(0, 10) // Устанавливает сегодняшнюю дату
+    console.log(todayStr)
+
+    const today = new Date() //new Date('2024-05-01')
+    const day = today.getDate()
+    let dateForRequest // Убрано значение по умолчанию ''
+
+    if (day >= 10) {
+      dateForRequest = today.toISOString().slice(0, 10) // Используем текущую дату, так как число больше или равно 10
+    } else {
+      // Если текущий день меньше 10, используем последний день предыдущего месяца
+      const lastDayOfPreviousMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        1
       )
-      return
+      dateForRequest = lastDayOfPreviousMonth.toISOString().slice(0, 10)
     }
 
-    let message = ''
+    const paymentData = await getLastPaymentForUser(userId, dateForRequest)
     console.log(paymentData.operator_type)
-    if (paymentData.operator_type === null) {
-      message = ruLang.payments(paymentData) //if true
+
+    if (!paymentData)
+      return await ctx.reply('Информация о зарплате недоступна.')
+
+    let message
+    if (!paymentData.operator_type) {
+      message = ruLang.payments(paymentData)
     } else {
-      message = ruLang.paymentsOperator(paymentData) //if null false
+      message = ruLang.paymentsOperator(paymentData)
     }
+
+    // Составляем сообщение для ответа
 
     await ctx.reply(message, { parse_mode: 'HTML' })
   } catch (error) {
-    console.error(`Ошибка в команде /pay: ${error}`)
-    await ctx.reply(`Произошла ошибка: ${error}`)
+    await ctx.reply(`Произошла ошибка в команде /pay: ${error}`)
   }
 }
 

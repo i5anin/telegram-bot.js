@@ -1,7 +1,7 @@
 <?php
 
 // Получаем сегодняшнюю дату
-// $today = date("Y-m-d"); // Закомментировано для отключения проверки даты
+$today = date("Y-m-d");
 
 // Извлекаем userID из параметров запроса
 $userID = $_GET['user_id'] ?? null;
@@ -12,6 +12,9 @@ if (!$userID) {
     echo json_encode(['error' => 'No user ID provided']);
     exit;
 }
+
+// Получаем дату из параметров запроса (если она передана)
+$date = $_GET['date'] ?? $today; // По умолчанию используем сегодняшний день
 
 // Подключаем конфигурационный файл
 $dbConfig = require 'sql_config.php';
@@ -32,11 +35,11 @@ if ($mysqli->connect_error) {
 
 $mysqli->set_charset('utf8mb4');
 
-// Подготовленный запрос для получения данных по userID за сегодняшнюю дату
-$query = "SELECT * FROM `payments` WHERE `user_id` = ?"; // Изменено: Удалена проверка даты
+// Подготовленный запрос для получения данных по userID за указанную дату
+$query = "SELECT * FROM `payments` WHERE `user_id` = ? AND `date` = ?";
 
 if ($stmt = $mysqli->prepare($query)) {
-    $stmt->bind_param('s', $userID); // Изменено: Удалена привязка даты
+    $stmt->bind_param('ss', $userID, $date);
     $stmt->execute();
     $result = $stmt->get_result();
 
