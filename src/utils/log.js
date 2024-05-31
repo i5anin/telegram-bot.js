@@ -116,13 +116,11 @@ async function sendToLog(ctx) {
 
     const logMessageToSend = {
       user_id: chat.id,
-      text:
-        `<blockquote>${text}</blockquote>\n` +
-        logMessage(chat.id, fio, username, fullName),
+      text: text,
       error: 0,
       ok: 1,
       type: 'message',
-      info: 'message'
+      info: fio
     }
 
     await sendLogData(logMessageToSend)
