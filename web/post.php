@@ -33,6 +33,11 @@
       height: 100vh;
       overflow: auto;
     }
+
+    /* Новые стили для узких столбцов */
+    .narrow-column {
+      max-width: 50px; /* Установите желаемую максимальную ширину */
+    }
   </style>
 </head>
 
@@ -45,11 +50,11 @@
           <th scope="col">user_id</th>
           <th scope="col">fio</th>
           <th scope="col">username</th>
-          <th scope="col">active</th>
-          <th scope="col">role</th>
-          <th scope="col">oplata</th>
-          <th scope="col">metrica</th>
-          <th scope="col">metrica_time</th>
+          <th scope="col" class="narrow-column">active</th>
+          <th scope="col" class="narrow-column">role</th>
+          <th scope="col" class="narrow-column">oplata</th>
+          <th scope="col" class="narrow-column">metrica</th>
+          <th scope="col" class="narrow-column">metrica_time</th>
           <th scope="col">inn</th>
           <th scope="col">date_reg</th>
           <th scope="col">post</th>
@@ -102,12 +107,12 @@
             <th scope="row"><?php echo $rowNumber; ?></th>
             <td class="text-cell"><?php echo $row['user_id']; ?></td>
             <td class="text-cell"><?php echo $row['fio']; ?></td>
-            <td class="text-cell"><?php echo $row['username']; ?></td>
-            <td class="text-cell"><?php echo $row['active']; ?></td>
-            <td class="text-cell"><?php echo $row['role']; ?></td>
-            <td class="text-cell"><?php echo $row['oplata']; ?></td>
-            <td class="text-cell"><?php echo $row['metrica']; ?></td>
-            <td class="text-cell"><?php echo $row['metrica_time']; ?></td>
+            <td class="text-cell narrow-column"><?php echo $row['username']; ?></td>
+            <td class="text-cell narrow-column"><?php echo $row['active']; ?></td>
+            <td class="text-cell narrow-column"><?php echo $row['role']; ?></td>
+            <td class="text-cell narrow-column"><?php echo $row['oplata']; ?></td>
+            <td class="text-cell narrow-column"><?php echo $row['metrica']; ?></td>
+            <td class="text-cell narrow-column"><?php echo $row['metrica_time']; ?></td>
             <td class="text-cell"><?php echo $row['inn']; ?></td>
             <td class="text-cell"><?php echo $row['date_reg']; ?></td>
             <td class="text-cell"><?php echo $row['post']; ?></td>
