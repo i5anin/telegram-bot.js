@@ -154,7 +154,8 @@ async function handleOperatorCommand(ctx) {
       // Если пользователь зарегистрирован
       const keyboard = Markup.inlineKeyboard([
         [Markup.button.url('Главная', 'https://t.me/+Sutzh5nau-s4MWVi')],
-        [Markup.button.url('Маршрутка', 'https://t.me/+lPaHwdU2ILMzNTdi')]
+        [Markup.button.url('Маршрутка', 'https://t.me/+lPaHwdU2ILMzNTdi')],
+        [Markup.button.url('ОТК', 'https://t.me/+G5Cg3nagVyc0Yzcy')]
       ])
 
       await ctx.reply('Вот несколько полезных ссылок:', keyboard)
