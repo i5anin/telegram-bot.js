@@ -98,7 +98,7 @@ async function logLeftChatMember(ctx) {
 async function sendLogData(logData) {
   try {
     await post(`${WEB_API}/log/log.php`, logData)
-    console.log('Лог успешно отправлен на внешний ресурс.')
+    // console.log('Лог успешно отправлен на внешний ресурс.')
   } catch (error) {
     console.error('Ошибка при отправке лога на внешний ресурс:', error)
   }

@@ -114,49 +114,49 @@ const instanceNumber = Math.floor(Math.random() * 9000) + 1000
 const currentDateTime = new Date()
 stateCounter.instanceNumber = instanceNumber // для метрики
 
-bot.on('message', (ctx) => {
-  console.log('message')
-  // Получение информации о группе или канале
-  const chatId = ctx.chat.id
-
-  // Получение количества пользователей
-  fetch(
-    `https://api.telegram.org/bot${BOT_TOKEN}/getChatMembersCount?chat_id=${chatId}`
-  )
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.ok) {
-        const count = data.result
-
-        // Получение названия группы
-        fetch(
-          `https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${chatId}`
-        )
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.ok) {
-              const title = data.result.title
-              console.log(
-                `Название группы: ${title}, Количество пользователей: ${count}`
-              )
-            } else {
-              console.error('Ошибка получения названия группы', data)
-            }
-          })
-          .catch((error) => {
-            console.error('Ошибка запроса:', error)
-          })
-      } else {
-        console.error('Ошибка получения количества пользователей', data)
-      }
-    })
-    .catch((error) => {
-      console.error('Ошибка запроса:', error)
-    })
-
-  // Вызов обработчика текста, если это нужно
-  handleTextCommand(ctx)
-})
+// bot.on('message', (ctx) => {
+//   console.log('message')
+//   // Получение информации о группе или канале
+//   const chatId = ctx.chat.id
+//
+//   // Получение количества пользователей
+//   fetch(
+//     `https://api.telegram.org/bot${BOT_TOKEN}/getChatMembersCount?chat_id=${chatId}`
+//   )
+//     .then((response) => response.json())
+//     .then((data) => {
+//       if (data.ok) {
+//         const count = data.result
+//
+//         // Получение названия группы
+//         fetch(
+//           `https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${chatId}`
+//         )
+//           .then((response) => response.json())
+//           .then((data) => {
+//             if (data.ok) {
+//               const title = data.result.title
+//               console.log(
+//                 `Название группы: ${title}, Количество пользователей: ${count}`
+//               )
+//             } else {
+//               console.error('Ошибка получения названия группы', data)
+//             }
+//           })
+//           .catch((error) => {
+//             console.error('Ошибка запроса:', error)
+//           })
+//       } else {
+//         console.error('Ошибка получения количества пользователей', data)
+//       }
+//     })
+//     .catch((error) => {
+//       console.error('Ошибка запроса:', error)
+//     })
+//
+//   // Вызов обработчика текста, если это нужно
+//   handleTextCommand(ctx)
+// })
 
 bot.use((ctx, next) => {
   if (ctx.message) {
@@ -181,15 +181,9 @@ bot.on('photo', (ctx) => handlePhoto(ctx))
 bot.command(['start', 'reg'], (ctx) =>
   handleRegComment(ctx, (ctx.session.isAwaitFio = true))
 ) // ['start', 'reg']
-bot.command('pay', (ctx) => payments(ctx))
-
 // bot.command('pay', (ctx) => payments(ctx))
 
-// function onMaintenance(ctx) {
-//   // Отправляем пользователю сообщение
-//   ctx.reply('❌ Функция временно недоступна и находится на доработке.')
-// }
-
+bot.command('pay', (ctx) => onMaintenance(ctx))
 bot.command('new_comment', (ctx) =>
   notifyUsers(ctx, (ctx.session.isUserInitiated = true))
 )
@@ -212,15 +206,6 @@ bot.command('metrics_master_notification', () => formatMetricsMessageMaster())
 // bot.command('metrics_old', metricsNotification)
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
 bot.command('oper', (ctx) => handleOperatorCommand(ctx))
-
-// Функция для разбивки массива на части
-function chunkArray(array, chunkSize) {
-  const result = []
-  for (let i = 0; i < array.length; i += chunkSize) {
-    result.push(array.slice(i, i + chunkSize))
-  }
-  return result
-}
 
 bot.command('list', (ctx) => {
   const searchTerm = ctx.message.text.split(' ')[1]
@@ -265,6 +250,20 @@ bot.command('list', (ctx) => {
       ctx.reply('Произошла ошибка. Попробуйте позже.')
     })
 })
+
+// Функция для разбивки массива на части
+function chunkArray(array, chunkSize) {
+  const result = []
+  for (let i = 0; i < array.length; i += chunkSize) {
+    result.push(array.slice(i, i + chunkSize))
+  }
+  return result
+}
+
+function onMaintenance(ctx) {
+  // Отправляем пользователю сообщение
+  ctx.reply('❌ Функция временно недоступна и находится на доработке.')
+}
 
 // bot.command('ping_test', pingService);
 

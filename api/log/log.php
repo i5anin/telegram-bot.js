@@ -32,6 +32,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 // Извлекаем необходимые данные из $data
 $userID = $data['user_id'] ?? null;
+$groupID = $data['group_id'] ?? null;
 $text = $data['text'] ?? null;
 $error = $data['error'] ?? null;
 $ok = $data['ok'] ?? null;
@@ -39,18 +40,18 @@ $type = $data['type'] ?? null;
 $info = $data['info'] ?? null;
 
 // Проверяем, были ли предоставлены необходимые данные
-// if (!$userID || !$text || !isset($error) || !isset($ok) || !$type || !$info) {
-//     http_response_code(400);
-//     echo json_encode(['error' => 'Missing required fields']);
-//     exit;
-// }
+if (!$userID || !$groupID || !$text || !isset($error) || !isset($ok) || !$type || !$info) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Missing required fields']);
+    exit;
+}
 
 // Подготавливаем SQL запрос
-$query = "INSERT INTO `log` (date_time_event, user_id, text, error, ok, type, info) VALUES (?, ?, ?, ?, ?, ?, ?)";
+$query = "INSERT INTO `log` (date_time_event, user_id, group_id, text, error, ok, type, info) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 if($stmt = $mysqli->prepare($query)) {
-    // Привязываем 'date_time_event' и другие параметры к маркерам в подготовленном запросе
-    $stmt->bind_param('sisssss', $currentDateTime, $userID, $text, $error, $ok, $type, $info);
+    // Привязываем 'date_time_event', 'group_id' и другие параметры к маркерам в подготовленном запросе
+    $stmt->bind_param('siisssss', $currentDateTime, $userID, $groupID, $text, $error, $ok, $type, $info);
 
     // Выполняем запрос
     if ($stmt->execute()) {
