@@ -23,18 +23,6 @@
             margin-top: 20px;
         }
 
-        .table .warning {
-            color: red;
-        }
-
-        .table .plan-deviation {
-            color: blue;
-        }
-
-        .table .funnel {
-            color: green;
-        }
-
         /* Стили для экранов шириной менее 390px */
         @media (max-width: 370px) {
             .table {
@@ -200,15 +188,15 @@
                 }
 
                 if (['prod_price_sles', 'prod_price_otk', 'prod_price_upk', 'prod_price_dorabotka', 'prod_price_dorabotka_sles', 'prod_price_sogl'].includes(key)) {
-                    valueCell.classList.add('warning')
+                    valueCell.classList.add('table-danger')
                 }
 
                 if (['cumulative_sklad_month', 'cumulative_brak_month', 'cumulative_manager_month'].includes(key)) {
-                    valueCell.classList.add('plan-deviation')
+                    valueCell.classList.add('table-info')
                 }
 
                 if (['prod', 'sles', 'otk', 'upk'].includes(key)) {
-                    valueCell.classList.add('funnel')
+                    valueCell.classList.add('table-primary')
                 }
             }
         }
