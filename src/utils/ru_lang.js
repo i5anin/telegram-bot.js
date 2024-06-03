@@ -1,5 +1,20 @@
 // messages.js
 
+function getColorEmoji(color) {
+  switch (color) {
+    case 'green':
+      return '🟢'
+    case 'red':
+      return '🔴'
+    case 'blue':
+      return '🔵'
+    case 'white':
+      return '⚪️'
+    default:
+      return '' // Возвращает пустую строку, если цвет не соответствует ни одному из заданных
+  }
+}
+
 const moment = require('moment')
 const { formatNumber, formatPercentage } = require('#src/utils/helpers')
 
@@ -36,11 +51,10 @@ module.exports = {
   error: 'Произошла ошибка при выполнении команды',
 
   payments: (paymentData) =>
-    `<b>${paymentData.fio}</b>\n` +
+    `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio}</b>\n` +
+    `<b>${paymentData.post || ''} (${paymentData.grade_info || ''})</b>\n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
-    // `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +
-    // `Рейтинг Качества:  <b>${paymentData.rating_brak}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_brak}</b>\n` +
     `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
     `Грейд: <b>${paymentData.grade}</b>\n` +
     `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
@@ -48,8 +62,11 @@ module.exports = {
     '</blockquote>' +
     `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment * (1 - 0.13))}</b>\u00A0₽\n`,
 
+  //🟢🔴🔵⚪️
+
   paymentsOperator: (paymentData) =>
-    `<b>${paymentData.fio}</b>\n` +
+    `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio}</b>\n` +
+    `<b>${paymentData.post || ''} (${paymentData.grade_info || ''})</b>\n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
     `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +

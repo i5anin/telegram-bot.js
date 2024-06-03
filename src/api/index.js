@@ -1,4 +1,5 @@
 const axios = require('axios')
+const { post } = require('axios')
 
 const SECRET_KEY = process.env.SECRET_KEY
 const BOT_TOKEN = process.env.BOT_TOKEN
@@ -17,6 +18,27 @@ async function getMetricsNach() {
       `Ошибка при получении данных из endpoint /metrics/get_nach.php: ${error.message}`
     )
     throw error
+  }
+}
+
+// Функция для отправки данных лога
+async function sendLogData(logData) {
+  try {
+    const response = await post(`${WEB_API}/log/log.php`, logData)
+
+    // Предполагаем, что функция `post` возвращает объект ответа, который содержит статус ответа и, возможно, данные
+    console.log('Ответ сервера:', response.status, response.data)
+
+    // Если вам нужно дополнительно проверить статус ответа
+    if (response.status === 200) {
+      // Обработка успешного ответа
+      console.log('Лог успешно отправлен:', response.data)
+    } else {
+      // Обработка ответа с ошибкой
+      console.log('Сервер вернул ошибку:', response.status, response.data)
+    }
+  } catch (error) {
+    console.error('Ошибка при отправке лога на внешний ресурс:', error)
   }
 }
 
@@ -215,5 +237,6 @@ module.exports = {
   getChatMembersCount,
   getChatAdministrators,
   getMetricsMaster,
-  getMetricsNach
+  getMetricsNach,
+  sendLogData
 }

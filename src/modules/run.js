@@ -21,9 +21,8 @@ function runBot(instanceNumber, currentDateTime) {
       })
   }
 
-  console.log(
-    `! Номер запущенного экземпляра : ${instanceNumber} Время запуска [${currentDateTime}]`
-  )
+  console.log(`Номер экземпляра : ${instanceNumber}`)
+  console.log(`Время запуска [${currentDateTime}]`)
   console.log('OPLATA_REPORT_ACTIVE =', OPLATA_REPORT_ACTIVE)
   console.log('MODE =', MODE)
 
