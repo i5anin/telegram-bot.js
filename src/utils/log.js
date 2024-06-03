@@ -78,7 +78,7 @@ async function sendToLog(ctx) {
     group_name: groupName,
     test: process.env.NODE_ENV === 'build' ? 0 : 1
   }
-  console.log(logMessageToSend)
+  // console.log(logMessageToSend)
   await sendLogData(logMessageToSend)
 }
 module.exports = {

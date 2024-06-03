@@ -47,7 +47,7 @@ async function getMetricsMaster() {
   const params = { key: SECRET_KEY }
   try {
     const response = await axios.get(url, { params })
-    console.log(response.data)
+    // console.log(response.data)
     return response.data
   } catch (error) {
     console.error(
