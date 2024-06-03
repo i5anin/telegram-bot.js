@@ -23,37 +23,6 @@
             margin-top: 20px;
         }
 
-        /* Стили для экранов шириной менее 390px */
-        @media (max-width: 370px) {
-            .table {
-                font-size: 12px; /* Уменьшаем размер шрифта */
-            }
-
-            .table td, .table th {
-                display: inline-block; /* Для более точного контроля ширины */
-                width: 40%; /* Задаем ширину ячейки */
-                box-sizing: border-box;
-                vertical-align: top;
-                overflow: hidden; /* Обрезаем содержимое, выходящее за пределы ячейки */
-                white-space: nowrap; /* Запрещаем перенос текста на новую строку */
-                text-overflow: ellipsis; /* Добавляем многоточие в конце обрезанного текста */
-            }
-
-            .table td {
-                margin-bottom: 10px; /* Пространство между ячейками */
-            }
-
-            .table th {
-                display: none; /* Скрываем заголовки таблицы */
-            }
-
-            .table thead tr {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-        }
-
         /* Стили для экранов шириной менее 768px (для обычного Bootstrap-стиля) */
         @media (max-width: 768px) {
             .table th {
