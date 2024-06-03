@@ -11,7 +11,7 @@ async function getMetricsNach() {
 
   try {
     const response = await axios.get(url, { params })
-    console.log(response.data)
+    // console.log(response.data)
     return response.data
   } catch (error) {
     console.error(
@@ -27,12 +27,12 @@ async function sendLogData(logData) {
     const response = await post(`${WEB_API}/log/log.php`, logData)
 
     // Предполагаем, что функция `post` возвращает объект ответа, который содержит статус ответа и, возможно, данные
-    console.log('Ответ сервера:', response.status, response.data)
+    // console.log('Ответ сервера:', response.status, response.data)
 
     // Если вам нужно дополнительно проверить статус ответа
     if (response.status === 200) {
       // Обработка успешного ответа
-      console.log('Лог успешно отправлен:', response.data)
+      // console.log('Лог успешно отправлен:', response.data)
     } else {
       // Обработка ответа с ошибкой
       console.log('Сервер вернул ошибку:', response.status, response.data)

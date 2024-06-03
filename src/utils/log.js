@@ -64,7 +64,7 @@ async function sendToLog(ctx) {
   const fullName = `${from.first_name ?? ''} ${from.last_name ?? ''}`.trim()
   const username = from.username || ''
 
-  console.log(fio)
+  // console.log(fio)
 
   // Формируем объект лога
   const logMessageToSend = {
