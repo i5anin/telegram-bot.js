@@ -135,11 +135,11 @@
     }
 
     function formatNumber(number) {
-        return number.toLocaleString('ru-RU', { minimumFractionDigits: 2 })
+        return Math.round(number).toLocaleString('ru-RU');
     }
 
     function formatPercentage(value, maxCharacters) {
-        const formattedValue = `${(value).toFixed(2)}%`
+        const formattedValue = `${(value).toFixed(0)}%`
         return formattedValue.substring(0, maxCharacters)
     }
 
