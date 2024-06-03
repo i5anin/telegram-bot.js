@@ -13,6 +13,7 @@ const {
 } = require('#src/utils/ru_lang')
 const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
 const moment = require('moment')
+const { Markup } = require('telegraf')
 
 function getMaxCharacters(latestMetrics) {
   const percentageValues = [
@@ -50,6 +51,12 @@ async function metricsNotificationDirector(ctx = null, index = 0, userId) {
     const maxCharacters = getMaxCharacters(latestMetrics)
     const message = formatMetricsMessage(latestMetrics, maxCharacters)
 
+    // Создаем кнопку с ссылкой на бота
+    const botLinkButton = Markup.button.url(
+      'Web метрики',
+      'https://t.me/pfforum_bot/metrics'
+    )
+
     // Логика для случаев, когда индекс равен 1
     if (index === 1) {
       // Send logs if necessary
@@ -67,7 +74,12 @@ async function metricsNotificationDirector(ctx = null, index = 0, userId) {
       }
 
       // Отправьте ответ пользователю и зарегистрируйте действие
-      await ctx.reply(message, { parse_mode: 'HTML' })
+      await ctx.reply(message, {
+        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [[botLinkButton]] // Добавляем кнопку в разметку сообщения
+        }
+      })
       await bot.telegram.sendMessage(
         LOG_CHANNEL_ID,
         (await getUserLinkById(ctx.chat.id)) + '\n' + message,
@@ -76,7 +88,12 @@ async function metricsNotificationDirector(ctx = null, index = 0, userId) {
     } else {
       // Отправить сообщение непосредственно указанному идентификатору пользователя
       try {
-        await bot.telegram.sendMessage(userId, message, { parse_mode: 'HTML' })
+        await bot.telegram.sendMessage(userId, message, {
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [[botLinkButton]] // Добавляем кнопку в разметку сообщения
+          }
+        })
         await bot.telegram.sendMessage(
           LOG_CHANNEL_ID,
           (await getUserLinkById(userId)) + '\n' + message,
