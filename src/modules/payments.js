@@ -28,8 +28,8 @@ async function payments(ctx) {
     }
 
     // Задаем демонстрационную дату
-    const todayStr = new Date().toISOString().slice(0, 10) // Устанавливает сегодняшнюю дату
-    console.log(todayStr)
+    // const todayStr = new Date().toISOString().slice(0, 10) // Устанавливает сегодняшнюю дату
+    // console.log(todayStr)
 
     const today = new Date() //new Date('2024-05-01')
     const day = today.getDate()
