@@ -252,16 +252,7 @@ bot.command('list', (ctx) => {
 })
 
 bot.command('list_test_otk_marh', (ctx) => {
-  const searchTerm = ctx.message.text.split(' ')[1]
-  // Проверка наличия поискового запроса
-  if (!searchTerm) {
-    ctx.reply('Введите поисковый запрос после команды /list')
-    return
-  }
-
-  fetch(
-    `https://api.pf-forum.ru/api/users/find_list.php?search_term=${searchTerm}`
-  )
+  fetch(`${WEB_API}/users/find_list.php?search_term=ЧПУ`)
     .then((response) => response.json())
     .then((data) => {
       if (data.status === 'OK') {
@@ -275,14 +266,17 @@ bot.command('list_test_otk_marh', (ctx) => {
 
           // Отправляем сообщения с пользователями
           let currentChunkIndex = 0
+          let counterOTK = 1
+          let counterEM = 1
+
           function processChunk() {
             if (currentChunkIndex < chunks.length) {
               const chunk = chunks[currentChunkIndex]
               currentChunkIndex++
 
               // Формирование сообщений для каждой группы
-              let messageOTK = `Пользователи, которых **нет** в ОТК (часть ${currentChunkIndex}):\n`
-              let messageEM = `Пользователи, которых **нет** в Электронной маршрутке (часть ${currentChunkIndex}):\n`
+              let messageOTK = `Пользователи, которых <b>нет</b> в ОТК (часть ${currentChunkIndex}):\n`
+              let messageEM = `Пользователи, которых <b>нет</b> в Электронной маршрутке (часть ${currentChunkIndex}):\n`
 
               chunk.forEach((user, userIndex) => {
                 // Проверка наличия в группах
@@ -303,17 +297,19 @@ bot.command('list_test_otk_marh', (ctx) => {
                   .then(([otkData, emData]) => {
                     // Проверяем, есть ли пользователь в группах
                     const isInGroupOTK =
-                      otkData.result && otkData.result.status === 'member'
+                      otkData.result &&
+                      otkData.result.status === ('member' || 'administrator')
                     const isInGroupEM =
-                      emData.result && emData.result.status === 'member'
+                      emData.result &&
+                      emData.result.status === ('member' || 'administrator')
 
                     // Добавление информации о группах в сообщение
                     if (!isInGroupOTK) {
-                      messageOTK += `\n<a href='tg://user?id=${user.user_id}'>${user.fio}</a> ${user.username ? `(@${user.username})` : ''} - ${user.post}`
+                      messageOTK += `\n${counterOTK++} <a href='tg://user?id=${user.user_id}'>${user.fio}</a> ${user.username ? `(@${user.username})` : ''} - ${user.post}`
                     }
 
                     if (!isInGroupEM) {
-                      messageEM += `\n<a href='tg://user?id=${user.user_id}'>${user.fio}</a> ${user.username ? `(@${user.username})` : ''} - ${user.post}`
+                      messageEM += `\n${counterEM++} <a href='tg://user?id=${user.user_id}'>${user.fio}</a> ${user.username ? `(@${user.username})` : ''} - ${user.post}`
                     }
 
                     // Отправка сообщений о группах (только после всех проверок)
@@ -351,6 +347,7 @@ bot.command('list_test_otk_marh', (ctx) => {
               console.log('Все пользователи проверены!')
             }
           }
+
           processChunk() // Начинаем обработку с первого чанка
         }
       } else {
