@@ -8,15 +8,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <style>
+
         body {
             font-family: Arial, sans-serif;
         }
 
         .container {
             margin-top: 20px;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-
+            padding-left: 1px;
+            padding-right: 1px;
         }
 
         .data-table {
@@ -36,7 +36,7 @@
         }
 
         /* Стили для экранов шириной менее 390px */
-        @media (max-width: 390px) {
+        @media (max-width: 370px) {
             .table {
                 font-size: 12px; /* Уменьшаем размер шрифта */
             }
@@ -71,12 +71,25 @@
             .table th {
                 text-align: left;
             }
+            .table-cell-left {
+                width: 60%;
+                box-sizing: border-box;
+                /* Позволяет содержимому переноситься на новую строку */
+                word-wrap: break-word;
+            }
+
+            .table-cell-right {
+                width: 40%;
+                box-sizing: border-box;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!--    <h1 class="text-center">Telegram App Metrics</h1>-->
     <div class="d-flex justify-content-center">
         <div class="btn-group" role="group">
             <input type="radio" class="btn-check" name="date_filter" id="today" value="today" checked>
@@ -150,24 +163,25 @@
     }
 
     function displayMetrics(metrics, index) {
-        const tbody = document.getElementById('metrics-data')
-        tbody.innerHTML = ''
-
+        const tbody = document.getElementById('metrics-data');
+        tbody.innerHTML = '';
         if (!metrics || !metrics.metrics || index >= metrics.metrics.length) {
-            const row = tbody.insertRow()
-            const cell = row.insertCell()
-            cell.colSpan = 2
-            cell.textContent = 'Данные не найдены'
-            return
+            const row = tbody.insertRow();
+            const cell = row.insertCell();
+            cell.colSpan = 2;
+            cell.textContent = 'Данные не найдены';
+            return;
         }
 
-        const metric = metrics.metrics[index]
+        const metric = metrics.metrics[index];
         for (const key in metric) {
             if (metric.hasOwnProperty(key)) {
-                const row = tbody.insertRow()
-                const nameCell = row.insertCell()
-                const valueCell = row.insertCell()
-                nameCell.textContent = humanNames[key] || key
+                const row = tbody.insertRow();
+                const nameCell = row.insertCell();
+                const valueCell = row.insertCell();
+                nameCell.textContent = humanNames[key] || key;
+                nameCell.classList.add('table-cell-left'); // Добавляем класс левой ячейке
+                valueCell.classList.add('table-cell-right');
 
                 if (key === 'date') {
                     valueCell.textContent = moment(metric[key]).format('DD.MM.YYYY')
