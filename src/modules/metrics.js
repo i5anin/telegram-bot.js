@@ -13,6 +13,7 @@ const {
 } = require('#src/utils/ru_lang')
 const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
 const moment = require('moment')
+const { Markup } = require('telegraf')
 
 function getMaxCharacters(latestMetrics) {
   const percentageValues = [
@@ -50,6 +51,12 @@ async function metricsNotificationDirector(ctx = null, index = 0, userId) {
     const maxCharacters = getMaxCharacters(latestMetrics)
     const message = formatMetricsMessage(latestMetrics, maxCharacters)
 
+    // Создаем кнопку с ссылкой на бота
+    const botLinkButton = Markup.button.url(
+      'Web метрики',
+      'https://t.me/pfforum_bot'
+    )
+
     // Логика для случаев, когда индекс равен 1
     if (index === 1) {
       // Send logs if necessary
@@ -67,7 +74,12 @@ async function metricsNotificationDirector(ctx = null, index = 0, userId) {
       }
 
       // Отправьте ответ пользователю и зарегистрируйте действие
-      await ctx.reply(message, { parse_mode: 'HTML' })
+      await ctx.reply(message, {
+        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [[botLinkButton]] // Добавляем кнопку в разметку сообщения
+        }
+      })
       await bot.telegram.sendMessage(
         LOG_CHANNEL_ID,
         (await getUserLinkById(ctx.chat.id)) + '\n' + message,
@@ -76,7 +88,12 @@ async function metricsNotificationDirector(ctx = null, index = 0, userId) {
     } else {
       // Отправить сообщение непосредственно указанному идентификатору пользователя
       try {
-        await bot.telegram.sendMessage(userId, message, { parse_mode: 'HTML' })
+        await bot.telegram.sendMessage(userId, message, {
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [[botLinkButton]] // Добавляем кнопку в разметку сообщения
+          }
+        })
         await bot.telegram.sendMessage(
           LOG_CHANNEL_ID,
           (await getUserLinkById(userId)) + '\n' + message,
@@ -140,7 +157,7 @@ async function sendMetricsMessagesNach() {
     }, {})
 
     for (const [userId, userMetrics] of Object.entries(metricsById)) {
-      const userCheck = await checkUser(userId) // replace 'SecretKey' with your actual secret key
+      const userCheck = await checkUser(userId) // Замените 'SecretKey' на ваш секретный ключ
 
       if (!userCheck.exists) {
         console.error(`User ${userId} does not exist.`)
@@ -174,14 +191,25 @@ async function sendMetricsMessagesNach() {
         if (metrics.length === 0 || !metrics[0])
           throw new Error('No metrics data available')
         const latestMetrics = metrics[0]
-        const maxCharacters = 4 // безопасный отступ для процентов
+        const maxCharacters = 4 // Безопасный отступ для процентов
         const message =
           combinedMessage +
           '\n\n' +
           formatMetricsVoronca(latestMetrics, maxCharacters)
+
+        // Создаем кнопку с ссылкой на бота
+        const botLinkButton = Markup.button.url(
+          'Web метрики123',
+          'https://t.me/pfforum_bot'
+        ) // Используем Markup.button.url
+
         await bot.telegram.sendMessage(userId, combinedMessage, {
-          parse_mode: 'HTML'
-        }) // TODO: отправка пользовтелю
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [[botLinkButton]] // Добавляем кнопку в разметку сообщения
+          }
+        }) // TODO: отправка пользователю
+
         await bot.telegram.sendMessage(
           LOG_CHANNEL_ID,
           (await getUserLinkById(userId)) + '\n' + message,
