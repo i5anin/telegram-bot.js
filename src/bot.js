@@ -114,6 +114,50 @@ const instanceNumber = Math.floor(Math.random() * 9000) + 1000
 const currentDateTime = new Date()
 stateCounter.instanceNumber = instanceNumber // для метрики
 
+bot.on('message', (ctx) => {
+  console.log('message')
+  // Получение информации о группе или канале
+  const chatId = ctx.chat.id
+
+  // Получение количества пользователей
+  fetch(
+    `https://api.telegram.org/bot${BOT_TOKEN}/getChatMembersCount?chat_id=${chatId}`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.ok) {
+        const count = data.result
+
+        // Получение названия группы
+        fetch(
+          `https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${chatId}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.ok) {
+              const title = data.result.title
+              console.log(
+                `Название группы: ${title}, Количество пользователей: ${count}`
+              )
+            } else {
+              console.error('Ошибка получения названия группы', data)
+            }
+          })
+          .catch((error) => {
+            console.error('Ошибка запроса:', error)
+          })
+      } else {
+        console.error('Ошибка получения количества пользователей', data)
+      }
+    })
+    .catch((error) => {
+      console.error('Ошибка запроса:', error)
+    })
+
+  // Вызов обработчика текста, если это нужно
+  handleTextCommand(ctx)
+})
+
 bot.use((ctx, next) => {
   if (ctx.message) {
     if (ctx.message.forward_from) {
@@ -137,13 +181,14 @@ bot.on('photo', (ctx) => handlePhoto(ctx))
 bot.command(['start', 'reg'], (ctx) =>
   handleRegComment(ctx, (ctx.session.isAwaitFio = true))
 ) // ['start', 'reg']
-bot.command('pay', (ctx) => onMaintenance(ctx))
+bot.command('pay', (ctx) => payments(ctx))
+
 // bot.command('pay', (ctx) => payments(ctx))
 
-function onMaintenance(ctx) {
-  // Отправляем пользователю сообщение
-  ctx.reply('❌ Функция временно недоступна и находится на доработке.')
-}
+// function onMaintenance(ctx) {
+//   // Отправляем пользователю сообщение
+//   ctx.reply('❌ Функция временно недоступна и находится на доработке.')
+// }
 
 bot.command('new_comment', (ctx) =>
   notifyUsers(ctx, (ctx.session.isUserInitiated = true))
@@ -167,6 +212,59 @@ bot.command('metrics_master_notification', () => formatMetricsMessageMaster())
 // bot.command('metrics_old', metricsNotification)
 bot.command('docs', (ctx) => handleDocsCommand(ctx))
 bot.command('oper', (ctx) => handleOperatorCommand(ctx))
+
+// Функция для разбивки массива на части
+function chunkArray(array, chunkSize) {
+  const result = []
+  for (let i = 0; i < array.length; i += chunkSize) {
+    result.push(array.slice(i, i + chunkSize))
+  }
+  return result
+}
+
+bot.command('list', (ctx) => {
+  const searchTerm = ctx.message.text.split(' ')[1]
+  // Проверка наличия поискового запроса
+  if (!searchTerm) {
+    ctx.reply('Введите поисковый запрос после команды /list')
+    return
+  }
+
+  fetch(
+    `https://api.pf-forum.ru/api/users/find_list.php?search_term=${searchTerm}`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === 'OK') {
+        // Обработка результатов поиска
+        const users = data.data
+        if (users.length === 0) {
+          ctx.reply('Пользователей не найдено.')
+        } else {
+          // Разбиваем пользователей на группы по 50
+          const chunks = chunkArray(users, 50)
+
+          // Отправляем сообщения с пользователями
+          chunks.forEach((chunk, index) => {
+            // Формирование сообщения
+            let message = `Найденные пользователи (часть ${index + 1}):\n`
+            chunk.forEach((user) => {
+              message += `\n<a href='tg://user?id=${user.user_id}'>${user.fio}</a> ${user.username ? `(@${user.username})` : ''} - ${user.post}`
+            })
+
+            // Отправка сообщения
+            ctx.reply(message, { parse_mode: 'HTML' })
+          })
+        }
+      } else {
+        ctx.reply('Ошибка поиска.')
+      }
+    })
+    .catch((error) => {
+      console.error('Ошибка запроса:', error)
+      ctx.reply('Произошла ошибка. Попробуйте позже.')
+    })
+})
 
 // bot.command('ping_test', pingService);
 
