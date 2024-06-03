@@ -3,6 +3,7 @@ const ruLang = require('#src/utils/ru_lang')
 const { handleAddComment } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
 const { addUser, addPhotoData } = require('#src/api/index')
+const { sendLogData } = require('#src/api/index')
 
 async function handleFio(ctx, text, chat, from) {
   console.log('ctx.session.isAwaitFio=', ctx.session.isAwaitFio)
@@ -113,15 +114,31 @@ async function handleTextCommand(ctx) {
 
   console.log(ctx)
 
-  if (chat.type === 'group' || chat.type === 'supergroup') {
-    const groupId = chat.id // ID группы
-    const groupName = chat.title // Название группы
-    const senderId = from.id // ID отправителя сообщения
-    const senderName = `${from.first_name || ''} ${from.last_name || ''}`.trim()
-    console.log(
-      `Сообщение от [${senderName} (ID: ${senderId})] в группе [${groupName} (ID: ${groupId})]: ${text}`
-    )
-  }
+  // if (chat.type === 'group' || chat.type === 'supergroup') {
+  //   const groupId = chat.id // ID группы
+  //   const groupName = chat.title // Название группы
+  //   const senderId = from.id // ID отправителя сообщения
+  //   const senderName = `${from.first_name || ''} ${from.last_name || ''}`.trim()
+  //
+  //   // Формируем объект лога
+  //   const logMessageToSend = {
+  //     user_id: senderId,
+  //     group_id: groupId, // Добавляем ID группы
+  //     text: text,
+  //     error: 0,
+  //     ok: 1,
+  //     type: chat.type,
+  //     info: groupName,
+  //     test: process.env.NODE_ENV === 'build' ? 0 : 1
+  //   }
+  //
+  //   // Вызываем функцию отправки лога с формируемым объектом
+  //   await sendLogData(logMessageToSend)
+  //
+  //   console.log(
+  //     `Сообщение от [${senderName} (ID: ${senderId})] в группе [${groupName} (ID: ${groupId})]: ${text}`
+  //   )
+  // }
 
   if (chat.type === 'private') {
     if (ctx.session.isAwaitFio) return await handleFio(ctx, text, chat, from)
@@ -135,7 +152,7 @@ async function handleTextCommand(ctx) {
       !ctx.message.reply_to_message
     ) {
       if (ctx.chat.type !== 'private') return
-      await sendToLog(ctx)
+      // await sendToLog(ctx)
       const message = `${emoji.x} Извините, я не понимаю это сообщение.\nПожалуйста, воспользуйтесь инструкцией /help.`
       await ctx.reply(message, { parse_mode: 'HTML' })
       await bot.telegram.sendMessage(

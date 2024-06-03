@@ -251,6 +251,118 @@ bot.command('list', (ctx) => {
     })
 })
 
+bot.command('list_test_otk_marh', (ctx) => {
+  const searchTerm = ctx.message.text.split(' ')[1]
+  // Проверка наличия поискового запроса
+  if (!searchTerm) {
+    ctx.reply('Введите поисковый запрос после команды /list')
+    return
+  }
+
+  fetch(
+    `https://api.pf-forum.ru/api/users/find_list.php?search_term=${searchTerm}`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === 'OK') {
+        // Обработка результатов поиска
+        const users = data.data
+        if (users.length === 0) {
+          ctx.reply('Пользователей не найдено.')
+        } else {
+          // Разбиваем пользователей на группы по 50
+          const chunks = chunkArray(users, 50)
+
+          // Отправляем сообщения с пользователями
+          let currentChunkIndex = 0
+          function processChunk() {
+            if (currentChunkIndex < chunks.length) {
+              const chunk = chunks[currentChunkIndex]
+              currentChunkIndex++
+
+              // Формирование сообщений для каждой группы
+              let messageOTK = `Пользователи, которых **нет** в ОТК (часть ${currentChunkIndex}):\n`
+              let messageEM = `Пользователи, которых **нет** в Электронной маршрутке (часть ${currentChunkIndex}):\n`
+
+              chunk.forEach((user, userIndex) => {
+                // Проверка наличия в группах
+                Promise.all([
+                  // Запрос к API Telegram для группы ОТК
+                  fetch(
+                    `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=-1002011411761&user_id=${user.user_id}`
+                  ),
+                  // Запрос к API Telegram для группы Электронная маршрутка
+                  fetch(
+                    `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=-1001967174143&user_id=${user.user_id}`
+                  )
+                ])
+                  .then(([otkResponse, emResponse]) => {
+                    // Парсим ответы от API Telegram
+                    return Promise.all([otkResponse.json(), emResponse.json()])
+                  })
+                  .then(([otkData, emData]) => {
+                    // Проверяем, есть ли пользователь в группах
+                    const isInGroupOTK =
+                      otkData.result && otkData.result.status === 'member'
+                    const isInGroupEM =
+                      emData.result && emData.result.status === 'member'
+
+                    // Добавление информации о группах в сообщение
+                    if (!isInGroupOTK) {
+                      messageOTK += `\n<a href='tg://user?id=${user.user_id}'>${user.fio}</a> ${user.username ? `(@${user.username})` : ''} - ${user.post}`
+                    }
+
+                    if (!isInGroupEM) {
+                      messageEM += `\n<a href='tg://user?id=${user.user_id}'>${user.fio}</a> ${user.username ? `(@${user.username})` : ''} - ${user.post}`
+                    }
+
+                    // Отправка сообщений о группах (только после всех проверок)
+                    if (userIndex === chunk.length - 1) {
+                      // Отправляем после проверки всех пользователей в чанке
+                      if (messageOTK.length > 45) {
+                        // Отправляем только если есть пользователи
+                        ctx.reply(messageOTK, { parse_mode: 'HTML' })
+                      }
+                      if (messageEM.length > 45) {
+                        // Отправляем только если есть пользователи
+                        ctx.reply(messageEM, { parse_mode: 'HTML' })
+                      }
+                      // Задержка 3 секунды перед обработкой следующего чанка
+                      setTimeout(processChunk, 3000)
+                    }
+                  })
+                  .catch((error) => {
+                    console.error(
+                      'Ошибка получения данных о членстве в группе:',
+                      error
+                    )
+                    if (error.response && error.response.error_code === 400) {
+                      //  Ошибка 400 - пользователь не найден в группе
+                      ctx.reply(`Пользователь ${user.fio} не найден в группе.`)
+                    } else {
+                      ctx.reply(
+                        `Ошибка получения данных о членстве в группе для ${user.fio}`
+                      )
+                    }
+                  })
+              })
+            } else {
+              // Все чанки обработаны
+              console.log('Все пользователи проверены!')
+            }
+          }
+          processChunk() // Начинаем обработку с первого чанка
+        }
+      } else {
+        ctx.reply('Ошибка поиска.')
+      }
+    })
+    .catch((error) => {
+      console.error('Ошибка запроса:', error)
+      ctx.reply('Произошла ошибка. Попробуйте позже.')
+    })
+})
+
 // Функция для разбивки массива на части
 function chunkArray(array, chunkSize) {
   const result = []
