@@ -78,20 +78,21 @@
 </head>
 <body data-bs-theme="dark">
 <div class="container">
-    <div class="d-flex justify-content-center">
-        <div class="btn-group" role="group">
-            <input type="radio" class="btn-check" name="date_filter" id="today" value="today" checked>
-            <label class="btn btn-outline-primary" for="today">Сейчас</label>
-            <input type="radio" class="btn-check" name="date_filter" id="yesterday" value="yesterday">
-            <label class="btn btn-outline-primary" for="yesterday">Вчера</label>
-        </div>
-    </div>
+
     <div class="data-table">
         <table class="table table-striped table-bordered">
             <thead>
             </thead>
             <tbody id="metrics-data"></tbody>
         </table>
+    </div>
+    <div class="d-flex justify-content-center">
+        <div class="btn-group btn-group-lg mb-3" role="group">
+            <input type="radio" class="btn-check" name="date_filter" id="today" value="today" checked>
+            <label class="btn btn btn-dark" for="today">Сейчас</label>
+            <input type="radio" class="btn-check" name="date_filter" id="yesterday" value="yesterday">
+            <label class="btn btn btn-dark" for="yesterday">Вчера</label>
+        </div>
     </div>
 </div>
 
@@ -108,18 +109,18 @@
         'prod_price': 'Итого внутр. производства',
         'predoplata': 'Ожидаемая предоплата',
         'total_price': 'Итого вн. производства с НДС',
-        'total_sklad_gp': '✅ Готовая продукция склад с НДС',
-        'cumulative_sklad_month': '📈 Производство',
-        'cumulative_brak_month': '📈 Брак',
-        'cumulative_manager_month': '📈 Отдел продаж',
-        'prod': '🔽 Производство',
-        'sles': '🔽 Слесарный участок',
-        'otk': '🔽 ОТК',
-        'upk': '🔽 Упаковка',
-        'productivity_prod': '⚙️ Продуктивность оборудования',
-        'productivity': '⚙️ Продуктивность производства',
-        'get_sum_otgr_prod': '📦 Отгрузка М/О',
-        'get_sum_otgr': '📦 Отгрузка',
+        'total_sklad_gp': 'Готовая продукция склад с НДС',
+        'cumulative_sklad_month': 'Производство',
+        'cumulative_brak_month': 'Брак',
+        'cumulative_manager_month': 'Отдел продаж',
+        'prod': '▽ Производство',
+        'sles': '▽ Слесарный участок',
+        'otk': '▽ ОТК',
+        'upk': '▽ Упаковка',
+        'productivity_prod': 'Продуктивность оборудования',
+        'productivity': 'Продуктивность производства',
+        'get_sum_otgr_prod': 'Отгрузка М/О',
+        'get_sum_otgr': 'Отгрузка',
     }
 
     function formatNumber(number) {
@@ -172,7 +173,7 @@
                 valueCell.classList.add('table-cell-right');
 
                 if (key === 'date') {
-                    valueCell.textContent = moment(metric[key]).format('DD.MM.YYYY')
+                    valueCell.textContent = moment(metric[key]).format('DD.MM.YYYY HH:mm')
                 } else if (['prod_price_mzp', 'prod_price', 'predoplata', 'total_price', 'total_sklad_gp', 'get_sum_otgr_prod', 'get_sum_otgr', 'prod_price_sles', 'prod_price_otk', 'prod_price_upk', 'prod_price_sogl', 'prod_price', 'prod_price_dorabotka', 'prod_price_dorabotka_sles'].includes(key)) {
                     valueCell.textContent = `${formatNumber(metric[key])} ₽`
                     valueCell.classList.add('currency')
@@ -188,7 +189,7 @@
                 }
 
                 if (['prod_price_sles', 'prod_price_otk', 'prod_price_upk', 'prod_price_dorabotka', 'prod_price_dorabotka_sles', 'prod_price_sogl'].includes(key)) {
-                    valueCell.classList.add('table-danger')
+                    valueCell.classList.add('table-success')
                 }
 
                 if (['cumulative_sklad_month', 'cumulative_brak_month', 'cumulative_manager_month'].includes(key)) {
