@@ -15,7 +15,7 @@ async function oplataNotification() {
 
     if (response && response.payments && response.payments.length > 0) {
       let payments = response.payments
-      console.log('Payments received:', payments)
+      console.log('Payments received:', payments.length)
 
       const sortedPayments = payments.sort(
         (a, b) => new Date(a.date) - new Date(b.date)

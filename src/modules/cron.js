@@ -17,7 +17,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
   // Уведомлять об ОПЛАТЕ каждые 8 мин
   cron.schedule('*/15 * * * *', async () => {
     await oplataNotification()
-    console.log('Running oplataNotification()')
+    // console.log('Running oplataNotification()')
   })
 
   if (!METRICS_REPORT_ACTIVE) {

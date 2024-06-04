@@ -51,9 +51,17 @@ async function handleRegComment(ctx) {
       `reg <code>${error}</code>`,
       { parse_mode: 'HTML' }
     )
-    ctx.reply(
-      'Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.'
-    )
+    try {
+      ctx.reply(
+        'Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.'
+      )
+    } catch (error) {
+      await bot.telegram.sendMessage(
+        LOG_CHANNEL_ID,
+        `reg reply <code>${error}</code>`,
+        { parse_mode: 'HTML' }
+      )
+    }
   }
 }
 
