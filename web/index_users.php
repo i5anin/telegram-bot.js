@@ -72,6 +72,8 @@ $mysqli->close();
               <th scope="col">user_id</th>
               <th scope="col">fio</th>
               <th scope="col">username</th>
+              <th scope="col">first_name</th>
+              <th scope="col">last_name</th>
               <th scope="col">active</th>
               <th scope="col">role</th>
               <th scope="col">inn</th>
@@ -87,15 +89,20 @@ $mysqli->close();
                 $rowNumber = 1;
                 while ($row = $result->fetch_assoc()) :
                   $inn_class = ($row['inn_filled'] === 'false') ? 'class="table-danger"' : '';
+                  $username = $row['username'];
+                  $userId = $row['user_id'];
+                  $tgLink = "https://t.me/$username";
                 ?>
               <tr class="<?= $active_class; ?>">
                 <th scope="row"><?= $rowNumber; ?></th>
                 <td><?= $row['user_id']; ?></td>
                 <td><?= $row['fio']; ?></td>
-                <td><?= $row['username']; ?></td>
+                <td><a href="<?= $tgLink; ?>"><?= $row['username']; ?></a></td>
+                <td><?= $row['first_name']; ?></td>
+                <td><?= $row['last_name']; ?></td>
                 <td><?= $row['active']; ?></td>
                 <td><?= $row['role']; ?></td>
-                <td><?= $row['inn_filled']; ?></td>
+                <td <?= $inn_class; ?>><?= $row['inn_filled']; ?></td>
                 <!-- Вывод других полей -->
                 <td><?= $row['oplata']; ?></td>
                 <td><?= $row['metrica']; ?></td>
