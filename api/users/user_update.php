@@ -37,9 +37,9 @@ function insertOrUpdateUser($id, $first_name, $last_name, $username) {
 }
 
 // Основной код
-// Замените 'your_telegram_bot_token' на ваш токен бота и 'your_chat_id' на идентификатор чата
-$tgToken = '6387629342:AAFRPGYusy4vz8Ok1msaytA0457iQMRvHLA';
-$chatId = '-1002011411761';
+$tgToken = $dbConfig['tg_token'];
+$chatId = $dbConfig['chat_id'];
+
 
 $result = $mysqli->query("SELECT `user_id` FROM `users`");
 if ($result->num_rows > 0) {
