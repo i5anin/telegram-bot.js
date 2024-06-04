@@ -3,7 +3,7 @@
     {
       "id": "390895078:390895078",
       "data": {
-        "isAwaitFio": true,
+        "isAwaitFio": false,
         "isAwaitComment": false,
         "isUserInitiated": false
       }

@@ -1,9 +1,9 @@
 // Загрузка переменных среды из .env файла
 require('dotenv').config()
 const { Telegraf } = require('telegraf')
-const { Markup } = require('telegraf')
 const LocalSession = require('telegraf-session-local')
 const io = require('@pm2/io')
+const puppeteer = require('puppeteer')
 
 // включить отслеживание транзакций
 // включить метрики веб-сервера (необязательно)
@@ -252,6 +252,28 @@ bot.command('list', (ctx) => {
 })
 
 bot.command('list_test_otk_marh', (ctx) => checkingGroup(ctx))
+
+bot.command('get_website_screenshot', async (ctx) => {
+  try {
+    const websiteUrl = ctx.message.text.split(' ')[1] // Получаем URL сайта из сообщения
+    if (!websiteUrl) {
+      ctx.reply('Введите URL сайта после команды /get_website_screenshot')
+      return
+    }
+
+    const browser = await puppeteer.launch() // Запускаем браузер
+    const page = await browser.newPage() // Создаем новую вкладку
+    await page.goto(websiteUrl) // Открываем сайт
+    await page.setViewport({ width: 1920, height: 1080 }) // Устанавливаем размер области скриншота
+    const screenshot = await page.screenshot({ type: 'png', fullPage: true }) // Делаем скриншот
+    await browser.close() // Закрываем браузер
+
+    await ctx.replyWithPhoto({ source: screenshot }) // Отправляем скриншот
+  } catch (error) {
+    console.error('Ошибка при получении скриншота:', error)
+    ctx.reply('Произошла ошибка. Попробуйте позже.')
+  }
+})
 
 // Функция для разбивки массива на части
 function chunkArray(array, chunkSize) {
