@@ -25,7 +25,7 @@ function getUserDataFromTelegram($userId, $tgToken, $chatId) {
 
 // Функция для вставки или обновления данных пользователя в базу данных
 function insertOrUpdateUser($id, $first_name, $last_name, $username) {
-    global $mysqli; // Добавляем `global $mysqli;` чтобы использовать глобальную переменную $mysqli внутри функции
+    global $mysqli;
 
     $stmt = $mysqli->prepare("INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `username`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE `first_name` = ?, `last_name` = ?, `username` = ?");
     $stmt->bind_param("issssss", $id, $first_name, $last_name, $username, $first_name, $last_name, $username);
@@ -50,7 +50,9 @@ if ($result->num_rows > 0) {
         if ($userData && $userData['ok']) {
             $user = $userData['result']['user'];
             $last_name = isset($user['last_name']) ? $user['last_name'] : ''; // Проверяем наличие поля 'last_name'
-            if (insertOrUpdateUser($user['id'], $user['first_name'], $last_name, $user['username'])) { // Используем $last_name
+            $username = isset($user['username']) ? $user['username'] : ''; // Проверяем наличие поля 'username'
+
+            if (insertOrUpdateUser($user['id'], $user['first_name'], $last_name, $username)) { // Используем $last_name и $username
                 echo "Данные пользователя с user_id = $userId успешно обновлены.\n";
             }
         } else {
