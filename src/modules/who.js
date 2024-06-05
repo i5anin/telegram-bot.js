@@ -6,7 +6,7 @@ const {
 } = require('#src/api/index')
 const msg = require('#src/utils/ru_lang')
 const { logMessage } = require('#src/utils/ru_lang')
-const { sendLogData } = require('#src/api')
+const { sendLogData } = require('#src/api/index')
 
 const handleForwardedMessage = async (ctx) => {
   let userId

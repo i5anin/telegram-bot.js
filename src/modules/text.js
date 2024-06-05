@@ -2,8 +2,7 @@ const ruLang = require('#src/utils/ru_lang')
 
 const { handleAddComment } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
-const { addUser, addPhotoData } = require('#src/api/index')
-const { sendLogData } = require('#src/api/index')
+const { addUser, addPhotoData, sendLogData } = require('#src/api/index')
 
 async function handleFio(ctx, text, chat, from) {
   console.log('ctx.session.isAwaitFio=', ctx.session.isAwaitFio)

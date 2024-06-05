@@ -6,7 +6,7 @@ const {
   getDefectType
 } = require('#src/utils/helpers')
 const { formatSKMessage } = require('#src/utils/ru_lang')
-const { sendLogData } = require('#src/api')
+const { sendLogData } = require('#src/api/index')
 
 async function fetchComments() {
   try {

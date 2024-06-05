@@ -1,6 +1,6 @@
 const fs = require('fs')
 const { getAllUsers } = require('#src/api/index')
-const { sendLogData } = require('#src/api')
+const { sendLogData } = require('#src/api/index')
 
 const getExternalUsers = async () => {
   try {

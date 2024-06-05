@@ -3,7 +3,7 @@ const { sendToLog } = require('#src/utils/log')
 const { getAllUsers } = require('#src/api/index')
 const { Markup } = require('telegraf')
 const { checkRegistration } = require('#src/modules/reg')
-const { sendLogData } = require('#src/api')
+const { sendLogData } = require('#src/api/index')
 
 async function getUserInfo(userId) {
   try {

@@ -10,7 +10,7 @@ const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
 const { updateComment } = require('#src/api/index')
 const { formatSKMessage } = require('#src/utils/ru_lang')
-const { sendLogData } = require('#src/api')
+const { sendLogData } = require('#src/api/index')
 
 // Функция задержки
 function sleep(ms) {

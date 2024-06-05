@@ -1,7 +1,7 @@
 const axios = require('axios')
 const ruLang = require('#src/utils/ru_lang') // Локализация сообщений
 const { checkUser } = require('#src/api/index')
-const { sendLogData } = require('#src/api')
+const { sendLogData } = require('#src/api/index')
 
 async function getLastPaymentForUser(userId, date) {
   try {

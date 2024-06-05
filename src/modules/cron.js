@@ -6,7 +6,7 @@ const {
   metricsNotificationDirector,
   metricsNotificationProiz
 } = require('#src/modules/metrics')
-const { sendLogData } = require('#src/api') // импортируйте функцию format
+const { sendLogData } = require('#src/api/index') // импортируйте функцию format
 
 function initCronJobs(currentDateTime, instanceNumber) {
   // Уведомлять о сообщениях каждые 15 мин

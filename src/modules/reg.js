@@ -3,7 +3,7 @@ const ruLang = require('#src/utils/ru_lang') // Локализация сооб�
 const { sendToLog } = require('#src/utils/log') // Добавление лога
 const { resetFlags } = require('#src/utils/helpers')
 const { checkUser } = require('#src/api/index')
-const { sendLogData } = require('#src/api')
+const { sendLogData } = require('#src/api/index')
 // const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
 
 // Функция для проверки, зарегистрирован ли пользователь на сервере
