@@ -57,7 +57,6 @@ $result = $mysqli->query($sql);
 $mysqli->close();
 
 ?>
-?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -90,28 +89,6 @@ $mysqli->close();
         overflow-x: auto; /* Добавляем горизонтальную прокрутку, если нужно */
       }
 
-      .table-danger {
-        background-color: #f8d7da; /* Красный */
-      }
-
-      .table-primary {
-        background-color: #cfe2ff; /* Синий */
-      }
-
-      .table-success {
-        background-color: #d4edda; /* Зеленый */
-      }
-
-      .table-warning {
-        background-color: #fff3cd; /* Желтый */
-      }
-
-      .table-info {
-        background-color: #e0ffff; /* Голубой */
-      }
-
-      /* Добавьте стили для других цветов по аналогии */
-
       .table td {
         white-space: nowrap; /* Запрет переноса внутри ячеек */
       }
@@ -125,7 +102,7 @@ $mysqli->close();
           <thead>
             <tr>
               <th scope="col">#</th>
-              <th scope="col">user_id</th>
+
               <th scope="col">fio</th>
               <!-- Другие колонки -->
               <th scope="col">date</th>
@@ -141,7 +118,6 @@ $mysqli->close();
               <th scope="col">kpi_brak</th>
               <th scope="col">rating_brak</th>
               <th scope="col">group_count</th>
-              <th scope="col">color</th>
               <th scope="col">post</th>
               <th scope="col">grade_info</th>
             </tr>
@@ -179,7 +155,6 @@ $mysqli->close();
             ?>
             <tr class="<?= $colorClass; ?>">
                 <th scope="row"><?= $rowNumber; ?></th>
-                <td><?= $row['user_id']; ?></td>
                 <td><?= $row['fio']; ?></td>
                 <td><?= $row['date']; ?></td>
                 <td><?= $row['operator_type']; ?></td>
@@ -194,7 +169,6 @@ $mysqli->close();
                 <td><?= $row['kpi_brak']; ?></td>
                 <td><?= $row['rating_brak']; ?></td>
                 <td><?= $row['group_count']; ?></td>
-                <td><?= $row['color']; ?></td>
                 <td><?= $row['post']; ?></td>
                 <td><?= $row['grade_info']; ?></td>
             </tr>
