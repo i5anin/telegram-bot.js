@@ -88,7 +88,7 @@ async function payments(ctx) {
   } catch (error) {
     const logMessageToSend = {
       user_id: '',
-      text: error,
+      text: JSON.stringify(error),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1

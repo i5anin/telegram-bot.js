@@ -35,6 +35,7 @@ const {
 } = require('#src/modules/metrics')
 const { handlePhoto } = require('#src/modules/photo')
 const { checkingGroup } = require('#src/modules/checkingGroup')
+const { sendLogData } = require('#src/api/index')
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env
@@ -299,8 +300,16 @@ bot.on('new_chat_members', logNewChatMembers)
 bot.on('left_chat_member', logLeftChatMember)
 
 // Запуск бота
-bot.launch().catch((err) => {
+bot.launch().catch(async (err) => {
   console.error('Fatal Error! Error while launching the bot:', err)
+  const logMessageToSend = {
+    user_id: '',
+    text: JSON.stringify(err),
+    error: 1,
+    ok: 0,
+    test: process.env.NODE_ENV === 'build' ? 0 : 1
+  }
+  await sendLogData(logMessageToSend)
   setTimeout(() => bot.launch(), 30000) // Попробовать перезапустить через 30 секунд
 })
 

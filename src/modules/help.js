@@ -108,9 +108,12 @@ ${emoji.point} пк: правой кнопкой мыши <u>ответить</u
 
 async function handleDocsCommand(ctx) {
   await sendToLog(ctx)
-  const chatId = ctx.message.chat.id // Получение chatId из контекста ctx
+
+  // Использование ctx.from.id для получения chatId пользователя, вызвавшего команду
+  const userId = ctx.from.id
+
   try {
-    const registrationData = await checkRegistration(chatId) // Проверка регистрации
+    const registrationData = await checkRegistration(userId) // Проверка регистрации пользователя
     const isRegistered = registrationData.exists
 
     if (isRegistered) {
@@ -137,10 +140,16 @@ async function handleDocsCommand(ctx) {
         ]
       ])
 
-      await ctx.reply('Вот несколько полезных ссылок:', keyboard)
+      // Отправка сообщения напрямую пользователю
+      await ctx.telegram.sendMessage(
+        userId,
+        'Вот несколько полезных ссылок:',
+        keyboard
+      )
     } else {
       // Если пользователь не зарегистрирован
-      await ctx.reply(
+      await ctx.telegram.sendMessage(
+        userId,
         'Доступ закрыт.\nВы должны зарегистрироваться, чтобы получить доступ к этим ресурсам.'
       )
     }
@@ -154,7 +163,10 @@ async function handleDocsCommand(ctx) {
     }
     await sendLogData(logMessageToSend)
     console.error('Ошибка при проверке регистрации:', error)
-    await ctx.reply(
+
+    // Отправка сообщения об ошибке напрямую пользователю
+    await ctx.telegram.sendMessage(
+      userId,
       'Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.'
     )
   }
