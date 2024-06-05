@@ -304,7 +304,7 @@ bot.launch().catch(async (err) => {
   console.error('Fatal Error! Error while launching the bot:', err)
   const logMessageToSend = {
     user_id: '',
-    text: JSON.stringify(err),
+    text: err.toString(),
     error: 1,
     ok: 0,
     test: process.env.NODE_ENV === 'build' ? 0 : 1

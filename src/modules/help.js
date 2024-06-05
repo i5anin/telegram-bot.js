@@ -21,7 +21,7 @@ async function getUserInfo(userId) {
   } catch (error) {
     const logMessageToSend = {
       user_id: '',
-      text: error,
+      text: error.toString(),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1
@@ -49,8 +49,8 @@ async function handleHelpCommand(ctx) {
 
       // Отправляем сообщение администратору в личные сообщения с информацией о пользователе
       await ctx.telegram.sendMessage(
-        ctx.from.id,
-        `Сообщение отправлено пользователю\nID: <code>${user.userId}</code>\nФИО: <code>${user.fio}</code>`,
+        LOG_CHANNEL_ID,
+        `Сообщение /help отправлено пользователю\nID: <code>${user.userId}</code>\nФИО: <code>${user.fio}</code>`,
         { parse_mode: 'HTML' }
       )
     } catch (err) {
@@ -163,7 +163,7 @@ async function handleDocsCommand(ctx) {
   } catch (error) {
     const logMessageToSend = {
       user_id: '',
-      text: error,
+      text: error.toString(),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1
@@ -204,7 +204,7 @@ async function handleOperatorCommand(ctx) {
   } catch (error) {
     const logMessageToSend = {
       user_id: '',
-      text: error,
+      text: error.toString(),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1

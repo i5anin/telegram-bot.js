@@ -104,7 +104,7 @@ async function metricsNotificationDirector(ctx = null, index = 0, userId) {
       } catch (error) {
         const logMessageToSend = {
           user_id: '',
-          text: error,
+          text: error.toString(),
           error: 1,
           ok: 0,
           test: process.env.NODE_ENV === 'build' ? 0 : 1
@@ -126,7 +126,7 @@ async function metricsNotificationDirector(ctx = null, index = 0, userId) {
   } catch (error) {
     const logMessageToSend = {
       user_id: '',
-      text: error,
+      text: error.toString(),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1
@@ -225,7 +225,7 @@ async function sendMetricsMessagesNach() {
       } catch (error) {
         const logMessageToSend = {
           user_id: '',
-          text: error,
+          text: error.toString(),
           error: 1,
           ok: 0,
           test: process.env.NODE_ENV === 'build' ? 0 : 1
@@ -247,7 +247,7 @@ async function sendMetricsMessagesNach() {
   } catch (error) {
     const logMessageToSend = {
       user_id: '',
-      text: error,
+      text: error.toString(),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1
@@ -313,7 +313,7 @@ async function formatMetricsMessageMaster() {
       } catch (error) {
         const logMessageToSend = {
           user_id: '',
-          text: error,
+          text: error.toString(),
           error: 1,
           ok: 0,
           test: process.env.NODE_ENV === 'build' ? 0 : 1
@@ -335,7 +335,7 @@ async function formatMetricsMessageMaster() {
   } catch (error) {
     const logMessageToSend = {
       user_id: '',
-      text: error,
+      text: error.toString(),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1

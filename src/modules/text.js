@@ -40,7 +40,7 @@ async function handleFio(ctx, text, chat, from) {
   } catch (error) {
     const logMessageToSend = {
       user_id: '',
-      text: error,
+      text: error.toString(),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1
@@ -133,7 +133,7 @@ async function handleTextCommand(ctx) {
   } catch (error) {
     const logMessageToSend = {
       user_id: '',
-      text: error,
+      text: error.toString(),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1

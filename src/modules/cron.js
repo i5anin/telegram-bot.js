@@ -90,7 +90,7 @@ function initCronJobs(currentDateTime, instanceNumber) {
       } catch (error) {
         const logMessageToSend = {
           user_id: '',
-          text: error,
+          text: error.toString(),
           error: 1,
           ok: 0,
           test: process.env.NODE_ENV === 'build' ? 0 : 1

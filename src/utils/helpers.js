@@ -36,7 +36,7 @@ async function getUserLinkById(userId) {
     // Формируем объект лога
     const logMessageToSend = {
       user_id: userId,
-      text: error,
+      text: error.toString(),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1
@@ -56,7 +56,7 @@ async function getUserName(userId) {
   } catch (error) {
     const logMessageToSend = {
       user_id: userId,
-      text: error,
+      text: error.toString(),
       error: 1,
       ok: 0,
       test: process.env.NODE_ENV === 'build' ? 0 : 1
