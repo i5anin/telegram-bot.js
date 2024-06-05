@@ -7,8 +7,12 @@ if (isset($_GET['key'])) {
     $dbConfig = require 'sql_config.php';
     $SECRET_KEY = $dbConfig['key'] ?? null;
 
-    if ($provided_key !== $SECRET_KEY) {
-        echo json_encode(['error' => 'Invalid secret key']);
+    // Получаем текущее время в часах
+    $currentHour = (int) date('H');
+
+    // Проверяем секретный ключ и текущее время
+    if ($provided_key !== $SECRET_KEY . $currentHour) {
+        echo json_encode(['error' => 'Invalid secret key or time']);
         exit;
     }
 } else {
@@ -42,10 +46,30 @@ if ($currentDay >= 1 && $currentDay <= 10) {
 }
 
 // Обновленный SQL запрос с учетом параметра inn и условия даты
-$sql = "SELECT u.*, p.date, p.fio, p.operator_type, p.base, p.grade, p.work_hours, p.tabel_hours, p.payment, p.inn AS payment_inn, p.vvp, p.kpi_good, p.rating_good, p.kpi_brak, p.rating_brak, p.group_count, p.color, p.post, p.grade_info, IF(u.`inn` <> '', 'true', 'false') AS `inn_filled`
-FROM `users` u
-LEFT JOIN `payments` p ON u.`user_id` = p.`user_id`
-WHERE u.`user_id` >= 0 AND p.`date` = '" . $targetDateString . "'";
+$sql = "SELECT u.*,
+            p.date,
+            p.fio,
+            p.operator_type,
+            p.base,
+            p.grade,
+            p.work_hours,
+            p.tabel_hours,
+            p.payment,
+            p.inn AS payment_inn,
+            p.vvp,
+            p.kpi_good,
+            p.rating_good,
+            p.kpi_brak,
+            p.rating_brak,
+            p.group_count,
+            p.color,
+            p.post,
+            p.grade_info,
+            IF(u.`inn` <> '', 'true', 'false') AS `inn_filled`
+        FROM `users` u
+        LEFT JOIN `payments` p ON u.`user_id` = p.`user_id`
+        WHERE u.`user_id` >= 0
+        AND DATE_FORMAT(p.`date`, '%d.%m.%y') = '" . $targetDate->format('d.m.y') . "'";
 
 if ($innFilter === 'false') {
     $sql .= " AND (u.`inn` = '' OR u.`inn` IS NULL)";
@@ -98,7 +122,7 @@ $mysqli->close();
   <body data-bs-theme="dark">
     <div >
       <div class="table-responsive">
-        <table class="table table-striped" id="usersTable">
+        <table class="table" id="usersTable">
           <thead>
             <tr>
               <th scope="col">#</th>
@@ -149,14 +173,14 @@ $mysqli->close();
                 $formattedPayment = number_format($row['payment'], 0, ',', ' ') . ' ₽';
                 $formattedVvp = number_format($row['vvp'], 0, ',', ' ') . ' ₽';
 
-                // Форматирование даты
-                $formattedDate = DateTime::createFromFormat('Y-m-d', $row['date'])->format('d.m.y');
+                // Форматирование даты (оставляем без изменений)
+                $formattedDate = $row['date'];
 
             ?>
             <tr class="<?= $colorClass; ?>">
                 <th scope="row"><?= $rowNumber; ?></th>
                 <td><?= $row['fio']; ?></td>
-                <td><?= $row['date']; ?></td>
+             <td><?= date('d.m.y', strtotime($row['date'])); ?></td>  <!-- Выводим дату в формате, который приходит из базы данных -->
                 <td><?= $row['operator_type']; ?></td>
                 <td><?= $formattedBase; ?></td>
                 <td><?= $row['grade']; ?></td>
