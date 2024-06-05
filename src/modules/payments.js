@@ -47,7 +47,7 @@ async function payments(ctx) {
     let dateForRequest =
       day >= 10
         ? today.toISOString().slice(0, 10)
-        : new Date(today.getFullYear(), today.getMonth(), 0)
+        : new Date(today.getFullYear(), today.getMonth(), 1) // 1 последний день 0 предпоследний
             .toISOString()
             .slice(0, 10) // Получаем последний день предыдущего месяца
 

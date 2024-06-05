@@ -11,7 +11,8 @@
     {
       "id": "-1002160820630:390895078",
       "data": {
-        "isUserInitiated": true
+        "isUserInitiated": true,
+        "isAwaitFio": true
       }
     }
   ]
