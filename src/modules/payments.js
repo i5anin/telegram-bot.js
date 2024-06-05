@@ -71,7 +71,20 @@ async function payments(ctx) {
 
     // Составляем сообщение для ответа
 
-    await ctx.reply(message, { parse_mode: 'HTML' })
+    // Проверяем, есть ли у бота права на отправку сообщений в этот чат
+    if (ctx.chat.type === 'private') {
+      // В личных сообщениях отправляем сообщение
+      await ctx.reply(message, { parse_mode: 'HTML' })
+    } else {
+      // В группах или каналах проверяем права бота
+      if (ctx.chat.permissions.can_send_messages) {
+        // Если у бота есть права, отправляем сообщение
+        await ctx.reply(message, { parse_mode: 'HTML' })
+      } else {
+        // Если у бота нет прав, отправляем сообщение об ошибке
+        await ctx.reply('У меня нет прав на отправку сообщений в этот чат.')
+      }
+    }
   } catch (error) {
     const logMessageToSend = {
       user_id: '',
