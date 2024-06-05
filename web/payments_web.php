@@ -57,6 +57,7 @@ $result = $mysqli->query($sql);
 $mysqli->close();
 
 ?>
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -110,19 +111,22 @@ $mysqli->close();
       }
 
       /* Добавьте стили для других цветов по аналогии */
+
+      .table td {
+        white-space: nowrap; /* Запрет переноса внутри ячеек */
+      }
     </style>
   </head>
 
   <body data-bs-theme="dark">
     <div >
       <div class="table-responsive">
-        <table class="table table-striped">
+        <table class="table table-striped" id="usersTable">
           <thead>
             <tr>
               <th scope="col">#</th>
               <th scope="col">user_id</th>
               <th scope="col">fio</th>
-              <th scope="col">inn</th>
               <!-- Другие колонки -->
               <th scope="col">date</th>
               <th scope="col">operator_type</th>
@@ -164,19 +168,19 @@ $mysqli->close();
                     // Добавьте другие цвета по аналогии
                 }
 
-                // Определяем класс для ячейки с INN
-                $innClass = $row['inn_filled'] === 'true' ? '' : 'table-non-active';
-
                 // Форматирование base, payment, vvp
-                $formattedBase = number_format($row['base'] , 0, ',', ' ') . ' ₽';
-                $formattedPayment = number_format($row['payment'] , 0, ',', ' ') . ' ₽';
-                $formattedVvp = number_format($row['vvp'] , 0, ',', ' ') . ' ₽';
+                $formattedBase = number_format($row['base'], 0, ',', ' ') . ' ₽';
+                $formattedPayment = number_format($row['payment'], 0, ',', ' ') . ' ₽';
+                $formattedVvp = number_format($row['vvp'], 0, ',', ' ') . ' ₽';
+
+                // Форматирование даты
+                $formattedDate = DateTime::createFromFormat('Y-m-d', $row['date'])->format('d.m.y');
+
             ?>
             <tr class="<?= $colorClass; ?>">
                 <th scope="row"><?= $rowNumber; ?></th>
                 <td><?= $row['user_id']; ?></td>
                 <td><?= $row['fio']; ?></td>
-                <td <?= $innClass; ?>><?= $row['inn_filled']; ?></td>
                 <td><?= $row['date']; ?></td>
                 <td><?= $row['operator_type']; ?></td>
                 <td><?= $formattedBase; ?></td>
@@ -203,6 +207,18 @@ $mysqli->close();
       </div>
     </div>
 
-    <!-- Скрипт для сортировки, если нужно -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <script>
+      $(document).ready(function () {
+        $('#usersTable').DataTable({
+          "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Russian.json"
+          }
+        });
+      });
+    </script>
   </body>
 </html>
