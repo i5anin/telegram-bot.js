@@ -155,17 +155,22 @@ $mysqli->close();
                     case 'blue':
                         $colorClass = 'table-primary';
                         break;
-                                            case 'white':
-                                                $colorClass = 'table-secondary';
-                                                break;
-                                            case 'green':
-                                                $colorClass = 'table-success';
-                                                break;
+                    case 'white':
+                        $colorClass = 'table-secondary';
+                        break;
+                    case 'green':
+                        $colorClass = 'table-success';
+                        break;
                     // Добавьте другие цвета по аналогии
                 }
 
                 // Определяем класс для ячейки с INN
                 $innClass = $row['inn_filled'] === 'true' ? '' : 'table-non-active';
+
+                // Форматирование base, payment, vvp
+                $formattedBase = number_format($row['base'] , 0, ',', ' ') . ' ₽';
+                $formattedPayment = number_format($row['payment'] , 0, ',', ' ') . ' ₽';
+                $formattedVvp = number_format($row['vvp'] , 0, ',', ' ') . ' ₽';
             ?>
             <tr class="<?= $colorClass; ?>">
                 <th scope="row"><?= $rowNumber; ?></th>
@@ -174,12 +179,12 @@ $mysqli->close();
                 <td <?= $innClass; ?>><?= $row['inn_filled']; ?></td>
                 <td><?= $row['date']; ?></td>
                 <td><?= $row['operator_type']; ?></td>
-                <td><?= $row['base']; ?></td>
+                <td><?= $formattedBase; ?></td>
                 <td><?= $row['grade']; ?></td>
                 <td><?= $row['work_hours']; ?></td>
                 <td><?= $row['tabel_hours']; ?></td>
-                <td><?= $row['payment']; ?></td>
-                <td><?= $row['vvp']; ?></td>
+                <td><?= $formattedPayment; ?></td>
+                <td><?= $formattedVvp; ?></td>
                 <td><?= $row['kpi_good']; ?></td>
                 <td><?= $row['rating_good']; ?></td>
                 <td><?= $row['kpi_brak']; ?></td>
