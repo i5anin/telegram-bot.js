@@ -14,6 +14,14 @@ async function getMetricsNach() {
     // console.log(response.data)
     return response.data
   } catch (error) {
+    const logMessageToSend = {
+      user_id: userId,
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error(
       `Ошибка при получении данных из endpoint /metrics/get_nach.php: ${error.message}`
     )

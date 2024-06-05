@@ -10,6 +10,7 @@ const { fetchComments } = require('#src/modules/comment')
 const { sendToLog } = require('#src/utils/log')
 const { updateComment } = require('#src/api/index')
 const { formatSKMessage } = require('#src/utils/ru_lang')
+const { sendLogData } = require('#src/api')
 
 // Функция задержки
 function sleep(ms) {
@@ -30,6 +31,14 @@ async function sendMessage(chatId, message) {
       )
     return true
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error(
       `Notify. Ошибка при отправке сообщения chatId: ${chatId}`,
       error
@@ -56,6 +65,14 @@ async function updateTaskStatus(id_task) {
       `Notify. ${response && response.status === 'OK' ? 'Статус задачи успешно обновлен' : 'Ошибка обновления статуса задачи:' + response.status}`
     )
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.log('Notify. Ошибка при обновлении статуса задачи:', error)
   }
 }

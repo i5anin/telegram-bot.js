@@ -1,5 +1,6 @@
 // Функция для выполнения GET-запросов
 const { getAllUsers, checkUser } = require('#src/api/index')
+const { sendLogData } = require('#src/api')
 
 // Функция для сброса флагов сессии
 function resetFlags(ctx) {
@@ -33,6 +34,15 @@ async function getUserLinkById(userId) {
       return `Пользователь не найден. <code>${userId}</code>`
     }
   } catch (error) {
+    // Формируем объект лога
+    const logMessageToSend = {
+      user_id: userId,
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error('Ошибка при получении данных пользователя:', error)
     return 'Ошибка при получении данных о пользователе.'
   }
@@ -45,6 +55,14 @@ async function getUserName(userId) {
     return user ? user.fio : '<code>Неизвестный пользователь</code>'
     // return user
   } catch (error) {
+    const logMessageToSend = {
+      user_id: userId,
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error('Failed to fetch users data:', error)
   }
 }

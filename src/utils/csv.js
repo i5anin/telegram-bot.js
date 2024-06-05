@@ -1,5 +1,6 @@
 const fs = require('fs')
 const { getAllUsers } = require('#src/api/index')
+const { sendLogData } = require('#src/api')
 
 const getExternalUsers = async () => {
   try {
@@ -11,6 +12,14 @@ const getExternalUsers = async () => {
       throw new Error('Invalid response from getAllUsers')
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error('Ошибка при получении данных с внешнего API:', error)
     return []
   }
@@ -48,6 +57,14 @@ async function generateReport(ctx, chatId) {
       const userInfoCsv = `${telegramUser.user.username || 'N/A'};${telegramUser.user.id};${telegramUser.user.first_name};${telegramUser.user.last_name || 'N/A'};${user.fio};${status}`
       csvReport.push(userInfoCsv)
     } catch (error) {
+      const logMessageToSend = {
+        user_id: '',
+        text: error,
+        error: 1,
+        ok: 0,
+        test: process.env.NODE_ENV === 'build' ? 0 : 1
+      }
+      await sendLogData(logMessageToSend)
       // Пользователь отсутствует в чате
       // absentCounter++
 

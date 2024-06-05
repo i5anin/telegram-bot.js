@@ -6,6 +6,7 @@ const {
   getDefectType
 } = require('#src/utils/helpers')
 const { formatSKMessage } = require('#src/utils/ru_lang')
+const { sendLogData } = require('#src/api')
 
 async function fetchComments() {
   try {
@@ -16,6 +17,14 @@ async function fetchComments() {
       throw new Error('Не удалось получить комментарии')
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error(`Произошла ошибка: ${error}`)
     return null
   }

@@ -6,6 +6,7 @@ const {
 } = require('#src/api/index')
 const msg = require('#src/utils/ru_lang')
 const { logMessage } = require('#src/utils/ru_lang')
+const { sendLogData } = require('#src/api')
 
 const handleForwardedMessage = async (ctx) => {
   let userId
@@ -90,6 +91,14 @@ async function whoCommand(ctx) {
         try {
           membersCount = await getChatMembersCount(targetId)
         } catch (error) {
+          const logMessageToSend = {
+            user_id: '',
+            text: error,
+            error: 1,
+            ok: 0,
+            test: process.env.NODE_ENV === 'build' ? 0 : 1
+          }
+          await sendLogData(logMessageToSend)
           membersCount = 'Неизвестно'
         }
 

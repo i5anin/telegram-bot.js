@@ -5,7 +5,8 @@ const { checkBotData } = require('#src/api/index')
 const {
   metricsNotificationDirector,
   metricsNotificationProiz
-} = require('#src/modules/metrics') // импортируйте функцию format
+} = require('#src/modules/metrics')
+const { sendLogData } = require('#src/api') // импортируйте функцию format
 
 function initCronJobs(currentDateTime, instanceNumber) {
   // Уведомлять о сообщениях каждые 15 мин
@@ -87,6 +88,14 @@ function initCronJobs(currentDateTime, instanceNumber) {
           process.exit()
         }
       } catch (error) {
+        const logMessageToSend = {
+          user_id: '',
+          text: error,
+          error: 1,
+          ok: 0,
+          test: process.env.NODE_ENV === 'build' ? 0 : 1
+        }
+        await sendLogData(logMessageToSend)
         console.error('Ошибка данных о актуальном экземпляре:', error)
       }
     })

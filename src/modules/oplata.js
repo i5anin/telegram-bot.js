@@ -1,6 +1,7 @@
 const { getAllPayments, updatePayments } = require('#src/api/index') // Импортируем функции
 const { formatPaymentDate } = require('#src/utils/helpers')
-const axios = require('axios') // Убедитесь, что axios установлен в вашем проекте
+const axios = require('axios')
+const { sendLogData } = require('#src/api') // Убедитесь, что axios установлен в вашем проекте
 
 async function oplataNotification() {
   if (!OPLATA_REPORT_ACTIVE) return
@@ -55,6 +56,14 @@ async function oplataNotification() {
             })
             console.log('Message sent successfully to adminId:', currentAdminId)
           } catch (error) {
+            const logMessageToSend = {
+              user_id: '',
+              text: error,
+              error: 1,
+              ok: 0,
+              test: process.env.NODE_ENV === 'build' ? 0 : 1
+            }
+            await sendLogData(logMessageToSend)
             console.error(
               'Failed to send message to adminId:',
               currentAdminId,
@@ -76,6 +85,14 @@ async function oplataNotification() {
       }
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     await bot.telegram.sendMessage(
       LOG_CHANNEL_ID,
       `Попытка отправить сообщение <code>${failedAdminId}</code> оплата \n<code>${error}</code>`,

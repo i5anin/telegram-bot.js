@@ -14,6 +14,7 @@ const {
 const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
 const moment = require('moment')
 const { Markup } = require('telegraf')
+const { sendLogData } = require('#src/api')
 
 function getMaxCharacters(latestMetrics) {
   const percentageValues = [
@@ -101,6 +102,14 @@ async function metricsNotificationDirector(ctx = null, index = 0, userId) {
         )
         console.log('Metrics Message sent successfully to userId:', userId)
       } catch (error) {
+        const logMessageToSend = {
+          user_id: '',
+          text: error,
+          error: 1,
+          ok: 0,
+          test: process.env.NODE_ENV === 'build' ? 0 : 1
+        }
+        await sendLogData(logMessageToSend)
         console.error(
           'Failed to send message to userId:',
           userId,
@@ -115,6 +124,14 @@ async function metricsNotificationDirector(ctx = null, index = 0, userId) {
       }
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     // Handle any errors in the process
     console.error('Error fetching or sending metrics:', error)
     await bot.telegram.sendMessage(
@@ -206,6 +223,14 @@ async function sendMetricsMessagesNach() {
         )
         console.log('Metrics message sent successfully to userId:', userId)
       } catch (error) {
+        const logMessageToSend = {
+          user_id: '',
+          text: error,
+          error: 1,
+          ok: 0,
+          test: process.env.NODE_ENV === 'build' ? 0 : 1
+        }
+        await sendLogData(logMessageToSend)
         console.error(
           'Failed to send message to userId:',
           userId,
@@ -220,6 +245,14 @@ async function sendMetricsMessagesNach() {
       }
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error('Error in sendMetricsMessagesNach:', error)
     throw error
   }
@@ -278,6 +311,14 @@ async function formatMetricsMessageMaster() {
           metrics.user_id
         )
       } catch (error) {
+        const logMessageToSend = {
+          user_id: '',
+          text: error,
+          error: 1,
+          ok: 0,
+          test: process.env.NODE_ENV === 'build' ? 0 : 1
+        }
+        await sendLogData(logMessageToSend)
         console.error(
           'Failed to send message to userId:',
           metrics.user_id,
@@ -292,6 +333,14 @@ async function formatMetricsMessageMaster() {
       }
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error('Error formatting metrics master message:', error)
     return 'Error formatting metrics master message'
   }

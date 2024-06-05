@@ -3,6 +3,7 @@ const ruLang = require('#src/utils/ru_lang') // Локализация сооб�
 const { sendToLog } = require('#src/utils/log') // Добавление лога
 const { resetFlags } = require('#src/utils/helpers')
 const { checkUser } = require('#src/api/index')
+const { sendLogData } = require('#src/api')
 // const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
 
 // Функция для проверки, зарегистрирован ли пользователь на сервере
@@ -14,6 +15,14 @@ async function checkRegistration(chatId) {
       fio: response.fio
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     await bot.telegram.sendMessage(
       LOG_CHANNEL_ID,
       `reg <code>${error}</code>`,
@@ -46,6 +55,14 @@ async function handleRegComment(ctx) {
     // Отправляем сообщение
     ctx.reply(textToReply, { parse_mode: 'HTML' })
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     await bot.telegram.sendMessage(
       LOG_CHANNEL_ID,
       `reg <code>${error}</code>`,
@@ -56,6 +73,14 @@ async function handleRegComment(ctx) {
         'Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.'
       )
     } catch (error) {
+      const logMessageToSend = {
+        user_id: '',
+        text: error,
+        error: 1,
+        ok: 0,
+        test: process.env.NODE_ENV === 'build' ? 0 : 1
+      }
+      await sendLogData(logMessageToSend)
       await bot.telegram.sendMessage(
         LOG_CHANNEL_ID,
         `reg reply <code>${error}</code>`,

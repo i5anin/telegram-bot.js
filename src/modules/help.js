@@ -3,6 +3,7 @@ const { sendToLog } = require('#src/utils/log')
 const { getAllUsers } = require('#src/api/index')
 const { Markup } = require('telegraf')
 const { checkRegistration } = require('#src/modules/reg')
+const { sendLogData } = require('#src/api')
 
 async function getUserInfo(userId) {
   try {
@@ -18,6 +19,14 @@ async function getUserInfo(userId) {
       throw new Error('User not found')
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error('Ошибка при получении данных пользователя:', error)
     throw error
   }
@@ -136,6 +145,14 @@ async function handleDocsCommand(ctx) {
       )
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error('Ошибка при проверке регистрации:', error)
     await ctx.reply(
       'Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.'
@@ -166,6 +183,14 @@ async function handleOperatorCommand(ctx) {
       )
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error('Ошибка при проверке регистрации:', error)
     await ctx.reply(
       'Произошла ошибка при проверке регистрации. Пожалуйста, попробуйте позже.'

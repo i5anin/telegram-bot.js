@@ -1,6 +1,7 @@
 const axios = require('axios')
 const ruLang = require('#src/utils/ru_lang') // Локализация сообщений
 const { checkUser } = require('#src/api/index')
+const { sendLogData } = require('#src/api')
 
 async function getLastPaymentForUser(userId, date) {
   try {
@@ -10,6 +11,14 @@ async function getLastPaymentForUser(userId, date) {
     const { payments } = response.data
     return payments[payments.length - 1] || null
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.log(`Ошибка при запросе к API: ${error}`)
     return null
   }
@@ -64,6 +73,14 @@ async function payments(ctx) {
 
     await ctx.reply(message, { parse_mode: 'HTML' })
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     await ctx.reply(`Произошла ошибка в команде /pay: ${error}`)
   }
 }

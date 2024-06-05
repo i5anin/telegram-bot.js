@@ -39,6 +39,14 @@ async function handleFio(ctx, text, chat, from) {
       )
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     console.error('Ошибка при добавлении пользователя:', error.message)
     ctx.reply(`Ошибка регистрации: ${error.message}`, {
       parse_mode: 'HTML'
@@ -124,6 +132,14 @@ async function handleTextCommand(ctx) {
       }
     }
   } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error,
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
     // Логируем ошибку и информируем пользователя
     console.error('Возникла ошибка при обработке команды:', error)
     try {
