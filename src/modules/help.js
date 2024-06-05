@@ -37,18 +37,19 @@ async function handleHelpCommand(ctx) {
 
   // Получаем аргументы после команды
   const input = ctx.message.text.split(' ')
-  const userId = input[1] ? parseInt(input[1]) : null
+  const userId = input[1] ? parseInt(input[1]) : ctx.from.id // Если аргумент после команды не задан, используем ID отправителя
 
-  // Проверяем, является ли отправитель администратором и был ли предоставлен аргумент
-  if (userId && String(ctx.from.id) === GRAND_ADMIN) {
+  // Проверяем, является ли отправитель администратором
+  if (String(ctx.from.id) === GRAND_ADMIN) {
     try {
       await sendHelpToUser(ctx, userId)
 
       // Получаем информацию о пользователе с помощью функции getUserInfo
       const user = await getUserInfo(userId)
 
-      // Отправляем сообщение администратору с информацией о пользователе
-      await ctx.reply(
+      // Отправляем сообщение администратору в личные сообщения с информацией о пользователе
+      await ctx.telegram.sendMessage(
+        ctx.from.id,
         `Сообщение отправлено пользователю\nID: <code>${user.userId}</code>\nФИО: <code>${user.fio}</code>`,
         { parse_mode: 'HTML' }
       )
@@ -56,23 +57,29 @@ async function handleHelpCommand(ctx) {
       // Проверяем, является ли ошибка ошибкой Telegram
       if (
         err.response &&
-        err.response.error_code === 400 &&
-        err.response.description === 'Bad Request: chat not found'
+        err.response.data &&
+        err.response.data.error_code === 400 &&
+        err.response.data.description.includes('chat not found')
       ) {
-        await ctx.reply(
+        await ctx.telegram.sendMessage(
+          ctx.from.id,
           'Не удалось отправить сообщение пользователю. Чат не найден.'
         )
       } else {
-        // Если это другой тип ошибки, выводим ее в консоль и отправляем сообщение о неизвестной ошибке
+        // Если это другой тип ошибки, выводим ее в консоль и отправляем сообщение о неизвестной ошибке в личные сообщения
         console.error('Error sending help to user:', err)
-        await ctx.reply(`Произошла неизвестная ошибка.\n<code>${err}</code>`, {
-          parse_mode: 'HTML'
-        })
+        await ctx.telegram.sendMessage(
+          ctx.from.id,
+          `Произошла неизвестная ошибка.\n<code>${JSON.stringify(err)}</code>`,
+          {
+            parse_mode: 'HTML'
+          }
+        )
       }
     }
-  } else if (!userId) {
-    // Если аргумент не предоставлен, отправляем справку отправителю
-    await sendHelpToUser(ctx, ctx.chat.id)
+  } else {
+    // Если отправитель не является администратором или аргумент не предоставлен, отправляем справку отправителю
+    await sendHelpToUser(ctx, ctx.from.id)
   }
 }
 
