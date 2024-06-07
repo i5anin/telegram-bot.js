@@ -5,7 +5,7 @@ const { checkBotData } = require('#src/api/index')
 const {
   metricsNotificationDirector,
   metricsNotificationProiz
-} = require('#src/modules/metrics')
+} = require('#src/modules/metrics/metrics')
 const { sendLogData } = require('#src/api/index') // импортируйте функцию format
 
 function initCronJobs(currentDateTime, instanceNumber) {

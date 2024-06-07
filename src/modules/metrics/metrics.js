@@ -4,7 +4,7 @@ const {
   checkUser,
   getMetricsMaster,
   getMetricsNach
-} = require('#src/api/index')
+} = require('#src/api')
 const { sendToLog } = require('#src/utils/log')
 const {
   formatMetricsMessage,
@@ -14,7 +14,7 @@ const {
 const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
 const moment = require('moment')
 const { Markup } = require('telegraf')
-const { sendLogData } = require('#src/api/index')
+const { sendLogData } = require('#src/api')
 
 function getMaxCharacters(latestMetrics) {
   const percentageValues = [

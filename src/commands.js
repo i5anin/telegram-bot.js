@@ -20,7 +20,7 @@ const {
   metricsNotificationDirector,
   formatMetricsMessageMaster,
   sendMetricsMessagesNach
-} = require('#src/modules/metrics')
+} = require('#src/modules/metrics/metrics')
 const { handlePhoto } = require('#src/modules/photo')
 const { handleForwardedMessage } = require('#src/modules/who')
 
