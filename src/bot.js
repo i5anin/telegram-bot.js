@@ -276,6 +276,33 @@ bot.command('get_website_screenshot', async (ctx) => {
   }
 })
 
+bot.command('mjpg', async (ctx) => {
+  try {
+    const websiteUrl = `${WEB_API}metrics/web.php?key=SecretKeyPFForum23`
+
+    const browser = await puppeteer.launch() // Запускаем браузер
+    const page = await browser.newPage() // Создаем новую вкладку
+    await page.goto(websiteUrl) // Открываем сайт
+    await page.setViewport({ width: 438, height: 667 }) // Устанавливаем размер области скриншота
+    console.log('before waiting')
+    await delay(4000) // Ожидание 4 секунд
+    console.log('after waiting')
+    const screenshot = await page.screenshot({ type: 'png', fullPage: true }) // Делаем скриншот
+    await browser.close() // Закрываем браузер
+
+    await ctx.replyWithPhoto({ source: screenshot }) // Отправляем скриншот
+  } catch (error) {
+    console.error('Ошибка при получении скриншота:', error)
+    ctx.reply('Произошла ошибка. Попробуйте позже.')
+  }
+})
+
+function delay(time) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, time)
+  })
+}
+
 // Функция для разбивки массива на части
 function chunkArray(array, chunkSize) {
   const result = []
