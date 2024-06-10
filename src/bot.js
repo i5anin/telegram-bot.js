@@ -35,7 +35,7 @@ const {
   sendMetricsMessagesNach
 } = require('#src/modules/metrics/metrics')
 const { handlePhoto } = require('#src/modules/photo')
-const { checkingGroup } = require('#src/modules/checkingGroup')
+const { checkingGroup } = require('#src/modules/checkingGroup/checkingGroup')
 const { sendLogData } = require('#src/api/index')
 const moment = require('moment')
 

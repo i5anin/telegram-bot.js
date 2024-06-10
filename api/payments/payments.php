@@ -38,6 +38,10 @@ $mysqli->set_charset('utf8mb4');
 // Подготовленный запрос для получения данных по userID за указанную дату
 $query = "SELECT * FROM `payments` WHERE `user_id` = ? AND `date` = ?";
 
+// TABLE payments ПОКАЗАТЬ ВСЕ ПОЛЯ
+// добавь TABLE `metrics`  2 поле   `payments_diff` float DEFAULT NULL,  `prod_diff`
+// СВЯЗАТЬ ИХ НЕЛЬЗЯ ВПРИНЦИПЕ ОНО ЗНАЧЕЕНИЕ ВСЕГДА АКТУАЛЬНОЕ 2  LEFT JOIN `metrics` m ON p.`date` = m.`date`
+
 if ($stmt = $mysqli->prepare($query)) {
     $stmt->bind_param('ss', $userID, $date);
     $stmt->execute();

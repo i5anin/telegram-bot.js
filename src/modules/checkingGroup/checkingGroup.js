@@ -82,10 +82,7 @@ async function checkingGroup(ctx) {
 
                       if (!isInGroupOTK) {
                         userButtons.push(
-                          Markup.button.url(
-                            'ОТК',
-                            'https://t.me/+G5Cg3nagVyc0Yzcy'
-                          )
+                          Markup.button.url('ОТК', process.env.GROUP_OTK_LINK)
                         )
                       }
 
@@ -93,7 +90,7 @@ async function checkingGroup(ctx) {
                         userButtons.push(
                           Markup.button.url(
                             'Маршрутка',
-                            'https://t.me/+lPaHwdU2ILMzNTdi'
+                            process.env.GROUP_EM_LINK
                           )
                         )
                       }
