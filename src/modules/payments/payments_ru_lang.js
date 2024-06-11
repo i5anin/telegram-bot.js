@@ -15,31 +15,12 @@ function getColorEmoji(color) {
   }
 }
 
-const operatorTypeMapping = {
-  f: 'Фрезер',
-  t: 'Токарь'
-}
+const operatorTypeMapping = { f: 'Фрезер', t: 'Токарь' }
 
 const moment = require('moment')
-const {
-  formatNumber,
-  formatPercentage
-} = require('#src/modules/sk_operator/helpers')
+const { formatNumber } = require('#src/modules/sk_operator/helpers')
 
 module.exports = {
-  alreadyRegistered: '<b>Вы уже зарегистрированы!</b>',
-  notRegistered:
-    'Не зарегистрированы. \nВведите данные в формате:\n<code>Иванов И.И.</code>',
-  registrationSuccess: 'Регистрация прошла успешно!',
-  registrationError: 'Ошибка регистрации: ',
-  serverError: 'Ошибка сервера.',
-  invalidData: 'Формат введенных данных неверный.',
-  enterData: 'Введите данные в формате <code>Иванов И.И.</code>',
-  userNotFound: (userId) =>
-    `Пользователь\nID: <code>${userId}</code>\n<b>не зарегистрирован в системе</b>`,
-  errorAPI: 'Ошибка при получении данных с внешнего API:',
-  error: 'Произошла ошибка при выполнении команды',
-
   payments: (paymentData) =>
     `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio} (${paymentData.grade_info || ''})</b>\n` +
     `<b>${paymentData.post || ''}</b>\n` +
