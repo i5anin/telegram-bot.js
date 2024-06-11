@@ -15,6 +15,11 @@ function getColorEmoji(color) {
   }
 }
 
+const operatorTypeMapping = {
+  f: 'Ф',
+  t: 'Т'
+}
+
 const moment = require('moment')
 const { formatNumber, formatPercentage } = require('#src/utils/helpers')
 
@@ -59,6 +64,7 @@ module.exports = {
     `Грейд: <b>${paymentData.grade}</b>\n` +
     `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
     `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
+    `Изм. средней зарплаты:\u00A0\u00A0<b>${paymentData.payments_diff}</b>\u00A0%\n` +
     '</blockquote>' +
     `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment * (1 - 0.13))}</b>\u00A0₽\n`,
 
@@ -71,10 +77,15 @@ module.exports = {
     '<blockquote>' +
     `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +
     `Рейтинг Качества:  <b>${paymentData.rating_brak}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_brak}</b>\n` +
+    `Смена:\u00A0\u00A0<b>${paymentData.smena}${operatorTypeMapping[paymentData.operator_type] || ''}</b>\u00A0` +
+    `ЦКП:\u00A0\u00A0<b>${formatNumber(paymentData.kpi)}</b>\u00A0` +
+    `Рейтинг:\u00A0\u00A0<b>${paymentData.rating_pos}</b>\u00A0\n` +
     `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
     `Грейд: <b>${paymentData.grade}</b>\n` +
     `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
     `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
+    `Изм. средней зарплаты:\u00A0\u00A0<b>${paymentData.payments_diff.toFixed(2)}</b>\u00A0%\n` +
+    `Отклонение участка ЧПУ:\u00A0\u00A0<b>${paymentData.prod_diff.toFixed(2)}</b>\u00A0%\n` +
     '</blockquote>' +
     `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment * (1 - 0.13))}</b>\u00A0₽\n`,
 

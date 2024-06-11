@@ -36,14 +36,44 @@ if ($mysqli->connect_error) {
 $mysqli->set_charset('utf8mb4');
 
 // Подготовленный запрос для получения данных по userID за указанную дату
-$query = "SELECT * FROM `payments` WHERE `user_id` = ? AND `date` = ?";
-
-// TABLE payments ПОКАЗАТЬ ВСЕ ПОЛЯ
-// добавь TABLE `metrics`  2 поле   `payments_diff` float DEFAULT NULL,  `prod_diff`
-// СВЯЗАТЬ ИХ НЕЛЬЗЯ ВПРИНЦИПЕ ОНО ЗНАЧЕЕНИЕ ВСЕГДА АКТУАЛЬНОЕ 2  LEFT JOIN `metrics` m ON p.`date` = m.`date`
+$query = "SELECT 
+    payments.id,
+    payments.date,
+    payments.fio,
+    payments.user_id,
+    payments.operator_type,
+    payments.base,
+    payments.grade,
+    payments.work_hours,
+    payments.tabel_hours,
+    payments.payment,
+    payments.inn,
+    payments.vvp,
+    payments.kpi_good,
+    payments.rating_good,
+    payments.kpi_brak,
+    payments.rating_brak,
+    payments.group_count,
+    payments.color,
+    payments.post,
+    payments.grade_info,
+    payments.smena,
+    (SELECT DISTINCT payments_diff 
+     FROM payment_stats
+     WHERE date = ? 
+) AS payments_diff,
+    ps.prod_diff, 
+    ps.rating_pos, 
+    ps.kpi 
+FROM 
+    `payments`
+LEFT JOIN 
+    `payment_stats` ps ON payments.`date` = ps.`date` AND payments.`smena` = ps.`smena` AND payments.`operator_type` = ps.`type`
+WHERE 
+    payments.`user_id` = ? AND payments.`date` = ?";
 
 if ($stmt = $mysqli->prepare($query)) {
-    $stmt->bind_param('ss', $userID, $date);
+    $stmt->bind_param('sss', $date, $userID, $date); // Обратите внимание, мы передаем $date три раза!
     $stmt->execute();
     $result = $stmt->get_result();
 
