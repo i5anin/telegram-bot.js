@@ -15,11 +15,9 @@ const { handleRegComment } = require('#src/modules/reg')
 const { payments } = require('#src/modules/payments')
 const { handleTextCommand } = require('#src/modules/text')
 // const { pingService } = require('#src/modules/pingService')
-const {
-  handleHelpCommand,
-  handleDocsCommand,
-  handleOperatorCommand
-} = require('#src/modules/help')
+const { handleDocsCommand } = require('#src/modules/links/docs/docs')
+const { handleHelpCommand } = require('#src/modules/help/help')
+const { handleOperatorCommand } = require('#src/modules/links/oper/oper')
 const { tableMetrics } = require('#src/modules/metrics/metrics_btn')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
@@ -37,7 +35,6 @@ const {
 const { handlePhoto } = require('#src/modules/photo')
 const { checkingGroup } = require('#src/modules/checkingGroup/checkingGroup')
 const { sendLogData } = require('#src/api/index')
-const moment = require('moment')
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env

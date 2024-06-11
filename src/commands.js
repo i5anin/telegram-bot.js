@@ -10,7 +10,7 @@ const {
   handleHelpCommand,
   handleDocsCommand,
   handleOperatorCommand
-} = require('#src/modules/help')
+} = require('#src/modules/links/docs/docs')
 const { oplataNotification } = require('#src/modules/oplata')
 const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
 const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')

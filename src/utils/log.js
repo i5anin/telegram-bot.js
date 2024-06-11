@@ -1,6 +1,5 @@
 const { logMessage } = require('#src/utils/ru_lang')
 const { getAllUsers } = require('#src/api/index')
-const { post } = require('axios')
 const { sendLogData, checkUser } = require('#src/api/index')
 
 async function logNewChatMembers(ctx) {
