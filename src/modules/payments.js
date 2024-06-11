@@ -67,6 +67,9 @@ async function payments(ctx) {
 
     // Отправляем сообщение напрямую пользователю
     await ctx.telegram.sendMessage(userId, message, { parse_mode: 'HTML' })
+    await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, {
+      parse_mode: 'HTML'
+    })
   } catch (error) {
     const logMessageToSend = {
       user_id: ctx.message.from.id.toString(),
