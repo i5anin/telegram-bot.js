@@ -34,7 +34,6 @@ function checkWarningAndFormat(value, category) {
   const isWithinLimits =
     (category === 'Слесарка' && value <= 3400000) ||
     ((category === 'ОТК' || category === 'Упаковка') && value <= 1700000)
-
   // Изменяем логику тернарного оператора, чтобы "⚠️" отображался по умолчанию
   const symbol = isWithinLimits ? '\u00A0✓' : '\u00A0⚠️' // По умолчанию для доработок, согласований и всех остальных случаев
 
@@ -109,7 +108,7 @@ module.exports = {
     `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n` +
     `Незавершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b>\u00A0₽\n` +
     '<blockquote>' +
-    `Cлесарка: ${checkWarningAndFormat(latestMetrics.prod_price_sles, 'Cлесарка')}` + // Слесарка меньше или равно 3 400 000
+    `Cлесарка: ${checkWarningAndFormat(latestMetrics.prod_price_sles, 'Слесарка')}` + // Слесарка меньше или равно 3 400 000
     `ОТК: ${checkWarningAndFormat(latestMetrics.prod_price_otk, 'ОТК')}` + // ОТК меньше или равно 1 700 000
     `Упаковка: ${checkWarningAndFormat(latestMetrics.prod_price_upk, 'Упаковка')}` + // Упаковка меньше или равно 1 700 000
     `Доработка ЧПУ: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka)}` +
