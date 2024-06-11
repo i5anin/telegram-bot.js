@@ -16,8 +16,8 @@ function getColorEmoji(color) {
 }
 
 const operatorTypeMapping = {
-  f: 'Ф',
-  t: 'Т'
+  f: 'Фрезер',
+  t: 'Токарь'
 }
 
 const moment = require('moment')
@@ -56,8 +56,8 @@ module.exports = {
   error: 'Произошла ошибка при выполнении команды',
 
   payments: (paymentData) =>
-    `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio}</b>\n` +
-    `<b>${paymentData.post || ''} (${paymentData.grade_info || ''})</b>\n` +
+    `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio} (${paymentData.grade_info || ''})</b>\n` +
+    `<b>${paymentData.post || ''}</b>\n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
     `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
@@ -71,13 +71,13 @@ module.exports = {
   //🟢🔴🔵⚪️
 
   paymentsOperator: (paymentData) =>
-    `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio}</b>\n` +
-    `<b>${paymentData.post || ''} (${paymentData.grade_info || ''})</b>\n` +
+    `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio} (${paymentData.grade_info || ''})</b>\n` +
+    `<b>${paymentData.post || ''} (${operatorTypeMapping[paymentData.operator_type] || ''})</b>\n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
     `Рейтинг ЦКП:  <b>${paymentData.rating_good}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_good}</b>\n` +
     `Рейтинг Качества:  <b>${paymentData.rating_brak}\u00A0/\u00A0${paymentData.group_count}\u00A0/\u00A0${paymentData.kpi_brak}</b>\n` +
-    `Смена:\u00A0\u00A0<b>${paymentData.smena}${operatorTypeMapping[paymentData.operator_type] || ''}</b>\u00A0` +
+    `Смена:\u00A0\u00A0<b>${paymentData.smena}</b>\u00A0` +
     `ЦКП:\u00A0\u00A0<b>${formatNumber(paymentData.kpi)}</b>\u00A0` +
     `Рейтинг:\u00A0\u00A0<b>${paymentData.rating_pos}</b>\u00A0\n` +
     `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
