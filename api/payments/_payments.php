@@ -4,10 +4,10 @@
 $today = date("Y-m-d");
 
 // Извлекаем userID из параметров запроса
-$userId = $_GET['user_id'] ?? null;
+$userID = $_GET['user_id'] ?? null;
 
 // Проверяем, был ли предоставлен userID
-if (!$userId) {
+if (!$userID) {
     http_response_code(400);
     echo json_encode(['error' => 'No user ID provided']);
     exit;
@@ -60,7 +60,7 @@ $query = "SELECT
     payments.smena,
     (SELECT DISTINCT payments_diff 
      FROM payment_stats
-     WHERE date = '$date' 
+     WHERE date = ? 
 ) AS payments_diff,
     ps.prod_diff, 
     ps.rating_pos, 
@@ -70,31 +70,26 @@ FROM
 LEFT JOIN 
     `payment_stats` ps ON payments.`date` = ps.`date` AND payments.`smena` = ps.`smena` AND payments.`operator_type` = ps.`type`
 WHERE 
-    payments.`user_id` = '$userId' AND payments.`date` = '$date';
-";
+    payments.`user_id` = ? AND payments.`date` = ?";
 
 if ($stmt = $mysqli->prepare($query)) {
-    $stmt->bind_param('ss', $userId, $date); // Используем userId и date из GET
+    $stmt->bind_param('sss', $date, $userID, $date); // Обратите внимание, мы передаем $date три раза!
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if ($stmt->execute()) {
-        $result = $stmt->get_result();
-        $payments = [];
-        while ($row = $result->fetch_assoc()) {
-            $payments[] = $row;
-        }
-
-        $stmt->close();
-        $mysqli->close();
-
-        echo json_encode(['payments' => $payments]);
-    } else {
-        http_response_code(500);
-        echo json_encode(['error' => "SQL query execution failed: " . $mysqli->error]);
-        exit;
+    $payments = [];
+    while ($row = $result->fetch_assoc()) {
+        $payments[] = $row;
     }
+
+    $stmt->close();
+    $mysqli->close();
+
+    echo json_encode(['payments' => $payments]);
 } else {
+    $mysqli->close();
     http_response_code(500);
-    echo json_encode(['error' => 'SQL query preparation failed: ' . $mysqli->error]);
+    echo json_encode(['error' => 'SQL query preparation failed']);
 }
 
 ?>
