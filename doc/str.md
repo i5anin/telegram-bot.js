@@ -1,10 +1,10 @@
 Вы можете разделить этот код на следующие файлы и определить структуру проекта:
 
-# index.js: Этот файл может содержать основной код для запуска сервера и бота, а также инициализацию различных модулей и middleware.
+# api.js: Этот файл может содержать основной код для запуска сервера и бота, а также инициализацию различных модулей и middleware.
 
 ```javascript
 Copy code
-// index.js
+// api.js
 const express = require("express");
 const { Telegraf } = require("telegraf");
 const axios = require("axios");

@@ -1,10 +1,13 @@
-const { fetchMetrics, checkUser } = require('#src/api')
+const { fetchMetrics, checkUser } = require('#src/api/api')
 const { sendToLog } = require('#src/utils/log')
 const { formatMetricsMessage } = require('#src/utils/ru_lang')
-const { formatNumber, getUserLinkById } = require('#src/utils/helpers')
+const {
+  formatNumber,
+  getUserLinkById
+} = require('#src/modules/sk_operator/helpers')
 
 const { Markup } = require('telegraf')
-const { sendLogData } = require('#src/api')
+const { sendLogData } = require('#src/api/api')
 
 function getMaxCharacters(latestMetrics) {
   const percentageValues = [

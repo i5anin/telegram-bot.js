@@ -1,7 +1,7 @@
-const { getAllPayments, updatePayments } = require('#src/api/index') // Импортируем функции
-const { formatPaymentDate } = require('#src/utils/helpers')
+const { getAllPayments, updatePayments } = require('#src/api/api') // Импортируем функции
+const { formatPaymentDate } = require('#src/modules/sk_operator/helpers')
 const axios = require('axios')
-const { sendLogData } = require('#src/api/index') // Убедитесь, что axios установлен в вашем проекте
+const { sendLogData } = require('#src/api/api') // Убедитесь, что axios установлен в вашем проекте
 
 async function oplataNotification() {
   if (!OPLATA_REPORT_ACTIVE) return

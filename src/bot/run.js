@@ -1,7 +1,7 @@
 const { format } = require('date-fns')
-const { updateBotData } = require('#src/api/index')
+const { updateBotData } = require('#src/api/api')
 
-function runBot(instanceNumber, currentDateTime) {
+function run(instanceNumber, currentDateTime) {
   // Объявляем formattedDateTime здесь, чтобы оно было доступно вне блока if
   const formattedDateTime = format(currentDateTime, 'yyyy-MM-dd HH:mm:ss')
 
@@ -45,4 +45,4 @@ function runBot(instanceNumber, currentDateTime) {
   }
 }
 
-module.exports = { runBot }
+module.exports = { runBot: run }

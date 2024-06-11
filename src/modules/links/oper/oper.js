@@ -1,8 +1,8 @@
 const axios = require('axios')
 const { Markup } = require('telegraf')
 const { sendToLog } = require('#src/utils/log')
-const { sendLogData } = require('#src/api/index')
-const { checkRegistration } = require('#src/modules/reg')
+const { sendLogData } = require('#src/api/api')
+const { checkRegistration } = require('#src/modules/reg/reg')
 
 const apiUrl = `${process.env.WEB_API}/links/links.php` // Замените на ваш API URL
 

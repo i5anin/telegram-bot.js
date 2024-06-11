@@ -1,7 +1,7 @@
 const fs = require('fs')
 const { sendToLog } = require('#src/utils/log')
-const { getAllUsers } = require('#src/api/index')
-const { sendLogData } = require('#src/api/index')
+const { getAllUsers } = require('#src/api/api')
+const { sendLogData } = require('#src/api/api')
 
 async function getUserInfo(userId) {
   try {

@@ -21,7 +21,10 @@ const operatorTypeMapping = {
 }
 
 const moment = require('moment')
-const { formatNumber, formatPercentage } = require('#src/utils/helpers')
+const {
+  formatNumber,
+  formatPercentage
+} = require('#src/modules/sk_operator/helpers')
 
 /**
  * Проверяет, выходит ли значение за пределы заданного диапазона (меньше 1 700 000 или больше 3 400 000),

@@ -1,11 +1,11 @@
 const cron = require('node-cron')
-const { notifyAllUsers } = require('#src/modules/notify')
-const { oplataNotification } = require('#src/modules/oplata')
-const { checkBotData } = require('#src/api/index')
+const { notifyAllUsers } = require('#src/modules/sk_operator/notify')
+const { oplataNotification } = require('#src/modules/oplata/oplata')
+const { checkBotData } = require('#src/api/api')
 const {
   metricsNotificationDirector
 } = require('#src/modules/metrics/director/metrics')
-const { sendLogData } = require('#src/api/index')
+const { sendLogData } = require('#src/api/api')
 const {
   formatMetricsMessageMaster
 } = require('#src/modules/metrics/master/metrics')

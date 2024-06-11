@@ -1,6 +1,6 @@
-const { getMetricsMaster } = require('#src/api')
-const { getUserLinkById } = require('#src/utils/helpers')
-const { sendLogData } = require('#src/api')
+const { getMetricsMaster } = require('#src/api/api')
+const { getUserLinkById } = require('#src/modules/sk_operator/helpers')
+const { sendLogData } = require('#src/api/api')
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))

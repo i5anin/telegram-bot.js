@@ -3,10 +3,10 @@ const {
   getChatInfo,
   getChatAdministrators,
   getChatMembersCount
-} = require('#src/api/index')
+} = require('#src/api/api')
 const msg = require('#src/utils/ru_lang')
 const { logMessage } = require('#src/utils/ru_lang')
-const { sendLogData } = require('#src/api/index')
+const { sendLogData } = require('#src/api/api')
 
 const handleForwardedMessage = async (ctx) => {
   let userId

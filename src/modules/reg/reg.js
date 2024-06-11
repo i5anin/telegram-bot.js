@@ -1,9 +1,9 @@
 // Подключаем необходимые модули и переменные
 const ruLang = require('#src/utils/ru_lang') // Локализация сообщений
 const { sendToLog } = require('#src/utils/log') // Добавление лога
-const { resetFlags } = require('#src/utils/helpers')
-const { checkUser } = require('#src/api/index')
-const { sendLogData } = require('#src/api/index')
+const { resetFlags } = require('#src/modules/sk_operator/helpers')
+const { checkUser } = require('#src/api/api')
+const { sendLogData } = require('#src/api/api')
 // const { handleTextCommand } = require('#src/modules/text')  // Обработка текстовых сообщений
 
 // Функция для проверки, зарегистрирован ли пользователь на сервере

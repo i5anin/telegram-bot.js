@@ -3,26 +3,32 @@
 require('dotenv').config()
 
 // Импорт модулей
-const { handleRegComment } = require('#src/modules/reg')
-const { payments } = require('#src/modules/payments')
-const { handleTextCommand } = require('#src/modules/text')
+const { handleRegComment } = require('#src/modules/reg/reg')
+const { payments } = require('#src/modules/payments/payments')
+const { handleTextCommand } = require('#src/modules/text/text')
 const {
   handleHelpCommand,
   handleDocsCommand,
   handleOperatorCommand
 } = require('#src/modules/links/docs/docs')
-const { oplataNotification } = require('#src/modules/oplata')
-const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
-const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
+const { oplataNotification } = require('#src/modules/oplata/oplata')
+const {
+  notifyUsers,
+  notifyAllUsers
+} = require('#src/modules/sk_operator/notify')
+const {
+  handleStatusCommand,
+  handleMsgCommand
+} = require('#src/utils/msg/admin')
 const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
-const { handleGetGroupInfoCommand } = require('#src/utils/csv')
+const { handleGetGroupInfoCommand } = require('#src/modules/test/number_users')
 const {
   metricsNotificationDirector,
   formatMetricsMessageMaster,
   sendMetricsMessagesNach
 } = require('#src/modules/metrics/director/metrics')
-const { handlePhoto } = require('#src/modules/photo')
-const { handleForwardedMessage } = require('#src/modules/who')
+const { handlePhoto } = require('#src/modules/test/photo')
+const { handleForwardedMessage } = require('#src/modules/test/who')
 
 function setupCommands(bot) {
   bot.use((ctx, next) => {

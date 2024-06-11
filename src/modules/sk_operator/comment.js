@@ -1,12 +1,12 @@
-const { getAllComments, updateComment } = require('#src/api/index')
+const { getAllComments, updateComment } = require('#src/api/api')
 const {
   formatPaymentDate,
   getUserName,
   getControlType,
   getDefectType
-} = require('#src/utils/helpers')
+} = require('#src/modules/sk_operator/helpers')
 const { formatSKMessage } = require('#src/utils/ru_lang')
-const { sendLogData } = require('#src/api/index')
+const { sendLogData } = require('#src/api/api')
 
 async function fetchComments() {
   try {

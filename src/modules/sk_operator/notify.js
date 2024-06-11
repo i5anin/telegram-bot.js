@@ -5,12 +5,12 @@ const {
   getDefectType,
   getControlType,
   getUserLinkById
-} = require('#src/utils/helpers')
-const { fetchComments } = require('#src/modules/comment')
+} = require('#src/modules/sk_operator/helpers')
+const { fetchComments } = require('#src/modules/sk_operator/comment')
 const { sendToLog } = require('#src/utils/log')
-const { updateComment } = require('#src/api/index')
+const { updateComment } = require('#src/api/api')
 const { formatSKMessage } = require('#src/utils/ru_lang')
-const { sendLogData } = require('#src/api/index')
+const { sendLogData } = require('#src/api/api')
 
 // Функция задержки
 function sleep(ms) {

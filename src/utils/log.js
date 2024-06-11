@@ -1,6 +1,6 @@
 const { logMessage } = require('#src/utils/ru_lang')
-const { getAllUsers } = require('#src/api/index')
-const { sendLogData, checkUser } = require('#src/api/index')
+const { getAllUsers } = require('#src/api/api')
+const { sendLogData, checkUser } = require('#src/api/api')
 
 async function logNewChatMembers(ctx) {
   const chatTitle = ctx.chat.title || 'Неназванный чат'

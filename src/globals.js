@@ -1,5 +1,5 @@
 // globals.js
-const { createMetric } = require('#src/utils/metricPM2')
+const { createMetric } = require('#src/bot/metricPM2')
 require('dotenv').config()
 function setupGlobal(bot, instanceNumber) {
   global.bot = bot

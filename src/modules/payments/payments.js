@@ -1,7 +1,7 @@
 const axios = require('axios')
-const ruLang = require('#src/utils/ru_lang') // Локализация сообщений
-const { checkUser } = require('#src/api/index')
-const { sendLogData } = require('#src/api/index')
+const ruLang = require('./ru_lang') // Локализация сообщений
+const { checkUser } = require('#src/api/api')
+const { sendLogData } = require('#src/api/api')
 
 // Функция для получения последнего платежа пользователя
 async function getLastPaymentForUser(userId, date) {

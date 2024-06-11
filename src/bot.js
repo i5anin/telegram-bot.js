@@ -10,31 +10,39 @@ const puppeteer = require('puppeteer')
 io.init({ transactions: true, http: true })
 
 // Импорт модулей
-const { initCronJobs } = require('#src/modules/cron')
-const { handleRegComment } = require('#src/modules/reg')
-const { payments } = require('#src/modules/payments')
-const { handleTextCommand } = require('#src/modules/text')
+const { initCronJobs } = require('#src/cron/cron')
+const { handleRegComment } = require('#src/modules/reg/reg')
+const { payments } = require('#src/modules/payments/payments')
+const { handleTextCommand } = require('#src/modules/text/text')
 // const { pingService } = require('#src/modules/pingService')
 const { handleDocsCommand } = require('#src/modules/links/docs/docs')
 const { handleHelpCommand } = require('#src/modules/help/help')
 const { handleOperatorCommand } = require('#src/modules/links/oper/oper')
 const { tableMetrics } = require('#src/modules/metrics/metrics_btn')
-const { oplataNotification } = require('#src/modules/oplata')
-const { notifyUsers, notifyAllUsers } = require('#src/modules/notify')
-const { handleStatusCommand, handleMsgCommand } = require('#src/utils/admin')
-const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
-const { handleGetGroupInfoCommand } = require('#src/utils/csv')
-const { runBot } = require('#src/modules/runBot')
-const { handleForwardedMessage, whoCommand } = require('#src/modules/who')
-const { createMetric } = require('#src/utils/metricPM2')
+const { oplataNotification } = require('#src/modules/oplata/oplata')
 const {
-  metricsNotificationDirector,
-  formatMetricsMessageMaster,
-  sendMetricsMessagesNach
+  notifyUsers,
+  notifyAllUsers
+} = require('#src/modules/sk_operator/notify')
+const { handleStatusCommand } = require('#src/bot/status')
+const { handleMsgCommand } = require('#src/utils/msg/admin')
+const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
+const { handleGetGroupInfoCommand } = require('#src/modules/test/number_users')
+const { runBot } = require('#src/bot/run')
+const { handleForwardedMessage, whoCommand } = require('#src/modules/test/who')
+const { createMetric } = require('#src/bot/metricPM2')
+const {
+  metricsNotificationDirector
 } = require('#src/modules/metrics/director/metrics')
-const { handlePhoto } = require('#src/modules/photo')
+const {
+  formatMetricsMessageMaster
+} = require('#src/modules/metrics/master/metrics')
+const {
+  sendMetricsMessagesNach
+} = require('#src/modules/metrics/hachalnik/metrics')
+const { handlePhoto } = require('#src/modules/test/photo')
 const { checkingGroup } = require('#src/modules/checkingGroup/checkingGroup')
-const { sendLogData } = require('#src/api/index')
+const { sendLogData } = require('#src/api/api')
 
 // Конфигурационные переменные
 const { BOT_TOKEN } = process.env

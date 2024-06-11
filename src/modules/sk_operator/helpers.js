@@ -1,5 +1,5 @@
 // Функция для выполнения GET-запросов
-const { getAllUsers, checkUser, sendLogData } = require('#src/api/index')
+const { getAllUsers, checkUser, sendLogData } = require('#src/api/api')
 
 // Функция для сброса флагов сессии
 function resetFlags(ctx) {
