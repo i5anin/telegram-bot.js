@@ -34,8 +34,6 @@ module.exports = {
     '</blockquote>' +
     `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment * (1 - 0.13))}</b>\u00A0₽\n`,
 
-  //🟢🔴🔵⚪️
-
   paymentsOperator: (paymentData) =>
     `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio} (${paymentData.grade_info || ''})</b>\n` +
     `<b>${paymentData.post || ''} (${operatorTypeMapping[paymentData.operator_type] || ''})</b>\n` +
