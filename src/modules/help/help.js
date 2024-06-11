@@ -1,8 +1,8 @@
 const { sendToLog } = require('#src/utils/log')
-const { sendLogData } = require('#src/api/index')
-const { checkRegistration } = require('#src/modules/reg')
-
-const apiUrl = `${process.env.WEB_API}/links/links.php` // Замените на ваш API URL
+const { sendLogData, getAllUsers } = require('#src/api')
+// const { checkRegistration } = require('#src/modules/reg')
+//
+// const apiUrl = `${process.env.WEB_API}/links/links.php` // Замените на ваш API URL
 
 async function handleHelpCommand(ctx) {
   await sendToLog(ctx)
