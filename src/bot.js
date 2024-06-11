@@ -31,7 +31,7 @@ const {
   metricsNotificationDirector,
   formatMetricsMessageMaster,
   sendMetricsMessagesNach
-} = require('#src/modules/metrics/metrics')
+} = require('#src/modules/metrics/director/metrics')
 const { handlePhoto } = require('#src/modules/photo')
 const { checkingGroup } = require('#src/modules/checkingGroup/checkingGroup')
 const { sendLogData } = require('#src/api/index')

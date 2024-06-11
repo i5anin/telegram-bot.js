@@ -3,10 +3,15 @@ const { notifyAllUsers } = require('#src/modules/notify')
 const { oplataNotification } = require('#src/modules/oplata')
 const { checkBotData } = require('#src/api/index')
 const {
-  metricsNotificationDirector,
-  metricsNotificationProiz
-} = require('#src/modules/metrics/metrics')
-const { sendLogData } = require('#src/api/index') // импортируйте функцию format
+  metricsNotificationDirector
+} = require('#src/modules/metrics/director/metrics')
+const { sendLogData } = require('#src/api/index')
+const {
+  formatMetricsMessageMaster
+} = require('#src/modules/metrics/master/metrics')
+const {
+  sendMetricsMessagesNach
+} = require('#src/modules/metrics/hachalnik/metrics') // импортируйте функцию format
 
 function initCronJobs(currentDateTime, instanceNumber) {
   // Уведомлять о сообщениях каждые 15 мин
@@ -49,8 +54,13 @@ function initCronJobs(currentDateTime, instanceNumber) {
     })
 
     cron.schedule('0 10 * * *', async () => {
-      await metricsNotificationProiz()
-      console.log('Running metricsNotificationProiz() at 10:00 AM every day')
+      await sendMetricsMessagesNach()
+      console.log('Running sendMetricsMessagesNach() at 10:00 AM every day')
+    })
+
+    cron.schedule('0 10 * * *', async () => {
+      await formatMetricsMessageMaster()
+      console.log('Running formatMetricsMessageMaster() at 10:00 AM every day')
     })
   }
 
