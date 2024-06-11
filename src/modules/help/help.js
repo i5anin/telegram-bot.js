@@ -1,8 +1,34 @@
+const fs = require('fs')
 const { sendToLog } = require('#src/utils/log')
-const { sendLogData, getAllUsers } = require('#src/api')
-// const { checkRegistration } = require('#src/modules/reg')
-//
-// const apiUrl = `${process.env.WEB_API}/links/links.php` // Замените на ваш API URL
+const { getAllUsers } = require('#src/api/index')
+const { sendLogData } = require('#src/api/index')
+
+async function getUserInfo(userId) {
+  try {
+    // Запрашиваем данные всех пользователей
+    const response = await getAllUsers()
+    // Ищем пользователя с заданным userId в полученных данных
+    const user = response.find((u) => u.user_id === userId) // Изменили response.users_data на response
+    if (user) {
+      // Если пользователь найден, возвращаем его данные
+      return { userId: user.user_id, fio: user.fio }
+    } else {
+      // Если пользователь не найден, выбрасываем ошибку или возвращаем undefined/null
+      throw new Error('User not found')
+    }
+  } catch (error) {
+    const logMessageToSend = {
+      user_id: '',
+      text: error.toString(),
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
+    console.error('Ошибка при получении данных пользователя:', error)
+    throw error
+  }
+}
 
 async function handleHelpCommand(ctx) {
   await sendToLog(ctx)
@@ -57,8 +83,8 @@ async function handleHelpCommand(ctx) {
 
 async function sendHelpToUser(ctx, chatId) {
   // Формируем и отправляем справку пользователю с указанным chatId
-  const photo = 'src/media/answer.jpg' // Убедитесь, что путь к файлу верный
-  const video = 'src/media/answer.mp4' // Убедитесь, что путь к файлу верный
+  const photo = fs.createReadStream('src/modules/help/media/answer.jpg')
+  const video = fs.createReadStream('src/modules/help/media/answer.mp4') // Убедитесь, что путь к файлу верный
   const messageJpg = `Доступные команды:
 
 1. /new_comment - Получить новые комментарии
@@ -72,42 +98,17 @@ ${emoji.point} пк: правой кнопкой мыши <u>ответить</u
 
 В случае ошибки напишите разработчику @i5anin Сергей.`
 
-  await ctx.telegram.sendPhoto(chatId, photo, {
-    caption: messageJpg,
-    parse_mode: 'HTML'
-  })
+  await ctx.telegram.sendPhoto(
+    chatId,
+    { source: photo },
+    {
+      caption: messageJpg,
+      parse_mode: 'HTML'
+    }
+  )
 
   // Отправка видео
-  await ctx.telegram.sendVideo(chatId, video)
+  await ctx.telegram.sendVideo(chatId, { source: video })
 }
 
-async function getUserInfo(userId) {
-  try {
-    // Запрашиваем данные всех пользователей
-    const response = await getAllUsers()
-    // Ищем пользователя с заданным userId в полученных данных
-    const user = response.find((u) => u.user_id === userId) // Изменили response.users_data на response
-    if (user) {
-      // Если пользователь найден, возвращаем его данные
-      return { userId: user.user_id, fio: user.fio }
-    } else {
-      // Если пользователь не найден, выбрасываем ошибку или возвращаем undefined/null
-      throw new Error('User not found')
-    }
-  } catch (error) {
-    const logMessageToSend = {
-      user_id: '',
-      text: error.toString(),
-      error: 1,
-      ok: 0,
-      test: process.env.NODE_ENV === 'build' ? 0 : 1
-    }
-    await sendLogData(logMessageToSend)
-    console.error('Ошибка при получении данных пользователя:', error)
-    throw error
-  }
-}
-
-module.exports = {
-  handleHelpCommand
-}
+module.exports = { handleHelpCommand }
