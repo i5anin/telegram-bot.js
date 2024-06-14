@@ -62,7 +62,9 @@ if ($stmt = $mysqli->prepare("SELECT
     `productivity`, 
     `get_sum_otgr`,
     `get_sum_otgr_prod`, 
-    `predoplata`, `total_price`, 
+    `predoplata`,
+    `portfolio`,
+    `total_price`,
     `total_sklad_gp` FROM `metrics`")) {
     $stmt->execute();
     $stmt->bind_result(
@@ -87,6 +89,7 @@ if ($stmt = $mysqli->prepare("SELECT
         $get_sum_otgr,
         $get_sum_otgr_prod,
         $predoplata,
+        $portfolio,
         $total_price,
         $total_sklad_gp
     );
@@ -115,6 +118,7 @@ if ($stmt = $mysqli->prepare("SELECT
             'get_sum_otgr' => round($get_sum_otgr, 2),
             'get_sum_otgr_prod' => round($get_sum_otgr_prod, 2),
             'predoplata' => round($predoplata, 2),
+            'portfolio' => round($portfolio, 2),
             'total_price' => round($total_price, 2),
             'total_sklad_gp' => round($total_sklad_gp, 2),
         ];

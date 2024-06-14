@@ -1,6 +1,6 @@
 const { fetchMetrics, checkUser } = require('#src/api/api')
 const { sendToLog } = require('#src/utils/log')
-const { formatMetricsMessage } = require('#src/utils/ru_lang')
+const { formatMetricsMessage } = require('#src/modules/metrics/metric_lang')
 const {
   formatNumber,
   getUserLinkById
