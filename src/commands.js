@@ -28,7 +28,7 @@ const {
   sendMetricsMessagesNach
 } = require('#src/modules/metrics/director/metrics')
 const { handlePhoto } = require('#src/modules/test/photo')
-const { handleForwardedMessage } = require('#src/modules/test/who')
+const { handleForwardedMessage, whoCommand } = require('#src/modules/test/who')
 
 function setupCommands(bot) {
   bot.use((ctx, next) => {
