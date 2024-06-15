@@ -30,7 +30,7 @@ module.exports = {
     `Грейд: <b>${paymentData.grade}</b>\n` +
     `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
     `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
-    `Изм. средней зарплаты:\u00A0\u00A0<b>${paymentData.payments_diff}</b>\u00A0%\n` +
+    `Потенциальный рост дохода:\u00A0\u00A0<b>${paymentData.payments_diff}</b>\u00A0%\n` +
     '</blockquote>' +
     `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment * (1 - 0.13))}</b>\u00A0₽\n`,
 
@@ -48,8 +48,8 @@ module.exports = {
     `Грейд: <b>${paymentData.grade}</b>\n` +
     `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\n` +
     `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
-    `Изм. средней зарплаты:\u00A0\u00A0<b>${paymentData.payments_diff.toFixed(2)}</b>\u00A0%\n` +
-    `Отклонение участка ЧПУ:\u00A0\u00A0<b>${paymentData.prod_diff.toFixed(2)}</b>\u00A0%\n` +
+    `Потенциальный рост дохода:\u00A0\u00A0<b>${paymentData.payments_diff.toFixed(2)}</b>\u00A0%\n` +
+    `Отклонение от цели участка ЧПУ:\u00A0\u00A0<b>${paymentData.prod_diff.toFixed(2)}</b>\u00A0%\n` +
     '</blockquote>' +
     `📈 Ваша чистая прибыль на сегодня: <b>${formatNumber(paymentData.payment * (1 - 0.13))}</b>\u00A0₽\n`
 }
