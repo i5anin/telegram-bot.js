@@ -65,8 +65,8 @@ module.exports = {
     `Согл.: ${checkWarningAndFormat(latestMetrics.prod_price_sogl)}` +
     '</blockquote>' +
     `Итого вн. производства: <b>${formatNumber(latestMetrics.prod_price)}</b>\u00A0₽\n` +
-    `Ожидаемая предоплата: <b>${formatNumber(latestMetrics.predoplata)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
-    `Портфель заказов: <b>${formatNumber(latestMetrics.portfolio)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
+    `Ожидаемая предоплата на текущий и следующий месяц: <b>${formatNumber(latestMetrics.predoplata)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
+    `Сумма будущих заказов на текущий и следующий месяц: <b>${formatNumber(latestMetrics.portfolio)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
     `Итого вн. производства: <b>${formatNumber(latestMetrics.total_price)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
     `Готовая продукция склад: <b>${formatNumber(latestMetrics.total_sklad_gp)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n\n` +
     '<b><u>Отклонение от плана</u></b>\n' +
