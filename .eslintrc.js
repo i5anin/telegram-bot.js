@@ -27,11 +27,11 @@ module.exports = {
         'no-console': 'off',
         // 'no-console': 'warn',
         'no-undef': 'off',
-        'linebreak-style': 'off', // Изменяется здесь, чтобы игнорировать проверку стиля перевода строки
+        'linebreak-style': 'off', 
         'no-unused-vars': 'warn',
-        'comma-dangle': ['error', 'never'],
+        //  'comma-dangle': ['error', 'never'],
         'import/order': 'off',
         semi: ['error', 'never'],
         quotes: ['error', 'single'],
     },
-} // Удалите запятую после последнего свойства!
+}
