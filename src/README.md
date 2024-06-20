@@ -33,8 +33,8 @@
 | `metricsNotificationDirector()` (DIR_METRIC) | `30 7 * * *`      | Отправляет уведомления о метриках директору (DIR_METRIC). | `METRICS_REPORT_ACTIVE` = true |
 | `metricsNotificationDirector()` (DIR_OPLATA) | `0 7 * * *`       | Отправляет уведомления о метриках директору (DIR_OPLATA). | `METRICS_REPORT_ACTIVE` = true |
 | `metricsNotificationDirector()` (KISELEV)    | `30 7 * * *`      | Отправляет уведомления о метриках директору (KISELEV).    | `METRICS_REPORT_ACTIVE` = true |
-| `sendMetricsMessagesNach()`                  | `0 10 * * *`      | Отправляет уведомления о метриках начальнику.             | `METRICS_REPORT_ACTIVE` = true |
-| `formatMetricsMessageMaster()`               | `0 10 * * *`      | Формирует отчет о метриках для мастера.                   | `METRICS_REPORT_ACTIVE` = true |
+| `sendMetricsMessagesNach()`                  | `0 10 * * *`      | Отправляет уведомления о метриках начальникам.            | `METRICS_REPORT_ACTIVE` = true |
+| `formatMetricsMessageMaster()`               | `0 10 * * *`      | Формирует отчет о метриках для мастерам.                  | `METRICS_REPORT_ACTIVE` = true |
 | `checkBotData()`                             | `*/30 * * * *`    | Проверяет актуальность данных о боте.                     | `MODE === 'build'`             |
 
 **Описание формата расписания:**

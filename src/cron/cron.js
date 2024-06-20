@@ -12,7 +12,7 @@ const {
 const {
     sendMetricsMessagesNach,
 } = require('#src/modules/metrics/hachalnik/metrics')
-const { get } = require('axios') // импортируйте функцию format
+const { get } = require('axios')
 
 function initCronJobs(currentDateTime, instanceNumber) {
 
@@ -33,14 +33,15 @@ function initCronJobs(currentDateTime, instanceNumber) {
     })
 
     // Уведомлять об ОПЛАТЕ каждые 8 мин
-    cron.schedule('*/15 * * * *', async () => {
-        await oplataNotification()
-        // console.log('Running oplataNotification()')
-    })
+    if (METRICS_REPORT_ACTIVE) { // Добавлено условие!
+        cron.schedule('*/15 * * * *', async () => {
+            await oplataNotification()
+            // console.log('Running oplataNotification()')
+        })
+    }
 
-    if (!METRICS_REPORT_ACTIVE) {
-        return
-    } else {
+    // Если METRICS_REPORT_ACTIVE = true, то запускаем задачи для отчетов о метриках
+    if (METRICS_REPORT_ACTIVE) {
         // Schedule for DIR_METRIC at 7:30 AM every day
         cron.schedule('30 7 * * *', async () => {
             await metricsNotificationDirector(null, 0, DIR_METRIC)
