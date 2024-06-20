@@ -1,7 +1,7 @@
-const ruLang = require('#src/utils/ru_lang')
+const ruLang = require('#src/modules/ru_lang')
 
 const { handleAddComment } = require('#src/modules/sk_operator/comment')
-const { sendToLog } = require('#src/utils/log')
+const { sendToLog } = require('#src/modules/log/log')
 const { addUser, addPhotoData, sendLogData } = require('#src/api/api')
 
 async function handleFio(ctx, text, chat, from) {

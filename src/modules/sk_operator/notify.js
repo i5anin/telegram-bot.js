@@ -7,9 +7,9 @@ const {
   getUserLinkById
 } = require('#src/modules/sk_operator/helpers')
 const { fetchComments } = require('#src/modules/sk_operator/comment')
-const { sendToLog } = require('#src/utils/log')
+const { sendToLog } = require('#src/modules/log/log')
 const { updateComment } = require('#src/api/api')
-const { formatSKMessage } = require('#src/utils/ru_lang')
+const { formatSKMessage } = require('#src/modules/ru_lang')
 const { sendLogData } = require('#src/api/api')
 
 // Функция задержки

@@ -5,7 +5,7 @@ const {
   getControlType,
   getDefectType
 } = require('#src/modules/sk_operator/helpers')
-const { formatSKMessage } = require('#src/utils/ru_lang')
+const { formatSKMessage } = require('#src/modules/ru_lang')
 const { sendLogData } = require('#src/api/api')
 
 async function fetchComments() {

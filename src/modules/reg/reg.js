@@ -1,6 +1,6 @@
 // Подключаем необходимые модули и переменные
-const ruLang = require('#src/utils/ru_lang') // Локализация сообщений
-const { sendToLog } = require('#src/utils/log') // Добавление лога
+const ruLang = require('#src/modules/ru_lang') // Локализация сообщений
+const { sendToLog } = require('#src/modules/log/log') // Добавление лога
 const { resetFlags } = require('#src/modules/sk_operator/helpers')
 const { checkUser } = require('#src/api/api')
 const { sendLogData } = require('#src/api/api')

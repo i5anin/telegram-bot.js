@@ -19,8 +19,8 @@ const {
 const {
   handleStatusCommand,
   handleMsgCommand
-} = require('#src/utils/msg/admin')
-const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
+} = require('#src/modules/msg/admin')
+const { logNewChatMembers, logLeftChatMember } = require('#src/modules/log/log')
 const { handleGetGroupInfoCommand } = require('#src/modules/test/number_users')
 const {
   metricsNotificationDirector,

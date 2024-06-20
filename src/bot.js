@@ -25,8 +25,8 @@ const {
   notifyAllUsers
 } = require('#src/modules/sk_operator/notify')
 const { handleStatusCommand } = require('#src/bot/status')
-const { handleMsgCommand } = require('#src/utils/msg/admin')
-const { logNewChatMembers, logLeftChatMember } = require('#src/utils/log')
+const { handleMsgCommand } = require('#src/modules/msg/admin')
+const { logNewChatMembers, logLeftChatMember } = require('#src/modules/log/log')
 const { handleGetGroupInfoCommand } = require('#src/modules/test/number_users')
 const { runBot } = require('#src/bot/run')
 const { handleForwardedMessage, whoCommand } = require('#src/modules/test/who')

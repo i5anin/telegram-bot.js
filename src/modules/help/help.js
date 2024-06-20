@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { sendToLog } = require('#src/utils/log')
+const { sendToLog } = require('#src/modules/log/log')
 const { getAllUsers } = require('#src/api/api')
 const { sendLogData } = require('#src/api/api')
 

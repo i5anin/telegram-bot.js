@@ -1,5 +1,5 @@
 const { fetchMetrics, checkUser } = require('#src/api/api')
-const { sendToLog } = require('#src/utils/log')
+const { sendToLog } = require('#src/modules/log/log')
 const { formatMetricsMessage } = require('#src/modules/metrics/metric_lang')
 const {
   formatNumber,

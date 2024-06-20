@@ -4,8 +4,8 @@ const {
   getChatAdministrators,
   getChatMembersCount
 } = require('#src/api/api')
-const msg = require('#src/utils/ru_lang')
-const { logMessage } = require('#src/utils/ru_lang')
+const msg = require('#src/modules/ru_lang')
+const { logMessage } = require('#src/modules/ru_lang')
 const { sendLogData } = require('#src/api/api')
 
 const handleForwardedMessage = async (ctx) => {

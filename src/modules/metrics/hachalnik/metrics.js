@@ -2,7 +2,7 @@ const { fetchMetrics, checkUser, getMetricsNach } = require('#src/api/api')
 const {
   formatMetricsMessageNach,
   formatMetricsVoronca
-} = require('#src/utils/ru_lang')
+} = require('#src/modules/ru_lang')
 const { getUserLinkById } = require('#src/modules/sk_operator/helpers')
 const moment = require('moment')
 

@@ -1,4 +1,4 @@
-const { logMessage } = require('#src/utils/ru_lang')
+const { logMessage } = require('#src/modules/ru_lang')
 const { getAllUsers } = require('#src/api/api')
 const { sendLogData, checkUser } = require('#src/api/api')
 

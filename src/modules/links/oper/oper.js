@@ -1,6 +1,6 @@
 const axios = require('axios')
 const { Markup } = require('telegraf')
-const { sendToLog } = require('#src/utils/log')
+const { sendToLog } = require('#src/modules/log/log')
 const { sendLogData } = require('#src/api/api')
 const { checkRegistration } = require('#src/modules/reg/reg')
 
