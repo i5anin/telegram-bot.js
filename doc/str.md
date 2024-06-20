@@ -34,11 +34,11 @@ console.error("Error while launching the bot:", error);
 
 ```
 
-# bot.js: В этом файле можно разместить код, связанный с настройкой и работой Telegram бота.
+# cron_bot.js: В этом файле можно разместить код, связанный с настройкой и работой Telegram бота.
 
 ```javascript
 Copy code
-// bot.js
+// cron_bot.js
 const { Telegraf } = require("telegraf");
 const axios = require("axios");
 const { initCronJobs } = require("./cron");
@@ -97,11 +97,11 @@ app.use("/", router);
 module.exports = { initRoutes };
 ```
 
-# cron.js: В этом файле можно разместить код для управления заданиями cron.
+# _main.js: В этом файле можно разместить код для управления заданиями cron.
 
 ```javascript
 Copy code
-// cron.js
+// _main.js
 const cron = require("node-cron");
 
 function initCronJobs(bot) {

@@ -10,7 +10,7 @@ const puppeteer = require('puppeteer')
 io.init({ transactions: true, http: true })
 
 // Импорт модулей
-const { initCronJobs } = require('#src/cron/cron')
+const { initCronJobs } = require('#src/cron/_main')
 const { handleRegComment } = require('#src/modules/reg/reg')
 const { payments } = require('#src/modules/payments/payments')
 const { handleTextCommand } = require('#src/modules/text/text')
