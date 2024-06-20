@@ -17,7 +17,7 @@ $mysqli->set_charset('utf8mb4');
 
 // Функция для получения данных пользователя от Telegram API используя cURL
 function getUserDataFromTelegram($userId, $tgToken, $chatId) {
-    $url = "https://api.telegram.org/bot$tgToken/getChatMember?chat_id=$chatId&user_id=$userId";
+    $url = "https://api.telegram.org/bot$tgToken/getChatMember?chat_id=$userId&user_id=$userId";
 
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
