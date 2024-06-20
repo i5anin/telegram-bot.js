@@ -30,8 +30,31 @@ async function fetchMetricsData() {
 
 async function initCronJobs(currentDateTime, instanceNumber) {
 
+    // Запускаем задачу каждые 10 секунд для обновления данных о метриках
+    cron.schedule('*/20 * * * * *', async () => {
+        console.log('Обновление данных о метриках каждые 10 секунд')
+        try {
+            const metricsData = await fetchMetricsData()
+
+            console.log(metricsData)
+
+            // Обновляем расписание для каждого пользователя
+            metricsData.forEach(metric => {
+                const { user_id, metrica_time_h, metrica_time_m } = metric
+                const schedule = `${metrica_time_m} ${metrica_time_h} * * *`
+                console.log(user_id, metrica_time_h, metrica_time_m)
+
+                // Обновляем расписание в metricsSchedules
+                metricsSchedules[user_id] = schedule;
+
+            })
+        } catch (error) {
+            console.error('Ошибка при получении данных о метриках:', error)
+        }
+    })
+
     cron.schedule('0 12 * * 0', async () => {
-        console.log('Запущена еженедельная задача обновления пользователей')
+        console.log('Запущена еженедельная задача обновления данных пользователей tg')
         try {
             const response = await get(`${WEB_API}/extra/user_update.php`)
             console.log('Результат выполнения задачи:', response.data)
@@ -40,13 +63,13 @@ async function initCronJobs(currentDateTime, instanceNumber) {
         }
     })
 
-    // Уведомлять о сообщениях каждые 15 мин
+    // Уведомлять о сообщениях каждые 17 мин
     cron.schedule('*/17 8-23 * * *', async () => {
         console.log('notifyAllUsers Running a task every 15 minutes')
         await notifyAllUsers()
     })
 
-    // Уведомлять об ОПЛАТЕ каждые 8 мин
+    // Уведомлять об ОПЛАТЕ каждые 15 мин
     if (METRICS_REPORT_ACTIVE) { // Добавлено условие!
         cron.schedule('*/15 * * * *', async () => {
             await oplataNotification()
@@ -55,7 +78,7 @@ async function initCronJobs(currentDateTime, instanceNumber) {
     }
 
     // Если METRICS_REPORT_ACTIVE = true, то запускаем задачи для отчетов о метриках
-    if (METRICS_REPORT_ACTIVE===false) {
+    if (METRICS_REPORT_ACTIVE === false) {
         console.log('METRICS_REPORT_ACTIVE')
         const metricsData = await fetchMetricsData()
 
@@ -65,19 +88,16 @@ async function initCronJobs(currentDateTime, instanceNumber) {
         metricsData.forEach(metric => {
 
             const { user_id, metrica_time_h, metrica_time_m } = metric
-            const schedule = `${metrica_time_m} ${metrica_time_h} * * *` // Форматирование расписания
+            // Создаем расписание для каждого пользователя
+            const schedule = `${metrica_time_m} ${metrica_time_h} * * *`
             console.log(user_id, metrica_time_h, metrica_time_m)
 
-            // Добавляем пользователя в массив с расписанием
-            metricsSchedules[user_id] = schedule
-
-            // Запускаем cron задание для отправки метрик раз в час
-            cron.schedule('*/10 * * * * *', async () => {
-                console.log(`! Running metricsNotificationDirector() for user ${user_id} at ${schedule}`)
+            // Устанавливаем задание для отправки метрик по расписанию
+            cron.schedule(schedule, async () => {
+                console.log(`Running metricsNotificationDirector() for user ${user_id} at ${schedule}`)
                 // Проверяем, есть ли пользователь в массиве
                 if (metricsSchedules[user_id]) {
                     await metricsNotificationDirector(null, 0, user_id)
-                    console.log(`Running metricsNotificationDirector() for user ${user_id} at ${schedule}`)
                 }
             })
         })
