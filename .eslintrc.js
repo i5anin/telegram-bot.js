@@ -27,7 +27,7 @@ module.exports = {
     'no-console': 'off',
     // 'no-console': 'warn',
     'no-undef': 'off',
-    'linebreak-style': ['error', 'unix'],
+    'linebreak-style': 'off', // Изменяется здесь, чтобы игнорировать проверку стиля перевода строки
     'no-unused-vars': 'warn',
     'comma-dangle': ['error', 'never'],
     'import/order': 'off',
