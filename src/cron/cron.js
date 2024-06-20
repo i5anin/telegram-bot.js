@@ -30,9 +30,9 @@ async function fetchMetricsData() {
 
 async function initCronJobs(currentDateTime, instanceNumber) {
 
-    // Запускаем задачу каждые 10 секунд для обновления данных о метриках
+    // Запускаем задачу каждые 20 секунд для обновления данных о метриках
     cron.schedule('*/20 * * * * *', async () => {
-        console.log('Обновление данных о метриках каждые 10 секунд')
+        console.log('Обновление данных о метриках каждые 20 секунд')
         try {
             const metricsData = await fetchMetricsData()
 
@@ -47,6 +47,21 @@ async function initCronJobs(currentDateTime, instanceNumber) {
                 // Обновляем расписание в metricsSchedules
                 metricsSchedules[user_id] = schedule;
 
+                // Устанавливаем/обновляем cron задание для отправки метрик
+                // Используем schedule.destroy() чтобы остановить прежнее задание
+                // перед созданием нового
+                const existingSchedule = cron.schedule(schedule);
+                if (existingSchedule) {
+                    existingSchedule.destroy();
+                }
+
+                cron.schedule(schedule, async () => {
+                    console.log(`Running metricsNotificationDirector() for user ${user_id} at ${schedule}`)
+                    // Проверяем, есть ли пользователь в массиве
+                    if (metricsSchedules[user_id]) {
+                        await metricsNotificationDirector(null, 0, user_id)
+                    }
+                })
             })
         } catch (error) {
             console.error('Ошибка при получении данных о метриках:', error)
