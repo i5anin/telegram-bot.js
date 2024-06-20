@@ -1,3 +1,4 @@
+const { format } = require('date-fns')
 const cron = require('node-cron')
 const { notifyAllUsers } = require('#src/modules/sk_operator/notify')
 const { oplataNotification } = require('#src/modules/oplata/oplata')
@@ -14,7 +15,20 @@ const {
 } = require('#src/modules/metrics/hachalnik/metrics')
 const { get } = require('axios')
 
-function initCronJobs(currentDateTime, instanceNumber) {
+// Храним расписание для отправки метрик
+const metricsSchedules = {}
+
+async function fetchMetricsData() {
+    try {
+        const response = await get(`${WEB_API}/metrics/get_metrica_time.php`)
+        return response.data
+    } catch (error) {
+        console.error('Ошибка при получении данных о метриках:', error)
+        return [] // Возвращаем пустой массив в случае ошибки
+    }
+}
+
+async function initCronJobs(currentDateTime, instanceNumber) {
 
     cron.schedule('0 12 * * 0', async () => {
         console.log('Запущена еженедельная задача обновления пользователей')
@@ -41,29 +55,31 @@ function initCronJobs(currentDateTime, instanceNumber) {
     }
 
     // Если METRICS_REPORT_ACTIVE = true, то запускаем задачи для отчетов о метриках
-    if (METRICS_REPORT_ACTIVE) {
-        // Schedule for DIR_METRIC at 7:30 AM every day
-        cron.schedule('30 7 * * *', async () => {
-            await metricsNotificationDirector(null, 0, DIR_METRIC)
-            console.log(
-                'Running metricsNotificationDirector() for DIR_METRIC at 7:30 AM every day',
-            )
-        })
+    if (METRICS_REPORT_ACTIVE===false) {
+        console.log('METRICS_REPORT_ACTIVE')
+        const metricsData = await fetchMetricsData()
 
-        // Schedule for DIR_OPLATA at 7:00 AM every day
-        cron.schedule('0 7 * * *', async () => {
-            await metricsNotificationDirector(null, 0, DIR_OPLATA)
-            console.log(
-                'Running metricsNotificationDirector() for DIR_OPLATA at 7:00 AM every day',
-            )
-        })
+        console.log(metricsData)
 
-        // Schedule for KISELEV at 7:00 AM every day
-        cron.schedule('30 7 * * *', async () => {
-            await metricsNotificationDirector(null, 0, KISELEV)
-            console.log(
-                'Running metricsNotificationDirector() for KISELEV at 7:00 AM every day',
-            )
+        // Обработка данных о метриках
+        metricsData.forEach(metric => {
+
+            const { user_id, metrica_time_h, metrica_time_m } = metric
+            const schedule = `${metrica_time_m} ${metrica_time_h} * * *` // Форматирование расписания
+            console.log(user_id, metrica_time_h, metrica_time_m)
+
+            // Добавляем пользователя в массив с расписанием
+            metricsSchedules[user_id] = schedule
+
+            // Запускаем cron задание для отправки метрик раз в час
+            cron.schedule('*/10 * * * * *', async () => {
+                console.log(`! Running metricsNotificationDirector() for user ${user_id} at ${schedule}`)
+                // Проверяем, есть ли пользователь в массиве
+                if (metricsSchedules[user_id]) {
+                    await metricsNotificationDirector(null, 0, user_id)
+                    console.log(`Running metricsNotificationDirector() for user ${user_id} at ${schedule}`)
+                }
+            })
         })
 
         cron.schedule('0 10 * * *', async () => {
@@ -83,13 +99,8 @@ function initCronJobs(currentDateTime, instanceNumber) {
             stateCounter.bot_check++
 
             // Получаем текущую дату и время
-            const formattedDateTime = format(currentDateTime, 'yyyy-MM-dd HH:mm:ss')
-            console.log(
-                'formattedDateTime=',
-                formattedDateTime,
-                'instanceNumber=',
-                instanceNumber,
-            )
+            const formattedDateTime = format(currentDateTime, 'yyyy-MM-dd HH:mm:ss') // Добавлено format()
+
 
             try {
                 const response = await checkBotData(formattedDateTime, instanceNumber)

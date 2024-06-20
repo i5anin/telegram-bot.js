@@ -108,3 +108,4 @@ state.db
 
 session.json
 *.csv
+session_db.json
