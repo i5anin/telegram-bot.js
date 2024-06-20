@@ -59,9 +59,10 @@ async function updateMetricsSchedules() {
 }
 
 async function initCronJobs(currentDateTime, instanceNumber) {
-    // Запускаем задачу каждые 10 секунд для обновления данных о метриках
-    cron.schedule('*/10 * * * * *', async () => {
-        console.log('Обновление данных о метриках каждые 10 секунд')
+
+    // Запускаем задачу каждый час
+    cron.schedule('0 * * * *', async () => {
+        console.log('Обновление данных о метриках каждый час')
         await updateMetricsSchedules()
     })
 
