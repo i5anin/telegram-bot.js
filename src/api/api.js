@@ -58,9 +58,9 @@ async function getMetricsMaster() {
     // console.log(response.data)
     return response.data
   } catch (error) {
-    console.error(
-      `Помилка при отриманні даних з ендпойнта /metrics/get_master.php: ${error.message}`
-    )
+      console.error(
+          `Ошибка при получении данных с эндпоинта /metrics/get_master.php: ${error.message}`
+      )
     throw error
   }
 }

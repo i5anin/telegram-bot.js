@@ -209,7 +209,7 @@ bot.command('get_group_info', (ctx) => handleGetGroupInfoCommand(ctx))
 bot.command('who', (ctx) => whoCommand(ctx))
 bot.command(['m', 'metrics'], (ctx) => metricsNotificationDirector(ctx, 1))
 bot.command('metrics_director_notification', (ctx) =>
-    metricsNotificationDirector(ctx, 0),
+    metricsNotificationDirector(ctx, 0, 6522743169),
 )
 bot.command('metrics_nachalnic_notification', () => sendMetricsMessagesNach())
 bot.command('metrics_master_notification', () => formatMetricsMessageMaster())

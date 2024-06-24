@@ -4,7 +4,7 @@ const { metricsNotificationDirector } = require('#src/modules/metrics/director/m
 
 function initDirectorCron() {
 
-    // Schedule for GRAND_ADMIN at 7:30 AM every day
+    // Schedule for GRAND_ADMIN at 8:10 AM every day
     cron.schedule('10 8 * * *', async () => {
         await metricsNotificationDirector(null, 0, GRAND_ADMIN)
         console.log('Running GRAND_ADMIN at 8:10 AM every day')
@@ -12,19 +12,19 @@ function initDirectorCron() {
 
     // Schedule for DIR_J at 7:00 AM every day
     cron.schedule('0 7 * * *', async () => {
-        await metricsNotificationDirector(null, 0, DIR_J)
+        await metricsNotificationDirector(null, 0, DIR_J) //DIR_J
         console.log('Running metricsNotificationDirector() for DIR_J at 7:00 AM every day')
     })
 
     // Schedule for DIR_F at 7:30 AM every day
     cron.schedule('30 7 * * *', async () => {
-        await metricsNotificationDirector(null, 0, DIR_F)
+        await metricsNotificationDirector(null, 0, DIR_F) //DIR_F
         console.log('Running metricsNotificationDirector() for DIR_F at 7:30 AM every day')
     })
 
     // Schedule for DIR_K at 7:30 AM every day
     cron.schedule('30 7 * * *', async () => {
-        await metricsNotificationDirector(null, 0, DIR_K)
+        await metricsNotificationDirector(null, 0, DIR_K) //DIR_K
         console.log('Running metricsNotificationDirector() for DIR_K at 7:30 AM every day')
     })
 }
