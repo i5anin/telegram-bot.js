@@ -64,8 +64,22 @@ async function payments(ctx) {
       ? ruLang.paymentsOperator(paymentData)
       : ruLang.payments(paymentData)
 
+    // Добавляем кнопку "Показать формулу"
+    const keyboard = [
+      [
+        {
+          text: 'Показать формулу',
+          callback_data: 'show_formula'
+        }
+      ]
+    ]
     // Отправляем сообщение напрямую пользователю
-    await ctx.telegram.sendMessage(userId, message, { parse_mode: 'HTML' })
+    await ctx.telegram.sendMessage(userId, message, {
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: keyboard
+      }
+    })
     await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, {
       parse_mode: 'HTML'
     })
@@ -86,4 +100,38 @@ async function payments(ctx) {
   }
 }
 
-module.exports = { payments }
+// Обработчик нажатия на кнопку "Показать формулу"
+async function handleFormulaButton(ctx) {
+  try {
+    const userId = ctx.update.callback_query.from.id // Получаем userId вызвавшего пользователя
+    const paymentData = await getLastPaymentForUser(userId, dateForRequest) // Получаем данные о последнем платеже
+
+    if (paymentData) {
+      const formula = paymentData.operator_type
+        ? ruLang.formulaOperator(paymentData)
+        : ruLang.formula(paymentData)
+      await ctx.telegram.sendMessage(userId, formula, { parse_mode: 'HTML' })
+    } else {
+      await ctx.telegram.sendMessage(
+        userId,
+        'Информация о зарплате недоступна.'
+      )
+    }
+  } catch (error) {
+    const logMessageToSend = {
+      user_id: ctx.update.callback_query.from.id.toString(),
+      text: JSON.stringify(error),
+      error: 1,
+      ok: 0,
+      test: process.env.NODE_ENV === 'build' ? 0 : 1
+    }
+    await sendLogData(logMessageToSend)
+    await ctx.telegram.sendMessage(
+      ctx.update.callback_query.from.id,
+      `Произошла ошибка при отображении формулы: ${error}`
+    )
+    console.error(`Внутренняя ошибка сервера: ${error}`)
+  }
+}
+
+module.exports = { payments, handleFormulaButton }
