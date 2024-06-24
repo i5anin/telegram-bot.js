@@ -20,6 +20,33 @@ const operatorTypeMapping = { f: 'Фрезер', t: 'Токарь' }
 const moment = require('moment')
 const { formatNumber } = require('#src/modules/sk_operator/helpers')
 
+function calculateAndFormatPaymentInfo(paymentData) {
+  // Вычисляем долю от прибыли
+  const partOfProfit = (paymentData.grade * paymentData.work_hours) / 168
+  const formattedPartOfProfit = partOfProfit.toFixed(2)
+
+  // Вычисляем ЗП
+  const salary = (paymentData.vvp / paymentData.part_sum) * partOfProfit
+  const formattedSalary = formatNumber(salary.toFixed(2))
+
+  // Формируем строку
+  return (
+    '<b>Формула:</b>\n' +
+    'Доля от прибыли = Грейд * Отработанные часы / 168\n' +
+    'Ваша чистая прибыль на сегодня = ВП / Сумма долей * Доля от прибыли\n' +
+    '\n' +
+    `• Грейд: <b>${paymentData.grade.toFixed(2)}</b>\n` +
+    `• Отработанные часы: <b>${formatNumber(paymentData.work_hours)}</b>\n` +
+    `• ВП: <b>${formatNumber(paymentData.vvp)}</b>\n` +
+    `• Сумма долей: <b>${paymentData.part_sum.toFixed(2)}</b>\n` +
+    `• Доля от прибыли: <b>${formattedPartOfProfit}</b>\n` +
+    '• Стандартное количество часов: <b>168</b>\n' +
+    '\n' +
+    `Доля от прибыли:\n<b>${paymentData.grade.toFixed(2)} * ${formatNumber(paymentData.work_hours)} / 168 = <u>${formattedPartOfProfit}</u></b>\n` +
+    `Ваша чистая прибыль на сегодня:\n<b>${formatNumber(paymentData.vvp)} / ${paymentData.part_sum.toFixed(2)} * ${formattedPartOfProfit} = <u>${formattedSalary}</u></b>\n`
+  )
+}
+
 module.exports = {
   payments: (paymentData) =>
     `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio} (${paymentData.grade_info || ''})</b>\n` +
@@ -53,10 +80,5 @@ module.exports = {
     '</blockquote>' +
     `📈 Ваша чистая прибыль на сегодня: <tg-spoiler><b>${formatNumber(paymentData.payment * (1 - 0.13))}</b></tg-spoiler>\u00A0₽\n`,
 
-  formula: (paymentData) =>
-    '<b>Формула:</b>\n' +
-    'ЗП\u00A0= ВП\u00A0/\u00A0Сумма долей\u00A0*\u00A0Доля\u00A0от\u00A0прибыли\n' +
-    'Доля\u00A0от\u00A0прибыли = Грейд\u00A0*\u00A0Отработанные\u00A0часы\u00A0/\u00A0168\n' +
-    `Сумма долей: <b>${paymentData.part_sum.toFixed(2)}</b>\n` +
-    `Доля от прибыли: <b>${paymentData.part.toFixed(2)}</b>`
+  formula: (paymentData) => calculateAndFormatPaymentInfo(paymentData)
 }
