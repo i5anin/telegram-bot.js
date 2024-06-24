@@ -23,12 +23,14 @@ const { formatNumber } = require('#src/modules/sk_operator/helpers')
 function calculateAndFormatPaymentInfo(paymentData) {
   // Вычисляем долю от прибыли
   const partOfProfit = (paymentData.grade * paymentData.work_hours) / 168
-  const formattedPartOfProfit = partOfProfit.toFixed(2)
+  const formattedPartOfProfit = partOfProfit.toFixed(5) // Увеличим точность округления
 
   // Вычисляем ЗП
   const salary = ((paymentData.vvp * 0.2) / paymentData.part_sum) * partOfProfit
-  const formattedSalary = formatNumber(salary.toFixed(2))
-  const formattedSalaryVAT = formatNumber(salary.toFixed(2) * (1 - 0.13))
+  const formattedSalary = formatNumber(salary.toFixed(5)) // Увеличим точность округления
+  const formattedSalaryVAT = formatNumber(
+    (salary.toFixed(5) * (1 - 0.13)).toFixed(2)
+  ) // Здесь округление до 2 знаков после запятой
 
   // Формируем строку
   return (
@@ -44,8 +46,8 @@ function calculateAndFormatPaymentInfo(paymentData) {
     '• Стандартное количество часов: <b>168</b>\n' +
     '\n' +
     `Доля от прибыли:\n<b>${paymentData.grade.toFixed(2)} * ${formatNumber(paymentData.work_hours)} / 168 = <u>${formattedPartOfProfit}</u></b>\n` +
-    `Ваша чистая прибыль на сегодня:\n<b>${formatNumber(paymentData.vvp * 0.2)} / ${paymentData.part_sum.toFixed(2)} * ${formattedPartOfProfit} = ${formattedSalary}</b>\n` +
-    `С НДС: <b><u>${formattedSalaryVAT}</u></b>\n`
+    `Ваша чистая прибыль на сегодня:\n<b>${formatNumber(paymentData.vvp * 0.2)} / ${paymentData.part_sum.toFixed(2)} * ${formattedPartOfProfit} = ${formatNumber(paymentData.payment) || formattedSalary}</b>\n` +
+    `С НДС: <b><u>${formatNumber(paymentData.payment * (1 - 0.13)) || formattedSalaryVAT}</u></b>\n`
   )
 }
 
