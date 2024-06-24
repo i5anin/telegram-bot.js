@@ -24,6 +24,19 @@ async function getLastPaymentForUser(userId, date) {
   }
 }
 
+function getDateForRequest() {
+  const today = new Date()
+  const day = today.getDate()
+  let dateForRequest =
+    day >= 10
+      ? today.toISOString().slice(0, 10)
+      : new Date(today.getFullYear(), today.getMonth(), 1) // 1 последний день 0 предпоследний
+          .toISOString()
+          .slice(0, 10) // Получаем последний день предыдущего месяца
+  console.log(dateForRequest)
+  return dateForRequest
+}
+
 // Основная функция для обработки команды
 async function payments(ctx) {
   try {
@@ -41,16 +54,7 @@ async function payments(ctx) {
       return
     }
 
-    const today = new Date()
-    const day = today.getDate()
-    let dateForRequest =
-      day >= 10
-        ? today.toISOString().slice(0, 10)
-        : new Date(today.getFullYear(), today.getMonth(), 1) // 1 последний день 0 предпоследний
-            .toISOString()
-            .slice(0, 10) // Получаем последний день предыдущего месяца
-
-    const paymentData = await getLastPaymentForUser(userId, dateForRequest)
+    const paymentData = await getLastPaymentForUser(userId, getDateForRequest())
 
     if (!paymentData) {
       await ctx.telegram.sendMessage(
@@ -104,13 +108,13 @@ async function payments(ctx) {
 async function handleFormulaButton(ctx) {
   try {
     const userId = ctx.update.callback_query.from.id // Получаем userId вызвавшего пользователя
-    const paymentData = await getLastPaymentForUser(userId, dateForRequest) // Получаем данные о последнем платеже
+    const paymentData = await getLastPaymentForUser(userId, getDateForRequest()) // Получаем данные о последнем платеже
 
     if (paymentData) {
-      const formula = paymentData.operator_type
-        ? ruLang.formulaOperator(paymentData)
-        : ruLang.formula(paymentData)
-      await ctx.telegram.sendMessage(userId, formula, { parse_mode: 'HTML' })
+      // Выводим формулу с paymentData в скобках
+      await ctx.telegram.sendMessage(userId, ruLang.formula(paymentData), {
+        parse_mode: 'HTML'
+      })
     } else {
       await ctx.telegram.sendMessage(
         userId,
