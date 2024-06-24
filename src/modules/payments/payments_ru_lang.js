@@ -54,7 +54,7 @@ function calculateAndFormatPaymentInfo(paymentData) {
 module.exports = {
   payments: (paymentData) =>
     `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio} (${paymentData.grade_info || ''})</b>\n` +
-    `<b>${paymentData.post || ''} ${operatorTypeMapping[paymentData.operator_type] || ''}</b>\n` +
+    `<b>${paymentData.post || ''} ${paymentData.operator_type ? `(${operatorTypeMapping[paymentData.operator_type]})` : ''}</b>\n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
     `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
@@ -67,7 +67,7 @@ module.exports = {
 
   paymentsOperator: (paymentData) =>
     `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio} (${paymentData.grade_info || ''})</b>\n` +
-    `<b>${paymentData.post || ''} ${operatorTypeMapping[paymentData.operator_type] || ''}</b>\n` +
+    `<b>${paymentData.post || ''} ${paymentData.operator_type ? `(${operatorTypeMapping[paymentData.operator_type]})` : ''}</b>\n` +
     `Дата: <b>${moment(paymentData.date, 'YYYY-MM-DD').format('DD.MM.YYYY')}</b> \n` +
     '<blockquote>' +
     `Рейтинг:  <b>${paymentData.rating_good}\u00A0</b>из<b>\u00A0${paymentData.group_count}\u00A0</b>ЦКП:<b>\u00A0${paymentData.kpi_good}</b>\n` +
