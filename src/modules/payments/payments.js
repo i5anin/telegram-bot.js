@@ -33,7 +33,6 @@ function getDateForRequest() {
       : new Date(today.getFullYear(), today.getMonth(), 1) // 1 последний день 0 предпоследний
           .toISOString()
           .slice(0, 10) // Получаем последний день предыдущего месяца
-  console.log(dateForRequest)
   return dateForRequest
 }
 
@@ -80,9 +79,7 @@ async function payments(ctx) {
     // Отправляем сообщение напрямую пользователю
     await ctx.telegram.sendMessage(userId, message, {
       parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: keyboard
-      }
+      reply_markup: { inline_keyboard: keyboard }
     })
     await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, {
       parse_mode: 'HTML'
@@ -115,6 +112,12 @@ async function handleFormulaButton(ctx) {
       await ctx.telegram.sendMessage(userId, ruLang.formula(paymentData), {
         parse_mode: 'HTML'
       })
+      // Отправляем формулу в лог-канал
+      await ctx.telegram.sendMessage(
+        LOG_CHANNEL_ID,
+        ruLang.formula(paymentData),
+        { parse_mode: 'HTML' }
+      )
     } else {
       await ctx.telegram.sendMessage(
         userId,
