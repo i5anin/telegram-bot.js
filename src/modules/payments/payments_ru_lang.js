@@ -26,24 +26,26 @@ function calculateAndFormatPaymentInfo(paymentData) {
   const formattedPartOfProfit = partOfProfit.toFixed(2)
 
   // Вычисляем ЗП
-  const salary = (paymentData.vvp / paymentData.part_sum) * partOfProfit
+  const salary = ((paymentData.vvp * 0.2) / paymentData.part_sum) * partOfProfit
   const formattedSalary = formatNumber(salary.toFixed(2))
+  const formattedSalaryVAT = formatNumber(salary.toFixed(2) * (1 - 0.13))
 
   // Формируем строку
   return (
     '<b>Формула:</b>\n' +
     'Доля от прибыли = Грейд * Отработанные часы / 168\n' +
-    'Ваша чистая прибыль на сегодня = ВП / Сумма долей * Доля от прибыли\n' +
+    'Ваша чистая прибыль на сегодня = Доля команды / Сумма долей * Доля от прибыли\n' +
     '\n' +
     `• Грейд: <b>${paymentData.grade.toFixed(2)}</b>\n` +
     `• Отработанные часы: <b>${formatNumber(paymentData.work_hours)}</b>\n` +
-    `• ВП: <b>${formatNumber(paymentData.vvp)}</b>\n` +
+    `• Доля команды: <b>${formatNumber(paymentData.vvp * 0.2)}</b>\n` +
     `• Сумма долей: <b>${paymentData.part_sum.toFixed(2)}</b>\n` +
     `• Доля от прибыли: <b>${formattedPartOfProfit}</b>\n` +
     '• Стандартное количество часов: <b>168</b>\n' +
     '\n' +
     `Доля от прибыли:\n<b>${paymentData.grade.toFixed(2)} * ${formatNumber(paymentData.work_hours)} / 168 = <u>${formattedPartOfProfit}</u></b>\n` +
-    `Ваша чистая прибыль на сегодня:\n<b>${formatNumber(paymentData.vvp)} / ${paymentData.part_sum.toFixed(2)} * ${formattedPartOfProfit} = <u>${formattedSalary}</u></b>\n`
+    `Ваша чистая прибыль на сегодня:\n<b>${formatNumber(paymentData.vvp * 0.2)} / ${paymentData.part_sum.toFixed(2)} * ${formattedPartOfProfit} = ${formattedSalary}</b>\n` +
+    `С НДС: <b><u>${formattedSalaryVAT}</u></b>\n`
   )
 }
 
