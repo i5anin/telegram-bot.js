@@ -79,9 +79,7 @@ async function payments(ctx) {
     // Отправляем сообщение напрямую пользователю
     await ctx.telegram.sendMessage(userId, message, {
       parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: keyboard
-      }
+      reply_markup: { inline_keyboard: keyboard }
     })
     await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, {
       parse_mode: 'HTML'
