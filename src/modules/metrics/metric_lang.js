@@ -55,33 +55,33 @@ module.exports = {
     `${emoji.point} <b>Дата:</b> <code>${formattedDate}</code>\n\n`,
   formatMetricsMessage: (latestMetrics, maxCharacters) =>
     `Дата: <b>${moment(latestMetrics.date, 'YYYY-MM-DD HH:mm:ss').format('DD.MM.YYYY HH:mm:ss')}</b>\n\n` +
-    `Незавершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b>\u00A0₽\n` +
-    '<blockquote>' +
-    `Cлесарка: ${checkWarningAndFormat(latestMetrics.prod_price_sles, 'Слесарка')}` + // Слесарка меньше или равно 3 400 000
-    `ОТК: ${checkWarningAndFormat(latestMetrics.prod_price_otk, 'ОТК')}` + // ОТК меньше или равно 1 700 000
-    `Упаковка: ${checkWarningAndFormat(latestMetrics.prod_price_upk, 'Упаковка')}` + // Упаковка меньше или равно 1 700 000
-    `Доработка ЧПУ: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka)}` +
-    `Доработка слес.: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka_sles)}` +
-    `Согл.: ${checkWarningAndFormat(latestMetrics.prod_price_sogl)}` +
-    '</blockquote>' +
-    `Итого вн. производства: <b>${formatNumber(latestMetrics.prod_price)}</b>\u00A0₽\n` +
-    `Ожидаемая предоплата на текущий и следующий месяц: <b>${formatNumber(latestMetrics.predoplata)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
-    `Сумма будущих заказов на текущий и следующий месяц: <b>${formatNumber(latestMetrics.portfolio)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
-    `Итого вн. производства: <b>${formatNumber(latestMetrics.total_price)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
-    `Готовая продукция склад: <b>${formatNumber(latestMetrics.total_sklad_gp)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n\n` +
-    '<b><u>Отклонение от плана</u></b>\n' +
-    `<code>${formatPercentage(latestMetrics.cumulative_sklad_month, maxCharacters)}</code> Производство\n` +
-    `<code>${formatPercentage(latestMetrics.cumulative_brak_month, maxCharacters)}</code> Брак\n` +
-    `<code>${formatPercentage(latestMetrics.cumulative_manager_month, maxCharacters)}</code> Отдел продаж\n\n` +
-    '<b><u>Воронка</u></b>\n' +
-    `<code>${formatPercentage(latestMetrics.prod, maxCharacters)}</code> Производство\n` +
-    `<code>${formatPercentage(latestMetrics.sles, maxCharacters)}</code> Слесарный участок\n` +
-    `<code>${formatPercentage(latestMetrics.otk, maxCharacters)}</code> ОТК\n` +
-    `<code>${formatPercentage(latestMetrics.upk, maxCharacters)}</code> Упаковка\n\n` +
-    `Прод. оборудования: <b>${formatNumber(latestMetrics.productivity_prod)}</b>\u00A0₽/час\n` +
-    `Прод. производства: <b>${formatNumber(latestMetrics.productivity)}</b>\u00A0₽/час\n` +
-    `Отгрузка М/О: <b>${formatNumber(latestMetrics.get_sum_otgr_prod)}</b>\u00A0₽\n` +
-    `Отгрузка: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n`,
+      `Незавершённое по М/О: <b>${formatNumber(latestMetrics.prod_price_mzp)}</b>\u00A0₽\n` +
+      '<blockquote>' +
+      `Cлесарка: ${checkWarningAndFormat(latestMetrics.prod_price_sles, 'Слесарка')}` + // Слесарка меньше или равно 3 400 000
+      `ОТК: ${checkWarningAndFormat(latestMetrics.prod_price_otk, 'ОТК')}` + // ОТК меньше или равно 1 700 000
+      `Упаковка: ${checkWarningAndFormat(latestMetrics.prod_price_upk, 'Упаковка')}` + // Упаковка меньше или равно 1 700 000
+      `Доработка ЧПУ: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka)}` +
+      `Доработка слес.: ${checkWarningAndFormat(latestMetrics.prod_price_dorabotka_sles)}` +
+      `Согл.: ${checkWarningAndFormat(latestMetrics.prod_price_sogl)}` +
+      '</blockquote>' +
+      `Итого вн. производства: <b>${formatNumber(latestMetrics.prod_price)}</b>\u00A0₽\n` +
+      `Ожидаемая предоплата на текущий и следующий месяц: <b>${formatNumber(latestMetrics.predoplata)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
+      `Сумма будущих заказов на текущий и следующий месяц: <b>${formatNumber(latestMetrics.portfolio)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
+      `Итого вн. производства: <b>${formatNumber(latestMetrics.total_price)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n` +
+      `Готовая продукция склад: <b>${formatNumber(latestMetrics.total_sklad_gp)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n\n` +
+      '<b><u>Отклонение от плана</u></b>\n' +
+      `<code>${formatPercentage(latestMetrics.cumulative_sklad_month, maxCharacters)}</code> Производство\n` +
+      `<code>${formatPercentage(latestMetrics.cumulative_brak_month, maxCharacters)}</code> Брак\n` +
+      `<code>${formatPercentage(latestMetrics.cumulative_manager_month, maxCharacters)}</code> Отдел продаж\n\n` +
+      '<b><u>Воронка</u></b>\n' +
+      `<code>${formatPercentage(latestMetrics.prod, maxCharacters)}</code> Производство\n` +
+      `<code>${formatPercentage(latestMetrics.sles, maxCharacters)}</code> Слесарный участок\n` +
+      `<code>${formatPercentage(latestMetrics.otk, maxCharacters)}</code> ОТК\n` +
+      `<code>${formatPercentage(latestMetrics.upk, maxCharacters)}</code> Упаковка\n\n` +
+      `Прод. оборудования: <b>${formatNumber(latestMetrics.productivity_prod)}</b>\u00A0₽/час\n` +
+      `Прод. производства: <b>${formatNumber(latestMetrics.productivity)}</b>\u00A0₽/час\n` +
+      `Отгрузка М/О: <b>${formatNumber(latestMetrics.get_sum_otgr_prod)}</b>\u00A0₽\n` +
+      `Отгрузка: <b>${formatNumber(latestMetrics.get_sum_otgr)}</b>\u00A0₽\u00A0<tg-spoiler>с\u00A0НДС</tg-spoiler>\n`,
 
   formatMetricsMessageNach: (metrics, period) =>
     `${emoji.tech} <b><u>Загрузка ${period}</u></b>\n` +
