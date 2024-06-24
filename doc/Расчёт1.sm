@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?application progid="SMath Studio настольная" version="1.1.8763.0"?>
+<worksheet xmlns="http://smath.info/schemas/worksheet/1.0">
+  <settings ppi="112">
+    <identity>
+      <id>f0e0aab1-80d2-4b74-8876-750e86e941cf</id>
+      <revision>2</revision>
+    </identity>
+    <calculation>
+      <precision>4</precision>
+      <exponentialThreshold>5</exponentialThreshold>
+      <trailingZeros>false</trailingZeros>
+      <significantDigitsMode>false</significantDigitsMode>
+      <roundingMode>0</roundingMode>
+      <approximateEqualAccuracy>0</approximateEqualAccuracy>
+      <fractions>decimal</fractions>
+    </calculation>
+    <pageModel active="false" viewMode="2" printGrid="false" printAreas="true" simpleEqualsOnly="false" printBackgroundImages="true">
+      <paper id="9" orientation="Portrait" width="827" height="1169" />
+      <margins left="39" right="39" top="49" bottom="49" />
+      <header alignment="Center" color="#a9a9a9">&amp;[DATE] &amp;[TIME] - &amp;[FILENAME]</header>
+      <footer alignment="Center" color="#a9a9a9">&amp;[PAGENUM] / &amp;[COUNT]</footer>
+      <backgrounds />
+    </pageModel>
+    <dependencies>
+      <assembly name="SMath Studio настольная" version="1.1.8763.0" guid="a37cba83-b69c-4c71-9992-55ff666763bd" />
+      <assembly name="MathRegion" version="1.11.8763.0" guid="02f1ab51-215b-466e-a74d-5d8b1cf85e8d" />
+      <assembly name="TextRegion" version="1.11.8763.0" guid="485d28c5-349a-48b6-93be-12a35a1c1e39" />
+    </dependencies>
+  </settings>
+  <regions type="content">
+    <region left="45" top="27" width="102" height="24" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">Грейд</e>
+          <e type="operand">1.15</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="45" top="54" width="181" height="25" color="#000000" fontSize="10">
+      <text lang="rus" fontFamily="Arial" fontSize="10">
+        <content>
+          <p>\[REGION[46fa4dd97df047fea894bd4bd5f5d684]]\</p>
+        </content>
+        <regions>
+          <region id="46fa4dd97df047fea894bd4bd5f5d684" left="2" top="0" width="174" height="24" color="#000000" fontSize="10">
+            <math>
+              <input>
+                <e type="operand">ОтработанныеЧасы</e>
+                <e type="operand">72</e>
+                <e type="operator" args="2">:</e>
+              </input>
+            </math>
+          </region>
+        </regions>
+      </text>
+    </region>
+    <region left="45" top="81" width="181" height="25" color="#000000" fontSize="10">
+      <text lang="rus" fontFamily="Arial" fontSize="10">
+        <content>
+          <p>\[REGION[b9b7b3aa469047bb8ee6a3d8a8af4ad4]]\</p>
+        </content>
+        <regions>
+          <region id="b9b7b3aa469047bb8ee6a3d8a8af4ad4" left="2" top="0" width="174" height="24" color="#000000" fontSize="10">
+            <math>
+              <input>
+                <e type="operand">ДоляКоманды</e>
+                <e type="operand">8498340</e>
+                <e type="operator" args="2">:</e>
+              </input>
+            </math>
+          </region>
+        </regions>
+      </text>
+    </region>
+    <region left="45" top="108" width="157" height="25" color="#000000" fontSize="10">
+      <text lang="rus" fontFamily="Arial" fontSize="10">
+        <content>
+          <p>\[REGION[bd60518a3ed4426999f6c6d9aa8e2d2a]]\</p>
+        </content>
+        <regions>
+          <region id="bd60518a3ed4426999f6c6d9aa8e2d2a" left="2" top="0" width="150" height="24" color="#000000" fontSize="10">
+            <math>
+              <input>
+                <e type="operand">СуммаДолей</e>
+                <e type="operand">93.71</e>
+                <e type="operator" args="2">:</e>
+              </input>
+            </math>
+          </region>
+        </regions>
+      </text>
+    </region>
+    <region left="45" top="162" width="250" height="42" color="#000000" fontSize="10">
+      <text lang="rus" fontFamily="Arial" fontSize="10">
+        <content>
+          <p>\[REGION[b6f4111a69394678a887092d6792a8d7]]\</p>
+        </content>
+        <regions>
+          <region id="b6f4111a69394678a887092d6792a8d7" left="2" top="0" width="243" height="41" color="#000000" fontSize="10">
+            <math>
+              <input>
+                <e type="operand">ДоляПрибыли</e>
+                <e type="operand">1.15</e>
+                <e type="operand">72</e>
+                <e type="operator" args="2">*</e>
+                <e type="operand">168</e>
+                <e type="operator" args="2">/</e>
+                <e type="operator" args="2">:</e>
+              </input>
+              <result action="numeric">
+                <e type="operand">0.4929</e>
+              </result>
+            </math>
+          </region>
+        </regions>
+      </text>
+    </region>
+    <region left="387" top="162" width="158" height="24" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">ДоляПрибыли2</e>
+          <e type="operand">0.49</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="45" top="216" width="301" height="41" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">ВП</e>
+          <e type="operand">8498340</e>
+          <e type="operand">93.71</e>
+          <e type="operator" args="2">/</e>
+          <e type="operand">ДоляПрибыли</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">:</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">44696.0577</e>
+        </result>
+      </math>
+    </region>
+    <region left="387" top="216" width="317" height="41" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">ВП2</e>
+          <e type="operand">8498340</e>
+          <e type="operand">93.71</e>
+          <e type="operator" args="2">/</e>
+          <e type="operand">ДоляПрибыли2</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">:</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">44436.9502</e>
+        </result>
+      </math>
+    </region>
+    <region left="387" top="270" width="118" height="24" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">ВП3</e>
+          <e type="operand">44436.95</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="45" top="288" width="243" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">НДС</e>
+          <e type="operand">ВП</e>
+          <e type="operand">1</e>
+          <e type="operand">0.13</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">:</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">38885.5702</e>
+        </result>
+      </math>
+    </region>
+    <region left="387" top="315" width="259" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">НДС2</e>
+          <e type="operand">ВП3</e>
+          <e type="operand">1</e>
+          <e type="operand">0.13</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">:</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">38660.1465</e>
+        </result>
+      </math>
+    </region>
+  </regions>
+</worksheet>
