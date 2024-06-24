@@ -83,7 +83,6 @@ async function payments(ctx) {
         inline_keyboard: keyboard
       }
     })
-    console.log(LOG_CHANNEL_ID, message)
     await ctx.telegram.sendMessage(LOG_CHANNEL_ID, message, {
       parse_mode: 'HTML'
     })
