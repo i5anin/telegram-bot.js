@@ -67,11 +67,11 @@ async function payments(ctx) {
       ? ruLang.paymentsOperator(paymentData)
       : ruLang.payments(paymentData)
 
-    // Добавляем кнопку "Показать формулу"
+    // Добавляем кнопку "Показать расчёт"
     const keyboard = [
       [
         {
-          text: 'Показать формулу',
+          text: 'Показать расчёт',
           callback_data: 'show_formula'
         }
       ]
@@ -101,7 +101,7 @@ async function payments(ctx) {
   }
 }
 
-// Обработчик нажатия на кнопку "Показать формулу"
+// Обработчик нажатия на кнопку "Показать расчёт"
 async function handleFormulaButton(ctx) {
   try {
     const userId = ctx.update.callback_query.from.id // Получаем userId вызвавшего пользователя
