@@ -36,8 +36,8 @@ function calculateAndFormatPaymentInfo(paymentData) {
     return (
         '<b>Формула:</b>\n' +
         '◉ Доля от прибыли = Грейд * Отработанные часы / 168\n' +
-        '◉ Рачёт = Доля команды / Сумма долей * Доля от прибыли\n' +
-        '◉ Ваша чистая прибыль на сегодня = Рачёт - 13%\n' +
+        '◉ До вычета налога = Доля команды / Сумма долей * Доля от прибыли\n' +
+        '◉ Ваша чистая прибыль на сегодня = До вычета налога - 13%\n' +
         '\n' +
         '<b>Расчёт:</b>\n' +
         `• Грейд: <b>${paymentData.grade.toFixed(2)}</b>\n` +
@@ -48,7 +48,7 @@ function calculateAndFormatPaymentInfo(paymentData) {
         '• Стандартное количество часов: <b>168</b>\n' +
         '\n' +
         `∙ Доля от прибыли:\n<b>${paymentData.grade.toFixed(2)} * ${formatNumber(paymentData.work_hours)} / 168 = <u>${formattedPartOfProfit}</u></b>\n` +
-        `∙ Расчёт:\n<b>${formatNumber(paymentData.vvp * 0.2)} / ${paymentData.part_sum.toFixed(2)} * ${formattedPartOfProfit} = ${formatNumber(paymentData.payment) || formattedSalary} ₽</b>\n` +
+        `∙ До вычета налога:\n<b>${formatNumber(paymentData.vvp * 0.2)} / ${paymentData.part_sum.toFixed(2)} * ${formattedPartOfProfit} = ${formatNumber(paymentData.payment) || formattedSalary} ₽</b>\n` +
         `∙ Ваша чистая прибыль на сегодня: <b><u>${formatNumber(paymentData.payment * (1 - 0.13)) || formattedSalaryVAT}</u> ₽</b>\n`
     )
 }
