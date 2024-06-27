@@ -65,7 +65,7 @@ module.exports = {
         `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
         `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\u00A0\u00A0\n` +
         '</blockquote>' +
-        `📈 Ваша чистая прибыль на сегодня: <tg-spoiler><b>${formatNumber(paymentData.payment * (1 - 0.13))}</b></tg-spoiler>\u00A0₽\n`,
+        `📈 Ваша чистая прибыль на сегодня: <u><b>${formatNumber(paymentData.payment * (1 - 0.13))}</b></u>\u00A0₽\n`,
 
     paymentsOperator: (paymentData) =>
         `<b>${getColorEmoji(paymentData.color)} ${paymentData.fio} (${paymentData.grade_info || ''})</b>\n` +
@@ -84,7 +84,7 @@ module.exports = {
         `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
         `ВП:\u00A0\u00A0<b>${formatNumber(paymentData.vvp)}</b>\u00A0₽\u00A0\u00A0\n` +
         '</blockquote>' +
-        `📈 Ваша чистая прибыль на сегодня: <tg-spoiler><b>${formatNumber(paymentData.payment * (1 - 0.13))}</b></tg-spoiler>\u00A0₽\n`,
+        `📈 Ваша чистая прибыль на сегодня: <u><b>${formatNumber(paymentData.payment * (1 - 0.13))}</b></u>\u00A0₽\n`,
 
     formula: (paymentData) => calculateAndFormatPaymentInfo(paymentData),
 }
