@@ -76,9 +76,9 @@ module.exports = {
         `Рейтинг Качества:  <b>${paymentData.rating_brak}\u00A0</b>из<b>\u00A0${paymentData.group_count}\u00A0</b>Брак:<b>\u00A0${paymentData.kpi_brak}</b>\n` +
         `Отработанные часы:  <b>${formatNumber(paymentData.work_hours)}</b>\n` +
         `Грейд: <b>${paymentData.grade.toFixed(2)}</b>\n\n` +
-        `Смена:\u00A0\u00A0<b>${paymentData.smena}</b>\u00A0` +
-        `ЦКП:\u00A0\u00A0<b>${formatNumber(paymentData.kpi)}</b>\u00A0` +
-        `Рейтинг:\u00A0\u00A0<b>${paymentData.rating_pos}</b>\n` +
+        `Смена:\u00A0<b>${paymentData.smena}</b>\u00A0\u00A0` +
+        `ЦКП:\u00A0<b>${formatNumber(paymentData.kpi)}</b>\u00A0\u00A0` +
+        `Рейтинг:\u00A0<b>${paymentData.rating_pos}</b>\n` +
         `Отклонение от цели участка ЧПУ:\u00A0\u00A0<b>${paymentData.prod_diff.toFixed(2)}</b>\u00A0%\n\n` +
         `Потенциальный рост дохода:\u00A0\u00A0<b>${paymentData.payments_diff.toFixed(2)}</b>\u00A0%\n` +
         `Доля команды:\u00A0\u00A0<b>${formatNumber(paymentData.vvp * 0.2)}</b>\u00A0₽\n` +
